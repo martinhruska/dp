@@ -30,37 +30,54 @@ It proves the program in standard mathematical way -- starting from axioms and p
 verify the properties of a given system.
 Theorem proving could be more or less automated.
 
-This thesis deals with specific part of static analysis focused on verification of the programs manipulating
+This thesis deals with specific part of static analysis called shape analysis which is focused to verification of the programs manipulating
 complex data structures (like a different kinds of lists and trees) allocated on the heap.
 The properties checked for this class of programs are for example checking whether no dangling
 pointers are dereferenced (no invalid dereference), whether all allocated memory on a heap is also freed (no memory leaks)
 a program exuction or whether there is not dealocated pointer which has not have assigned memory (no invalid free).
-There are different approaches to this kind of static analysis.
-One approach is based on separation logic (some citations here) which has yet some successful implementation \cite{predator} which has been
-evaluated on SV-Comp benchmark \cite{svcomp}.
-Another approach is automata based, more precisly based on concept of \emph{Forest automata} and this one
-will be main topic of this thesis.
+There are different approaches to this kind of static analysis with the different advantages.
+For example approach based on \emph{seperation logic} brings scalability to a verification procedure.
+On the other side, automata based approach, conceretly \emph{abstract tree regular model checking}, is
+superior in flexibility.
+However, this theisis will be focused to a verification procedure employing concept of Forest automata (FA) which tries
+to synthetize benefits of the mentioned approaches.
 
-The Forest automata has been introduced in \cite{forester} and implemented in tool called \emph{Forester} (appeared on SV-Comp 15).
+Forest automata has been introduce in \cite{forester} and they are extension of finite automata or more precisly finite tree automata.
+They are used as abstract domain in this verification procedure.
+Basically, the verification procudere based on FA is perforing symbolic execution of a verified program and
+FA serves here as the abstract domain.
+A prototype of this verification procedure has been implemented in tool called \emph{Forester}.
+Forester verifies programs in language C and it can detect invalid dereferences, invalid free, memory leaks and also reachability of an error label.
+It is yet able to verify non-trivial data structures like skiplist of the second and the third level
+but there is still room for improvement, e.g. by extending support of C language.
 
+The main topic of this topic is improvement of Forester tool.
+Since FA are highly related to finite tree automata (TA) the first of goal is to connect
+Forester with VATA library -- state-of-the-art library for TA manipulation.
+Particulary, this consists creating of an interface between Forester and VATA to employ VATA as TA library for Forester backend.
+The second goal of this thesis is to implement \emph{backward run} for Forester what enables checking spuriousness of an error found in program.
+The error could be spurous because of used to high abstraction over FA domain but the information get by backward could be used for refinment of \emph{predicate abstraction}
+what is one kind of abstraction used in Forester (another one is \emph{height abstraction}.
+It was also not possible to fully test predicate abstraction because of absence of backward run implementation
+so a part of this goal is to complete and test implementation of predicate abstraction.
 
+A structure of this theisi will be following.
+In Chapter \ref{ch:prel} will be given definitions of preliminaries for further text.
+Chapter \ref{ch:tools} provides description of VATA library and Forester tool.
+General principle of backward run and predicate abstract is given in Chapter \label{ch:pred} and their
+application for verification based on FA is described in Chapter \label{ch:backwar}.
+Chapter \ref{ch:impl} provides description of implementation and finally Chapter \ref{ch:eval} is about evalutation.
 \cite{Knuth}
 
-formal verification
-
-complex data structure and memory safety
-
-forester and vata
-
-outline
-
 \chapter{Preliminaries}
+\label{ch:prel}
 
 \section{Graphs and Languages}
 \section{Tree Automata}
 \section{Forest Automata}
 
 \chapter{VATA and Forester}
+\label{ch:tools}
 
 \section{VATA}
 
@@ -69,18 +86,23 @@ outline
 \section{Other Tools}
 
 \chapter{??Predicate Abstraction and Backward Run??}
+\label{ch:pred}
 
 \chapter{Backward Run in Forest Automata Based Verification}
+\label{ch:backward}
 
-\section{Backward Run in Symbolic Context}
+\section{Backward Run over Symbolic Context}
 
 \section{Intersection of Forest Automata}
 
 \chapter{Implementation}
+\label{ch:impl}
 
 \section{Execution Trace}
 \section{Module For Intersection}
 
 \chapter{Evaluation}
+\label{ch:eval}
 
 \chapter{Conclusion}
+\label{ch:concl}
