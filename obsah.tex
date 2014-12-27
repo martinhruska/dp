@@ -204,28 +204,7 @@ All of the mentioned encodings currently support efficient language inclusion ch
 from \cite{tacas10} but this does not hold for other operations because some of them are not implemented yet for specific encoding.
 The full enumeration of the supported operations for the particular encodings is given in Table \ref{tab:vataop}.
 
-\begin{table}[bt]
-	\begin{center}
-		\catcode`\-=12
-		\begin{tabular}{| l | c | c | c |} \hline
-		& {\textbf{Explicit}} & \multicolumn{2}{|c|}{\textbf{Semi-symbolic}} \\ \cline{2-4}
-		\textbf{Operation} & \textbf{top-down} & \textbf{bottom-up} & \textbf{top-down} \\ \hline
-		Union & $+$ & $+$ & $+$ \\
-		Intersection & $+$ & $+$ & $+$ \\
-		Complement (experimental) & $+$ & $+$ & $+$ \\
-		Removing useless states & $+$ & $+$ & $+$ \\
-		Removing unreachable states & $+$ & $+$ & $+$ \\
-		Simulation & $+$ & $-$ & $-$ \\
-		Downward Inclusion  & $+$ & $+$ & $-$ \\ 
-		Upward Inclusion  & $+$ & $-$ & $-$ \\ 
-		Simulation over LTS (Labeled Transitions System) & $+$ & $-$ & $-$ \\ \hline
-		\end{tabular}
-	\caption{Table of supported operations over NTA by particular encodings implemented in \vata.
-	Table is taken from \cite{hruska13}.}
-	\label{tab:vataop}
-	\end{center}
-\end{table}
-
+\input{tab/vataop.tex}
 
 \section{The Forester Tool}
 \label{sec:FA}
