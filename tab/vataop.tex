@@ -1,0 +1,21 @@
+\begin{table}[bt]
+	\begin{center}
+		\catcode`\-=12
+		\begin{tabular}{| l | c | c | c |} \hline
+		& {\textbf{Explicit}} & \multicolumn{2}{|c|}{\textbf{Semi-symbolic}} \\ \cline{2-4}
+		\textbf{Operation} & \textbf{top-down} & \textbf{bottom-up} & \textbf{top-down} \\ \hline
+		Union & $+$ & $+$ & $+$ \\
+		Intersection & $+$ & $+$ & $+$ \\
+		Complement (experimental) & $+$ & $+$ & $+$ \\
+		Removing useless states & $+$ & $+$ & $+$ \\
+		Removing unreachable states & $+$ & $+$ & $+$ \\
+		Simulation & $+$ & $-$ & $-$ \\
+		Downward Inclusion  & $+$ & $+$ & $-$ \\ 
+		Upward Inclusion  & $+$ & $-$ & $-$ \\ 
+		Simulation over LTS (Labeled Transitions System) & $+$ & $-$ & $-$ \\ \hline
+		\end{tabular}
+	\caption{Table of supported operations over NTA by particular encodings implemented in \vata.
+	Table is taken from \cite{hruska13}.}
+	\label{tab:vataop}
+	\end{center}
+\end{table}
