@@ -77,26 +77,27 @@ Chapter \ref{ch:impl} provides description of implementation and finally Chapter
 \section{Forest Automata}
 
 \chapter{Forest Automata based Verification}
+\label{ch:fav}
 
-\chapter{\vata\ and The Forester tool}
+\chapter{\vata\ and Forester}
 \label{ch:tools}
 
 As it was mentioned in introduction, FA based verification is implemented by tool
 called Forester.
-Since the FA are closely related to TA as it was shown in Chapter \ref{ch:prel}
+Since the FA are closely related to TA as it was shown in Chapter \ref{ch:prel} so
 Forester also depends on an implementation of TA.
 It currently has its own implementation of TA providing operations over TA needed during verification procedure.
 However it is quite impratical to mantain a special TA library inside of Forester
-epsecially when we consider that there is a highly efficient TA library called VATA.
-The VATA library provides implementation of standard operations over TA like union or intersection
-but it also implements state-of-the-art algorithms \cite{tacas11} for language inclusion checking which efficieny
+and it would be more practical to employ some existing efficient TA library.
+One very efficient library is the VATA library which provides implementation of standard operations over TA like union or intersection
+but it also implements state-of-the-art algorithms \cite{tacas11} for language inclusion checking which efficiency
 is also crucial for performance of Forester.
-It seems locigcal according to these facts to connect Forester with the VATA library employing VATA like a backend TA library for Forester.
+It seems logical according to these facts to connect Forester with the VATA library employing VATA like a backend TA library for Forester.
 
-This chapter will provide a description of the VATA library firstly and then also a description of the Forester tool.
-Finally the implementation of the Forester tool using VATA library done as a part of this thesis will be described.
+This chapter will provide a description of the VATA library firstly and then also a description of Forester.
+Finally the implementation of Forester using VATA library done as a part of this thesis will be described.
 
-\section{\vata\ }
+\section{\vata}
 \label{sec:VATA}
 
 \vata\ is open source library for nondeterministic tree automata.
@@ -186,6 +187,7 @@ the other side it does not store anywhere explicitly set of states because it ca
 \endgroup
 
 Another already implemented encoding is semi-symbolic based on VATA own implementation of MTBDD package.
+This encoding is efficient mainly for TA with large alphabet.
 Because semi-symblic encoding and MTBDD are not in the aim of this thesis the will no be detaily described
 but it is possbile to find such kind of description in \cite{lengal10}.
 The main idea of semi-symbolic encoding is shown in Figure \ref{fig:symnta}.
@@ -198,7 +200,7 @@ where each set $S$ is dedicated to a symbol $a$ of the NFA and contains states s
 with $(q_1,\ldots,q_n)$ on the right-handed side and symbol $a$ and state from the set $S$ on the left-handed side.
 The final state set of a NTA is again represented by explicit set in both variants,
 state set is not stored explicitly because one can obtain it from transition relation and
-the symbols are encoded in MTBDD.
+the symbols are encoded (as binary strings) in MTBDD.
 
 All of the mentioned encodings currently support efficient language inclusion checking using algorithm
 from \cite{tacas10} but this does not hold for other operations because some of them are not implemented yet for specific encoding.
@@ -206,7 +208,7 @@ The full enumeration of the supported operations for the particular encodings is
 
 \input{tab/vataop.tex}
 
-\section{The Forester Tool}
+\section{Forester}
 \label{sec:FA}
 
 Forester is open source tool for verification of program manipulation complex dynamic data structures.
@@ -219,7 +221,7 @@ Tool is written in C++.
 Forester is implemented as a GCC plugin but it does not analyze directly intermediate code of GCC called GIMPLE but is
 uses Code Listener infrastructure \cite{codelistnere} to provide fronted over GIMPLE.
 
-Figure \ref{fig:fa_exec} provides high level view of Forester execution. 
+To get high level overiview of verification process performed by Forester please see Figure \ref{fig:fa_exec}. 
 Forester starts analysis of a program by translation of intermediate code representation provided by Code Listenter
 to its own microcode.
 Microcode represents each program statement by one or few instruction which are indeed abstract transformers.
@@ -238,40 +240,169 @@ and if it is not then a shape invariat has been found and the analyzed program i
 	\label{fig:fa_exec}
 \end{figure}
 
-Conceptual design of the Forester tool is shown in Figure \ref{fig:fa_design}.
-
+A little deeper description of conceptual design of Forester (which is shown in Figure \ref{fig:fa_design}) and relations
+betweeen its modules will be given now.
+Please note that implementation of Forester is not explicitly seprated to the stand-alone compilation modules so the notion of the modules
+used in following text is more abstract to provide reader just basic summary of the Forester design.
+One module could be e.g. set of closely related classes with a similiar purpose.
+As it was mentiond above Code Listener representation of GCC intermediate code is mainly used by Forester \emph{Compiler} module.
+Compiler then needs to know \emph{Microcode Instructions} to be able to create their list to run \emph{Symbolic Execution} over it.
+Symbolic execcution then execute microcode instructions (abstract transformers) which manipulates \emph{Symbolic State} and of course
+also \emph{Forest Automata} included in symbolic states.
+Symbolic exection also need \emph{Symbol Context} which is created for each function (and also for global space)
+and keeps information about variables used in the function, about function arguments or about stack frame layout.
+Symbolic state provides information about state of heap which is represented by FA and it also keeps the information about
+corresponding microcode instruction.
+\emph{Forest Automata} module provides methods for manipulation FA need during verification procedure.
+The operations like normalization or abstraction over FA are not part of module implementing FA implementation but are provided
+like stand alone classes which takes FA as parameters.
+These operation could be understanded like anothe module \emph{Operation over Forest Automata}.
+Finally, Forester currently has its own implementation of \emph{Tree Automata}.
+It is very lightweighted implementation containing optimized operations like language inclusion checking using simulation needed for (efficient) Forester run.
+The advantage of this implementation is its simplicity and optimization in operation hardly exploited by Forester what makes verification run shorter.
+On the other side, it is not easy to mantain such a optimized implementation when one consider that there are still progress in field of design of efficent algorithms
+for TA which could bring much higher efficiency then implementation optimization.
 \begin{figure}[bt]
 	\begin{center}
 		\input{fig/fa_design.tikz}
 	\end{center}
-	\caption{Conceptual design of the Forester tool.}
+	\caption{Conceptual design of Forester.}
 	\label{fig:fa_design}
 \end{figure}
 
+Please note, that is just concptual high level view of design Forester.
+A real implementaion is much more complicated (e.g. Forest automata are implemented by two classes: \emph{FA} and \emph{FAE})
+and full technical details.
+A full description of the implementation is also not aim of this text and it is not
+also possible due to size which could such documentation take.
 
-\section{Forester with VATA}
+It was already mentioned that substitution of Forester TA implementation by
+VATA could bring some advanteges.
+We will summarize them here again.
+The first one is fact that it is much easier to maintain one library where
+the state-of-the-art algorithms will be implemented and optimized.
+Since VATA and Forester is developed by the same developers it also easy to added
+to \vata\ operations needed by Forester.
+Having narrow interface between TA library and the rest of Forester implementation
+also improves code quiality of Forester in the sense of modularity, maintenability and code organization.
+These arguments lead us to implement a version of Forester using the VATA library what will be described in chapter \ref{ch:fova}.
+
+\chapter{Forester with VATA}
 \label{sec:fova}
 
-\subsection{Adapter design pattern}
+This chapter describes process of porting Forester to \vata, its difficulties and design and also deals with implementation
+itself.
 
-\chapter{??Predicate Abstraction and Backward Run??}
-\label{ch:pred}
+First of all it is important to declare that we use \vata implementation of explicit encoding of TA because
+it is currently the one that support the most of neeeded operations over TA and it is also more efficient than
+semi-symbolic encoding for purposes of Forester because no large alphabets are used during verification procedure
+so the advantage of the semi-symbolic encoding would not be fully utillizied here.
 
-\chapter{Backward Run in Forest Automata Based Verification}
+Forester implementation is currently far from being mature and high structural dependency is
+one of its bottlenecks.
+So the first thing needed to be done is reducing number of dependencies between classes (described in Section \ref{sec:forester_prep}.
+Then it is would be possible to apply design pattern \emph{adapter} \cite{gamma} (described in Section \ref{sec:adapter} to create
+interface between Forester and \vata (final implementation described in \ref{sec:fova_impl}.
+Applying of adapter design pattern makes possible to include VATA without need of rewriting
+Forester to the names of methods and data used in VATA.
+It is also creates one place (particularry adapter class) connecting Forester and VATA instead of
+including VATA into many of the Forester classes and so it prevents from creating to strong relation between them.
+
+\section{Forester refactoring}
+\label{sec:forester_prep}
+
+As it was mentioned there are strong dependencies between classes in Forester implementation.
+The original implementation of tree automata library has not been exception so it was needed
+to refactore implementation before it would be possible to create adapter clas for \vata API.
+The core class of original tree automata is class \emph{TA} and there are also related classes,
+e.g. class \emph{TT} for transitions representation or class \emph{Antichain} language inclusion checking using the Antichain algorithm.
+This set of classes realizing original tree automata library will be further refered as tree automata module.
+
+The refactoring is mainly based on reduction of the number data types and data members declared
+to be \emph{public} (in sense of C++ language).
+This is by exploiting features provided by standard C++11 \cite{c++11} which provides methods (keyword \emph{auto})
+for auto deduction of the data types by compiler what makes possible to make some of data types of the original tree automata module.
+\emph{Iterator} is another concept often used in combination with auto deduction of types to reduce need to export internals of tree automata module.
+The combination of these two patterns have been used for example when one needs to iterate over all transitions of tree automata or all transition with some
+state as parent.
+Another part of refactoring consists simple replacing access of the class data members by corresponding getters and setters method.
+Reducing of structural dependencies is also done by emphasis application of \emph{Law of Demeter} \cite{something} what practically
+means that classes using TA explicitly should implement methods providing information about TA instead of providing object representing TA itself.
+E.g. when one class wants to know whether a given state is final in an tree automaton of an forest automaton then FA implementation should
+implement a method instead of providing access to its TA.
+Applying the Law of Demeter reduces knowledge needed about implementation of TA module across the whole project what
+helps us to make little interface for TA module.
+However, Forester coding base is also after this refactoring far from accomplishing mentioned good practice (and also many not mentioned) all around the code.
+
+\section{Adapter design pattern}
+\label{sec:adapter}
+
+\emph{Adapter} is structural design patter \cite{gamma} used for creating interface between classes incompatible classes.
+Adapter in notion of UML is shown in Figure \ref{fig:adapter}.
+Adapter consists from a class \emph{Adaptee} what is the class that we want to make compatible with
+another class \emph{Client} which wants to use the methods of Adaptee.
+Class \emph{Adaptor} is the one providing connection between Client and Adaptee.
+Adaptor could be implemented as inhereted class from Adaptee and employes concept of inheritence to redirect
+method calls to its parent (with some possible preprocessing).
+Another possible implementation is composing Adaptee to Adaptor and using Adaptor like interface to Adaptee.
+Adaptor also could add a new method that combines Adaptee methods to achieve wanted operations.
+
+\begin{figure}
+	\begin{center}
+		\includegraphics[scale=0.5]{fig/adapter.png}
+	\end{center}
+	\caption{Adapter design pattern expressed in UML.
+	Picture is taken from \cite{wikihttp://en.wikipedia.org/wiki/Adapter_pattern}}
+	\label{fig:adapter}
+\end{figure}
+
+Let show what are the mentioned roles in our case.
+Adaptee is API of \vata, specifically it is class \emph{ExplicitTreeAut} representing a tree automaton in explicit encoding.
+Client is not in our case just one class but it is a set of the Forester classes using somehow TA library
+and Adaptor is newly implemented class \emph{VATAAdapter} which description is in the following section.
+
+\section{Implementation}
+\label{sec:fova_impl}
+
+The main part of adapter design patter is in our case newly implemented class \emph{VATAAdapter} playing role of Adaptor.
+We decided to used the implementation approach to Adapter preffering composition over inheritence
+because it is more suitable for our purposes since we often needs to rename methods 
+(name of a method in Forester differs with name of a method in VATA performing same operation)
+or conversion of paremeters data type (e.g. from vector to set). 
+
+So class \emph{VATAAdapter} instantiates class \emph{ExplicitTreeAut} from VATA as its private data member
+and redirect to this instance method calls from Forester (the names of methods of VATAAdapter are the same as they were
+in the original TA library).
+\emph{VATAAdapter} also sometimes performs mentioned data types conversion.
+There are also methods implemented by adapter not presented in VATA like method \emph{unfoldAtRoot}
+performing some kind of an unfolding.
+The methods of this kind are very Forester specific so it is not sensible to add them to general purpose library like \vata is.
+
+We initialy supposed that it will be possible to keep the original TA module with VATA library
+to be able easily switch between them.
+However it has proved that this would bring high overhead in some sitatuin when a conversion of some data types is needed
+compared to situation when there are used directly data types compatible with \vata in Forester code
+so we decided to remove the original tree automata module and further support only version of Forester with \vata.
+
+\chapter{template$<$class Text$>$ Backward Run in Forest Automata Based Verification(Text text)}
 \label{ch:backward}
+text
 
 \section{Backward Run over Symbolic Context}
 
 \section{Intersection of Forest Automata}
 
-\chapter{Implementation}
+\chapter{template$<$class Text$>$ Implementation(Text text)}
 \label{ch:impl}
+text
 
 \section{Execution Trace}
 \section{Module For Intersection}
 
-\chapter{Evaluation}
+\chapter{template$<$class Text$>$ Evaluation(Text text)}
 \label{ch:eval}
+text
 
-\chapter{Conclusion}
+\chapter{template$<$class Text$>$ Conclusion(Text text)}
 \label{ch:concl}
+text
