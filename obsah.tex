@@ -100,9 +100,9 @@ Finally the implementation of the Forester tool using VATA library done as a par
 \label{sec:VATA}
 
 \vata\ is open source library for nondeterministic tree automata.
-Its main application is in a field of formal verification.
+Its main application is in the field of formal verification.
 VATA is licensed under GPL, version 3, and can be obtained from its official website \cite{www:vata}.
-A implentation programming language is C++.
+Implentation programming language is C++.
 It is the only library to our knowledge implementing state-of-the algorithms for checking inclusion of NTA languages
 what makes it suitable for usage as a Forester backend library.
 However, \vata\ does not only provide implementation of algorithms for NTA but also highly efficient implementation of
@@ -209,6 +209,34 @@ The full enumeration of the supported operations for the particular encodings is
 \section{The Forester Tool}
 \label{sec:FA}
 
+Forester is open source tool for verification of program manipulation complex dynamic data structures.
+It currently supports program in C langauge.
+Forester is distributed as a \emph{GCC} plugin under GPL license, version 3, and can be obtained from its official websice \cite{www.:forester}.
+Tool is written in C++.
+
+\subsection{Design}
+
+Forester is implemented as a GCC plugin but it does not analyze directly intermediate code of GCC called GIMPLE but is
+uses Code Listener infrastructure \cite{codelistnere} to provide fronted over GIMPLE.
+
+Figure \ref{fig:fa_exec} provides high level view of Forester execution. 
+Forester starts analysis of a program by translation of intermediate code representation provided by Code Listenter
+to its own microcode.
+Microcode represents each program statement by one or few instruction which are indeed abstract transformers.
+Symbolic execution is then execute over this microcode.
+Abstract domain represented by TA as the core part of symbolic state is gradually transformed by abstract transformers
+represented by the microcode instructions during the symbolic execution.
+When Forester detects an error the symbolic execution is aborted and the analyzed program is determined as incorrect one.
+When symbolic execution is over Forester checks whether there is no left garbage (ofcourse, garbage is gradually checked also during the symbolic exection)
+and if it is not then a shape invariat has been found and the analyzed program is determined as correct.
+
+\begin{figure}[bt]
+	\begin{center}
+		\input{fig/fa_exec.tikz}
+	\end{center}
+	\caption{High level overview of Forester.}
+	\label{fig:fa_exec}
+\end{figure}
 
 \section{Forester with VATA}
 \label{sec:fova}
