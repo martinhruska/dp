@@ -1,4 +1,5 @@
 \begin{tikzpicture}[
+  scale=0.9,
   cl/.style={thick,fill=orange!50},
   red/.style={thick,fill=Red},
   detection/.style={thick,fill=blue!50},
