@@ -72,9 +72,149 @@ Chapter \ref{ch:impl} provides description of implementation and finally Chapter
 \chapter{Preliminaries}
 \label{ch:prel}
 
-\section{Graphs and Languages}
-\section{Tree Automata}
-\section{Forest Automata}
+This chapter gives the definitions of the basic concepts.
+First, the graphs, trees and forests are defined together with automata accepting them in Section \ref{sec:graph}.
+Then the forest automata are extended to the forest automata of higher level in Section \ref{sec:fah}.
+This section follow the definitions and a structure used in \cite{cav13:techrep}.
+
+\section{Graphs, Trees and Forests}
+\label{sec:graph}
+
+Let us suppose a word $w = a_1 \ldots a_n$, we denote $i$-th symbol of $w$ as $a_i$.
+We denote $dom(f)$ domain of a total mapping $\funcdecl{f}{A}{B}$ and its range is denoted by $rng(f)$.
+
+\subsection{Graphs and Trees}
+\label{subsec:graph}
+A \emph{ranked alphabet} is a finite set of symbols $\Sigma$ and a related mapping $\funcdecl{\#}{\Sigma}{\mathbb{N}}$
+assigning to a symbol its rank.
+A (directed, ordered, labelled) \emph{graph} is a total map $\funcdecl{g}{V}{\Sigma \times V^{*}}$ where $V$ is a finite set of nodes.
+The items of set $\Sigma$ are within graph context called \emph{labels}.
+Map $g$ maps each node $v\in V$ to:
+\begin{enumerate}
+	\item A label $\alpha \in \Sigma$ that we will denote by $l_g(v)$.
+	\item A sequence of \emph{successors} $(v_1 \cdots v_n) \in V^n$ for a $n \in \mathbb{N}$.
+		We denote successors by $S_g(v)$ and $v_i$ is denoted by $S^i_g(v)$.
+\end{enumerate}
+It holds that $\#(l_g(v)) = |S_g(v)|$.
+We will omit subscript $g$ when no ambiguity is possible.
+
+A \emph{leave} of $g$ is a node $v \in V$ such that $S_g(v) = \epsilon$.
+An \emph{edge} of $g$ is a pair $v \mapsto (a, v_1 \cdots v_n))$ where $v, v_1, \ldots, v_n \in V$,
+$a \in \Sigma$ such that $g(v) = (a, v_1 \cdots v_n)$.
+\emph{In-degree} of a node $v' \in V$ in graph $g$ is the overall number of occurrences in $g(v)$ for any $v \in V$.
+We will in-degre of a node $v \in V$ by $idg_g(v)$ and we will again omit subscript $g$ whenever it is possible.
+More formal, in-degree is defined as $idg(v') = |\{v \mapsto (a, v_1 \cdots v_n)) \emph{ is an edge such that } \exists i \in \{1,\ldots,n\}: v' = v_i\}|$.
+The \emph{joins} of $g$ are nodes $v \in V$ such that $idg(v') > 1$.
+
+A \emph{path} from $v\in V$ to $v' \in V$ is a sequence $p=v_0, i_1, v_1, \ldots, i_n, v_n$ where $v=v_0, v' = v_n$
+and $\forall j \in \{1,\ldots,n\}: v_j = S^{i_j}(v_{j-1})$ (informally, $v_j$ is the $i^j$-th successor of $v_{j-1}$).
+A empty path has $n=0$.
+A node $u \in V$ is \emph{reachable} from a node $v \in V$ iff that is a path from $v$ to $u$ or $u=v$.
+A node $u \in V$ is \emph{root} of $g$ iff all nodes $v \in V$ are reachable from $u$.
+We will use term $root$ also for a mapping $\funcdecl{root}{g}{V}$ which maps a graph to its root.
+When there is a root in a graph then the graph is called \emph{rooted}.
+
+A \emph{tree} $t$ is a graph which is either empty, or it has exactly one root and $\forall v \in V: idg(v) <= 1$ (informally,
+each node is a successor of at most one of the other nodes).
+
+\subsection{Forests}
+\label{subsec:forests}
+
+Let us suppose withou loss of generality that $\Sigma \cap \mathbb{N} = \emptyset$.
+A $\Sigma$-labelled \emph{forest} is a sequence of tree $t_1, \ldots, t_n$ over ($\Sigma \cup \{1,\ldots,n\}$)
+where $\forall i \in \{1,\ldots,n\}: \#i = 0$.
+\emph{Root preferences} are leaves labelled $i \in \mathbb{N}$.
+The forest $t_1,\ldots,t_n$ (we suppose that their nodes sets are disjoint) represents the graph $\fagr$ that could
+be constructed by interconnecting their roots with the related root reference.
+E.g. when there is a root reference $2$ in $t_1$ then this leaf is replaced by the root node of $t_2$.
+Let's formalize the idea of construction of $\fagr$.
+$\fagr$ contains an edge $v \mapsto (a,v_1, \ldots,v_m)$ iff $\exists i \in \{1,\ldots,n\} \ \exists(v \mapsto (a, v_1', \ldots, v_m')) \in edges(t_i)
+\ \forall j \in \{1,\ldots,m\}: v_j = h(v_j')$ where $edges(t_i)$ is the set of all edges of a tree $t_i$ and
+\[ h(v_j') = \left\{
+  \begin{array}{l l}
+  root(t_k) & \quad \text{if $v_j'$ is a root reference with $l(v_j') = k$}\\
+  v_j'   & \quad \text{otherwise}
+  \end{array} \right.\]
+
+\subsection{Graphs and Forests with Ports}
+
+We will extend graphs and forests with concept of the \emph{ports} which should
+serve for marking input and output nodes.
+An \emph{input-output-graph} (io-graph) is a pair $(g,\phi)$ (in sense of brevity also denoted by $g_\phi$)
+where $g$ is a graph and $\phi=(\phi_1 \cdots \phi_n) \in dom(g)^+$ is a sequence of ports, $\phi_1$
+is an input port and $\phi_1 \cdots \phi_n$ is a sequence of output ports.
+The ports in $\phi$ are unique.
+If a root if $g_\phi$ is $\phi_1$ then $g_\phi$ is \emph{accessible}.
+
+The \emph{cut-points} of a graph $g_\phi$ is the set of its ports and joins and we denote this set by $cps(g_\phi)$.
+Formally, $cps(g_\phi)=\{v \in V\,|\, v \in \phi \vee idg(v) > 1\}$.
+
+An \emph{io-forest} is a pair $f=(t_1 \cdots t_n, \pi)$ such that $n \geq 1$ and $\pi \in \{1,\ldots,n\}^n$
+is a sequence of port indicies, where $\pi_1$ is the input port index and $\pi_2 \ldots \pi_{|\pi|}$ is a sequence
+of the output ports indicies.
+The indicies are unique as in the case of ports.
+It is also possible to construct a io-graph $\otimes f$ from a forest $f$ such that
+$\otimes f = (\otimes t_1 \cdots t_n,root(t_{\pi_{1}},\ldots,t_{\pi_{n}}))$.
+So the port of $\otimes f$ are roots of the trees indexed by indicies in $\pi$.
+This means that a root of tree pointed by $\pi_1$ is an input port of $\otimes f$ and
+the roots of trees pointed by the other indicies in $\pi$ are the output ports of $\otimes f$.
+
+\subsection{Tree Automata}
+\label{subsec:ta}
+
+A (finite, non-deterministic, top-down) \emph{tree automaton} (TA) is a
+quadruple $A = (Q, \Sigma, \Delta, R)$ where
+\begin{itemize}
+	\item $Q$ is a finite set of \emph{states}
+	\item $\Sigma$ is a ranked alphabet
+	\item $\Delta$ is a set of \emph{transition rules} where transition has a form $(q,a,q_1 \cdots q_n)$ where $q,q_1,\ldots,q_n \in Q$, $a \in \Sigma$, $n \geq 0$ and $\#a = n$.
+		Alternatively, we write $q \xrightarrow{a} (q_1 \cdots q_n)$ to denote a $(q,a,q_1 \cdots q_n) \in \Delta$.
+		When $n=0$ then the rule is called \emph{leaf rule}.
+	\item $R \subseteq Q$ is a set of \emph{root states}.
+\end{itemize}
+
+We could symetrically define also bottom-up tree automata as quadruple $B = (Q, \sigma, \Delta, F)$ where
+\begin{itemize}
+	\item $Q$ is a finite set of states
+	\item $\Sigma$ is a ranked alphabet
+	\item $\Delta$ is a set of transition rules where transition has a form $(q_1 \cdots q_n,a,q)$ where $q,q_1,\ldots,q_n \in Q$, $a \in \Sigma$, $n \geq 0$ and $\#a = n$.
+		We can again write $(q_1 \cdots q_n) \xrightarrow{a} q$ to denote a $(q_1 \cdots q_n,a,q) \in \Delta$.
+		When $n=0$ then the rule is called \emph{leaf rule}.
+	\item $F \subseteq Q$ is a set of \emph{final states}.
+\end{itemize}
+
+We will further consider top-down tree automata as default.
+
+Since syntax of a TA is already defined we are going to define its semantics.
+A \emph{run} of a TA $A$ over a tree $t$ is mapping $\funcdecl{\rho}{dom(t)}{Q}$ such that
+$\forall v \in dom(t)\ \exists (q \xrightarrow{a} (q_1 \cdots q_n)) \in \Delta:  q=\rho(v) \wedge  \forall i \in \{1, \ldots, |S(v)|\}: q_i=\rho(S(v)_i)$.
+We use $t \Rightarrow_{\rho} q$ to denote a run $\rho$ of TA A over tree $t$ s.t. $\rho(t) = q$ and we use $t \Rightarrow q$ to denote that there exists
+a run $\rho$ over $t$ to $q$.
+Finally, we can define language of a TA.
+The \emph{language} of a state $q\in Q$ is defined by $L(q) = \{t\,|\, t \Rightarrow q\}$.
+The \emph{language} of a NTA $A$ is defined by $L(A) = \Cup_{q\in R} L(q)$.
+
+\subsection{Forest Automata}
+\label{subsec:fa}
+
+A \emph{Forest Automata} (FA) over $\Sigma$ is a pair $F=(A_1\cdots A_n, \pi)$
+where $A_1 \cdots A_n$ is a sequence of tree automata defined over alphabet $\Sigma \cup \{1,\ldots,n\}$
+and $\pi = I_1 \cdots I_n$ where $I_1,\ldots, I_n \in \{1, \ldots, n\}$ is a sequence of port indicies.
+There are two kinds of languages related to FA.
+The first one is forest langauge obtained by cartesian product of the languages of particular TA (and port indicies) of FA
+what gives a set of io-forests.
+The second one is graph language obtained by uniting of the io-forests from forest language to a io-graph.
+Formally, The \emph{forest language} of the FA $F$ is the set of io-forests $L_f(F)= L(A_1) \times \ldots L(A_n) \times \{\pi\}$.
+Please note that it is neccessary to add to the cartesian product also sequence of indicies to preseve structure of io-forests
+and so to be able to construct graph language of $F$.
+The \emph{graph language} of $F$ is the set of io-graph $L(F) = \{\times f\,|\, f \in L_f{F}\}$.
+
+\section{Forest Automata of Higher Level}
+\label{sec:fah}
+
+\subsection{Structured Labels}
+
+\subsection{Forest Automata of Higher Level}
 
 \chapter{Forest Automata based Verification}
 \label{ch:fav}
