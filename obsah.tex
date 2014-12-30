@@ -103,18 +103,22 @@ An \emph{edge} of $g$ is a pair $v \mapsto (a, v_1 \cdots v_n))$ where $v, v_1, 
 $a \in \Sigma$ such that $g(v) = (a, v_1 \cdots v_n)$.
 \emph{In-degree} of a node $v' \in V$ in graph $g$ is the overall number of occurrences in $g(v)$ for any $v \in V$.
 We will in-degre of a node $v \in V$ by $idg_g(v)$ and we will again omit subscript $g$ whenever it is possible.
-More formal, in-degree is defined as $idg(v') = |\{v \mapsto (a, v_1 \cdots v_n)) \emph{ is an edge such that } \exists i \in \{1,\ldots,n\}: v' = v_i\}|$.
-The \emph{joins} of $g$ are nodes $v \in V$ such that $idg(v') > 1$.
+More formal, in-degree is defined as $idg(v') = |\{v \mapsto (a, v_1 \cdots v_n) \,|\, v \mapsto (a, v_1 \cdots v_n) \emph{ is an edge such that } \exists i \in \{1,\ldots,n\}: v' = v_i\}|$.
+The \emph{joins} of $g$ are nodes $v \in V$ such that $idg(v') \rangle 1$.
 
 A \emph{path} from $v\in V$ to $v' \in V$ is a sequence $p=v_0, i_1, v_1, \ldots, i_n, v_n$ where $v=v_0, v' = v_n$
 and $\forall j \in \{1,\ldots,n\}: v_j = S^{i_j}(v_{j-1})$ (informally, $v_j$ is the $i^j$-th successor of $v_{j-1}$).
-A empty path has $n=0$.
+The empty path has $n=0$.
+The path $p$ has \emph{length} $n$ what we denote by $length(n) = p$.
+The path $p$ is acyclic if $\forall u_i,u_j \in p: i \neq j \Rightarrow u_i \neq u_j$.
+A \emph{cost} of an acyclic path is sequence $i_1, \ldots, i_n$.
+The path $p$ is cheaper then a path $p_1$ if it 
 A node $u \in V$ is \emph{reachable} from a node $v \in V$ iff that is a path from $v$ to $u$ or $u=v$.
 A node $u \in V$ is \emph{root} of $g$ iff all nodes $v \in V$ are reachable from $u$.
 We will use term $root$ also for a mapping $\funcdecl{root}{g}{V}$ which maps a graph to its root.
 When there is a root in a graph then the graph is called \emph{rooted}.
 
-A \emph{tree} $t$ is a graph which is either empty, or it has exactly one root and $\forall v \in V: idg(v) <= 1$ (informally,
+A \emph{tree} $t$ is a graph which is either empty, or it has exactly one root and $\forall v \in V: idg(v) \leq 1$ (informally,
 each node is a successor of at most one of the other nodes).
 
 \subsection{Forests}
@@ -136,9 +140,8 @@ $\fagr$ contains an edge $v \mapsto (a,v_1, \ldots,v_m)$ iff $\exists i \in \{1,
   v_j'   & \quad \text{otherwise}
   \end{array} \right.\]
 
-TODO Canonicity
-
 \subsection{Graphs and Forests with Ports}
+\label{subsec:gfp}
 
 We will extend graphs and forests with concept of the \emph{ports} which should
 serve for marking input and output nodes.
@@ -149,7 +152,7 @@ The ports in $\phi$ are unique.
 If a root if $g_\phi$ is $\phi_1$ then $g_\phi$ is \emph{accessible}.
 
 The \emph{cut-points} of a graph $g_\phi$ is the set of its ports and joins and we denote this set by $cps(g_\phi)$.
-Formally, $cps(g_\phi)=\{v \in V\,|\, v \in \phi \vee idg(v) > 1\}$.
+Formally, $cps(g_\phi)=\{v \in V\,|\, v \in \phi \vee idg(v) \rangle 1\}$.
 
 An \emph{io-forest} is a pair $f=(t_1 \cdots t_n, \pi)$ such that $n \geq 1$ and $\pi \in \{1,\ldots,n\}^n$
 is a sequence of port indicies, where $\pi_1$ is the input port index and $\pi_2 \ldots \pi_{|\pi|}$ is a sequence
@@ -160,6 +163,29 @@ $\otimes f = (\otimes t_1 \cdots t_n,root(t_{\pi_{1}},\ldots,t_{\pi_{n}}))$.
 So the port of $\otimes f$ are roots of the trees indexed by indicies in $\pi$.
 This means that a root of tree pointed by $\pi_1$ is an input port of $\otimes f$ and
 the roots of trees pointed by the other indicies in $\pi$ are the output ports of $\otimes f$.
+
+
+\subsection{Minimal and Canonical Forest}
+\label{subsec:mcforest}
+
+There are two properties of forests called that we will futher need.
+An io-forest $f_m=(t_1 \cdots t_n, \phi)$ representing a graph $\otimes f$ is \emph{minimal}
+iff the roots of trees $t_1,\ldots,t_n$ corresponds to the cut-points of $\otimes f$,
+so there is a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n\} )\}$ and $cps(\otimes f)$.
+The minimal io-forest is unique to permutations of $t_1,\ldots,t_n$.
+
+We need to defined ordering $\preceq_p$, so called \emph{cannonical ordering}, over cutpoints of $\otimes f$ to be able to define canonicity of the forest $f$.
+The cannonical ordering $\preceq_p \subseteq cps(\otimes f) \times cps(\otimes f)$ is defined as follows $c_1 \preceq_p c_2 \Leftrightarrow \emph{cost of the cheapest path from }
+\phi_1 \emph{ (input port) to } c_1 \emph{ is}$ $\emph{cheaper}$ $\emph{ than cost of the cheapest path from } \phi_1 \emph{ to } c_2$.
+The io-forest $f_c$ is \emph{canonical} iff it is minimal and the trees $t_1,\ldots, t_n$ are ordered by $\preceq_p$ and $\times f$ is accesible.
+The cannonical io-forest is a unique representation of accesbile io-graph.
+The cannonical io-forest can be obtained by depth-first traversal (DFT) of $\otimes f$ what is a graph of a forest $f = (t_1 \cdots t_n, \phi)$.
+We need to assume that there is odering $\leq_\Sigma$ over labels $\Sigma$ of $\otimes f$ before description of DFT method.
+We create a stack of nodes for DFT initialized with input and output ports ordered by $\preceq_p$ when the smallest node is on the top of the stack.
+Then the DFT is run over $\otimes f$ and we obtain cannonical forest $f_c$ where trees are in the following order.
+The first ones are trees corresponding to the ports of $f$ ordered by $\preceq_p$ and the rest of the trees are in the order
+in which they were visited by DFT traversal.
+
 
 \subsection{Tree Automata}
 \label{subsec:ta}
@@ -211,14 +237,139 @@ Please note that it is neccessary to add to the cartesian product also sequence 
 and so to be able to construct graph language of $F$.
 The \emph{graph language} of $F$ is the set of io-graph $L(F) = \{\times f\,|\, f \in L_f{F}\}$.
 
-TODO inclusion and canonicity
+We say that $F$ respects \emph{cannonicity} if $\forall f \in L_f(F): \emph{f is cannonical}$.
+Checking inclusion of languages of forest automata respecting cannonicity could be done \emph{component-wise},
+i.e. checking language inclusion of their tree automata one by one.
+
+\begin{lemma}
+	Let $F^1 = (A_1^1\cdots A_{n_1}^1, \pi^1)$ and $F^2 = (A_1^2\cdots A_{n_2}^2, \pi^2)$
+	be two FA respecting canonicity.
+	Then $L(F^1) \subseteq L(F^2)$ iff
+	\begin{itemize}
+			\item $n_1$ = $n_2$
+			\item $\pi^1 = \pi^2$
+			\item $\forall i \in \{1,\ldots,n_1\}: L(A_i^1) \subseteq L(A_i^2)$
+	\end{itemize}
+\end{lemma}
+\begin{proof}
+	Proof can found in \cite{cav11tr}.
+\end{proof}
 
 \section{Forest Automata of Higher Level}
 \label{sec:fah}
 
+We have worked with symbols that have no inner structure and
+we need to define also automata over \emph{structured labels} to be a
+able to use them and the automata defined over them for shape analysis.
+
 \subsection{Structured Labels}
 
+$\Gamma$ is a ranked alphabet of \emph{sublabels} with defined total ordering $\sqsubset$.
+Let $g$ be a graph defined over $2^\Gamma$ where $\forall A \subseteq \Gamma: \#A = \sum_{a\in A} = \#a$
+and $A$ denotes a symbol of $g$.
+The graph $g$ has edges in the form $v \mapsto (\{a_1,\ldots,a_m\},v_1 \cdots v_n)$ where
+$a_1 \sqsubset a_2 \sqsubset \ldots \sqsubset a_m$ and $\sum_{a \in \{a_1,\ldots,a_n\} \# a = n}$.
+We will denote such edge by $e$.
+Each edge $e$ consists \emph{sub-edges} that creates sequence $e\langle 1\rangle = v \mapsto (a_1,v_1 \cdots v_{\#a_1}),\ldots, e\langle n\rangle= v \mapsto (a_m,v_{n-\#a_m+1} \cdots v_n)$.
+We will denote $i$-th subedge of $e$ in $g$ by $e\langle i\rangle = v \mapsto (a_i,v_k \cdots v_l)$ where $i \in \{1,\ldots,m\}$ or
+we can also denote it by indicies from $\{k,\ldots,l\}$.
+We use $SE(g)$ to denote all subedges of graph $g$.
+A node $v$ of a graph is isolated if it is not part of any sub-edge.
+Formally, $\nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l): v = v' \wedge \nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l)\ \exists v'' \in \{v_k,\ldots, v_l\}: v = v''$.
+A graph $g$ is \emph{unambigously determined} by $SE(g)$ if $g$ has no isolated nodes.
+
+\subsection{Tree Automata over Structured Labels}
+
+Since we already extended the labels to structure ones we will also define tree automata over these labels.
+A (finite, non-deterministic, top-down) \emph{tree automata} (over structured labels) is quadruple $A=(Q,2^\Sigma, \delta, R)$ where
+\begin{itemize}
+	\item $Q$ is a finite set of states.
+	\item $\Sigma$ is a ranked alphabet.
+	\item $\Delta$ is a transition rules set with rules in form $(q,\{a_1,\ldots,a_n\},q_1 \cdots q_n)$ where $q,q_1,\ldots,q_n \in Q$, $\{a_1,\ldots,a_n\} \in \Gamma$.
+	Each rule consists sequence of the \emph{rule-terms} $d\langle 1\rangle = q \mapsto (a_1,q_1 \cdots q_{\#a_1}),\ldots, d\langle n\rangle= q \mapsto (q_m,v_{n-\#a_m+1} \cdots q_n)$ and
+	we will again denotethe $i$-th rule term of sequence by $d\langle i\rangle$ where $i \in \{1,\ldots,m\}$.
+	\item $R\subseteq Q$ is a finite set of root states.
+\end{itemize}
+
 \subsection{Forest Automata of Higher Level}
+
+Finally, we can extend also FA to the version defined over structured labels.
+Nonformally, an forest automaton of higher level has another forest automata (of lower lever) as symbols on its edges.
+This makes possible to build a hierchy of forest automata.
+Let formalize this idea.
+We start from forest automata of \emph{level} 1.
+So let $\Gamma_1$ be a set of all forest automata over $2^\Gamma$ and the elements of this set are called \emph{forest automata of level 1}.
+All forest automata of \emph{level $i$} forms a set $\Gamma_i$.
+A forest automaton $F$ of level $i$ is defined over ranked alphabeth $2^{\Gamma \cup \Delta}$ where $\delta$ is a subset of forest automata of
+level $i-1$ which are called \emph{boxes} of $F$.
+The \emph{Rank} $F$ of an FA $F$ is the number of its output port indicies.
+Finally, the set of all forest automata of all levels is denoted by $\sum_{i \geq 0} \Gamma_i$ and it is ordered by some total ordering $\sqsubset_{\Gamma_*}$.
+
+We will define operation \emph{sub-edge replacement} which help us to define semantics of forest automata of higher level languages.
+Informally, the subedge replacement removes one sub-edge and matches its origin and outputs with a new graph serving like a substitution of sub-edge.
+This operation will be further used for replacement of sub-edge of FA with another FA of lower level by the graph represented by FA of lower level.
+
+Formally, let $g$ be a graph with an edge $e \in edges(g)$ and sub-edge $e\langle i\rangle = v_1 \rightarrow (a,v_2 \cdots v_n)$.
+Let $g_{\phi}'$ be an io-graph such that $|\phi| = n$.
+We assume that $dom(g) \cap dom(g') = \emptyset$.
+The sub-edge $e\langle i\rangle$ could be replaced by $g'$ such that $\forall j \in \{1,\ldots,n\}: l_{g}(v_j) \cap
+l_{g'}(\phi_j) = \emptyset$
+(this conditions checks whether there is no successor of $v_j$ and $\phi_j$ reachable over the same
+label from both nodes).
+The result of replacement (if it is possible to do it) is denoted as $g\subst{g'_\phi}{e\langle i\rangle}$.
+The result is the graph $g_n$ in the sequence $g_0,\ldots,g_n$ of graphs which are defined as follows: 
+\begin{itemize}
+	\item $SE(g_0) = SE(g) \cup SE(g') \setminus \{e\langle i\rangle\}$.
+	\item $\forall j \in \{1, \ldots, n\}: \emph{the graph } g_j \emph{ is obtained from } g_{j-1} \emph{ by following procedure }$
+		\begin{enumerate}
+			\item Deriving a~graph $h$ by replacing the origin of the sub-edges of the $j$-th port $\phi_j$ of $g'$ by $v_j$.
+			\item Redirecting edges leading to $\phi_{j}$ to $v_j$, i.e., replacing all occurrences of $\phi_j$ in $range(h)$ by $v_j$
+			\item Removing $\phi_j$. 
+		\end{enumerate}
+\end{itemize}
+
+We will apply the concept of sub-edge replacement to the forest automata of higher level now
+and introduce following two procedures over FA.
+\begin{itemize}
+	\item \emph{Unfolding} of a graph $g$ is replacement of its sub-edge with a symbol, which is
+		a FA $F'$, by a graph from $L(F')$.
+		Formally, sub-edge $e\langle i \rangle$ of the graph $g$ has a symbol $a$ and this symbol is a FA $F'$ (so this symbol is a box)
+		and $g'_\phi \in L(a)$ then $h = g \subst{g'_\phi}{e\langle i \rangle}$ is an unfolding of $g$.
+		We will denote unfolding $h$ of $g$ by $g \prec h$.
+	\item \emph{Folding} is a replacement of $g'_\phi$ by $e \langle i \rangle$ in $h$ obtaining $g$.
+		So we can say that $g'_\phi$ to $e \langle i \rangle$. 
+\end{itemize}
+
+A transitive reflective closure of $\prec$ is denoted by $\prec^*$.
+A set of all graphs get by repeatedly application of unfolding on a graph $g$ over ranked alphabet $\Gamma$ is called
+\emph{$\Gamma$-semantics} and it is formally defined as a set of graphs $g'$ such that $g \prec^* g'$
+what we denote as $\llbracket g \rrbracket_\Gamma$ or just simply $\llbracket g \rrbracket$ when it is
+clear what alphabet we speak about.
+Finally, having a FA $F$ of higher level then $\llbracket F \rrbracket = \bigcup_{g_\phi \in L(F)} (\llbracket g \rrbracket \times \{\phi\})$.
+Please note that the the meaning of $L(F)$ and $L_f(F)$ has not been changed but both sets (languages) just can contain graphs (or forests)
+over structured labels.
+
+When we come back definiton of canoncity respecting FA we will find that it is applicable also for FA of higher level.
+A FA $F$ is cannonicity repsecting if $\forall f \in L_f(F): \emph{f is cannonical}$ and since definition of cannonical $f$
+is not affected by extending labels to the structured ones the meaning of cannonicity is same as for basic FA.
+The language inclusion checking is again possible to do component-wise like in the case of basic FA what is
+formulated by Lemma \ref{lemma:hfa_incl}.
+
+\begin{lemma}
+	Let $F^1 = (A_1^1\cdots A_{n_1}^1, \pi^1)$ and $F^2 = (A_1^2\cdots A_{n_2}^2, \pi^2)$
+	be two FA of higher level respecting canonicity.
+	Then $L(F^1) \subseteq L(F^2)$ iff
+	\begin{itemize}
+			\item $n_1$ = $n_2$
+			\item $\pi^1 = \pi^2$
+			\item $\forall i \in \{1,\ldots,n_1\}: L(A_i^1) \subseteq L(A_i^2)$
+	\end{itemize}
+\end{lemma}
+\begin{proof}
+	Proof can found in \cite{cav11tr}.
+\end{proof}
+
+%TODO sets of FA. are they really needed anywhere?
 
 \chapter{Forest Automata based Verification}
 \label{ch:fav}

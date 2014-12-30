@@ -33,6 +33,8 @@
 %-----------------------------------------------------------------------------
 %Balicky
 %-----------------------------------------------------------------------------
+\usepackage{stmaryrd}
+\usepackage{stmaryrd}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage[czech,english]{babel}
