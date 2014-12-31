@@ -125,10 +125,10 @@ each node is a successor of at most one of the other nodes).
 \label{subsec:forests}
 
 Let us suppose withou loss of generality that $\Sigma \cap \mathbb{N} = \emptyset$.
-A $\Sigma$-labelled \emph{forest} is a sequence of tree $t_1, \ldots, t_n$ over ($\Sigma \cup \{1,\ldots,n\}$)
+A $\Sigma$-labelled \emph{forest} is a sequence of tree $t_1 \cdots t_n$ over ($\Sigma \cup \{1,\ldots,n\}$)
 where $\forall i \in \{1,\ldots,n\}: \#i = 0$.
 \emph{Root preferences} are leaves labelled $i \in \mathbb{N}$.
-The forest $t_1,\ldots,t_n$ (we suppose that their nodes sets are disjoint) represents the graph $\fagr$ that could
+The forest $t_1 \cdots t_n$ (we suppose that their nodes sets are disjoint) represents the graph $\fagr$ that could
 be constructed by interconnecting their roots with the related root reference.
 E.g. when there is a root reference $2$ in $t_1$ then this leaf is replaced by the root node of $t_2$.
 Let's formalize the idea of construction of $\fagr$.
@@ -373,6 +373,92 @@ formulated by Lemma \ref{lemma:hfa_incl}.
 
 \chapter{Forest Automata based Verification}
 \label{ch:fav}
+
+A program using complex dynamic data structures can reach the different heap configurations
+during its execution.
+These heap configurations could be represented by FA what leads to possibility
+of using FA in shape analysis which checks whether it is not possible for the program to reach an error like doule free or
+invalid pointer dereference during its execution.
+
+This chapter provides an overview of the shape analysis based forest automatat introduced in \cite{formalmethods}.
+Frist, a heap representation using FA is described and then
+we provide overview of symbolic execution that employs framework of abstract interpretation.
+
+\section{Heap Representation}
+\label{sec:hd}
+
+It is possible to view a \emph{heap} (more precisly, a single heap configuration)
+as a (directed) graph where each allocated heap cells corresponds to a node in the graph.
+The heap cells consists \emph{pointer selectors} and \emph{data selectors} that picks a data from some finite data domain.
+A pointer selectors could point to another graph node or to the value \emph{null} or it could be undefined.
+A data selector then reference its node to the data from data domain.
+When we consider the pointer variables of a program it also holds that they can have pointer and data selectors.
+A heap graph could be split to the trees in the following manner.
+We identify the heap cut-points (corresponding to the already defined term \emph{cut-points})
+what are the heap cells pointed by a variable or by more then one other heap cells by their pointer selectors.
+The heap is then split to the trees whose roots nodes are cut-points identified in the previous step.
+The pointer selectors that pointed to the cut-points are now pointed to the root references what interconnects
+of particular tree components (and provides possibility to reconstruct the original graph again).
+Finally, the created tuple of the trees is called a forest.
+Please note, that the mentioned procedure corresponds to the terms defined in Chapter \ref{ch:prel}
+so it is possible to achieve cannonical forest as it was described in Section \ref{sec:mcforest}.
+
+Let formalized the idea given above.
+We denote a pointer selector by $PSel$, a data selector by $DSel$ and data domain by $\mathbb{D}$.
+A single heap configuration is a io-graph $g_st$ over the ranked alphabet of the strucutred labels $2^\Gamma$
+with sub-labels from the ranked alphabet $\Gamma = PSel \cup (DSel \times \mathbb{D})$ having the
+ranking function that assigns $1$ to the pointer selectors and $0$ to the data selelectors.
+Values of data selectors are stored in the structured labels as sub-labels from $DSel \times \mathbb{D}$.
+A node $v$ of a graph representing a heap reflects by its label internal structure the structure of
+related allocated memory cell in the heap so it holds that $l_g(v) \in 2^\Gamma$.
+A null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) = \emptyset$
+and undefined selectors of a node $v$ have not corresponding  sub-labels in $l_g(\texttt(v))$.
+
+Consider following example taken from \cite{cav13tr}.
+We have a singly-linked list where its items are data structures containing pointers to
+a next item and also integer data variable, written in C:
+\begin{center}
+\begin{minipage}{0.3\textwidth}
+    \begin{verbatim}
+     struct SLL {
+      struct SLL* next;
+      int data;
+     };
+    \end{verbatim}
+\end{minipage}
+\end{center}
+Then a allocated cell of this singly-linked list on the heap with value $13$ in \texttt{data} variable and pointer to a cell named $s_{next}$
+in \texttt{next} variable could be represented
+by a node $s$ with following label $l_g(s) = \{next_g(x_{next}),(data_g,13),()\}$.
+As you can see, the pointer selector $next_g \in PSel$ representing the pointer variable \texttt{next} from \texttt{SLL} structure
+has really rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing \texttt{data} variable from \texttt{SLL} structure
+has rank $0$.
+
+As we mentioned described approach could be used for single heap configuration representation but to be able
+to represent the sets of the heap configurations reachable by the analysed program we need
+to employ the forest automata of higher level respecting cannonicity that represents cannonical io-forests
+which modells the heap configurations.
+
+TODO stack frame
+
+
+heap is graph over selectors and data
+
+formalize the ideas
+line is set of heaps configuration
+
+\section{Symbolic Execution}
+\label{sec:se}
+
+conrete domain
+
+abstract domain
+
+abstract transformers
+
+normalization
+
+boxes
 
 \chapter{\vata\ and Forester}
 \label{ch:tools}
