@@ -14,7 +14,7 @@ One approach to ensure software qaulity is \emph{testing} (and dynamic analysis)
 on runnig a program in the different contexts and under the different inputs
 and checking whether programs behaviour and outputs are expected one.
 This method can satisfy many of requiremnts for software quality and often cover greate space of programs behaviours
-but on the other side it is only possbile to prove presence of the errors using testing not their absence (\cite{djikstra}).
+but on the other side it is only possbile to prove presence of the errors using testing not their absence (\cite{dijkstra}).
 Moreover finding errors during testing does not mean that all of them has been found.
 
 The mentioned weakness of testing can be resolved by \emph{formal verification}
@@ -42,7 +42,7 @@ superior in flexibility.
 However, this theisis will be focused to a verification procedure employing concept of Forest automata (FA) which tries
 to synthetize benefits of the mentioned approaches.
 
-Forest automata has been introduce in \cite{forester} and they are extension of finite automata or more precisly finite tree automata.
+Forest automata has been introduce in \cite{forester11,forester12} and they are extension of finite automata or more precisly finite tree automata.
 They are used as abstract domain in this verification procedure.
 Basically, the verification procudere based on FA is perforing symbolic execution of a verified program and
 FA serves here as the abstract domain.
@@ -53,7 +53,7 @@ but there is still room for improvement, e.g. by extending support of C language
 
 The main topic of this topic is improvement of Forester tool.
 Since FA are highly related to finite tree automata (TA) the first of goal is to connect
-Forester with VATA library -- state-of-the-art library for TA manipulation \cite{tacas12}.
+Forester with VATA library -- state-of-the-art library for TA manipulation \cite{libvata}.
 Particulary, this consists creating of an interface between Forester and VATA to employ VATA as TA library for Forester backend.
 The second goal of this thesis is to implement \emph{backward run} for Forester what enables checking spuriousness of an error found in program.
 The error could be spurous because of used to high abstraction over FA domain but the information get by backward could be used for refinment of \emph{predicate abstraction}
@@ -67,7 +67,6 @@ Chapter \ref{ch:tools} provides description of VATA library and Forester tool.
 General principle of backward run and predicate abstract is given in Chapter \label{ch:pred} and their
 application for verification based on FA is described in Chapter \label{ch:backwar}.
 Chapter \ref{ch:impl} provides description of implementation and finally Chapter \ref{ch:eval} is about evalutation.
-\cite{Knuth}
 
 \chapter{Preliminaries}
 \label{ch:prel}
@@ -75,7 +74,7 @@ Chapter \ref{ch:impl} provides description of implementation and finally Chapter
 This chapter gives the definitions of the basic concepts.
 First, the graphs, trees and forests are defined together with automata accepting them in Section \ref{sec:graph}.
 Then the forest automata are extended to the forest automata of higher level in Section \ref{sec:fah}.
-This section follow the definitions and a structure used in \cite{cav13:techrep}.
+This section follow the definitions and a structure used in \cite{techrep}.
 
 \section{Graphs, Trees and Forests}
 \label{sec:graph}
@@ -252,7 +251,7 @@ i.e. checking language inclusion of their tree automata one by one.
 	\end{itemize}
 \end{lemma}
 \begin{proof}
-	Proof can found in \cite{cav11tr}.
+	Proof can found in \cite{forester:techrep}.
 \end{proof}
 
 \section{Forest Automata of Higher Level}
@@ -364,9 +363,10 @@ formulated by Lemma \ref{lemma:hfa_incl}.
 			\item $\pi^1 = \pi^2$
 			\item $\forall i \in \{1,\ldots,n_1\}: L(A_i^1) \subseteq L(A_i^2)$
 	\end{itemize}
+	\label{lemma:hfa_incl}
 \end{lemma}
 \begin{proof}
-	Proof can found in \cite{cav11tr}.
+	Proof can found in \cite{forester:techrep}.
 \end{proof}
 
 %TODO sets of FA. are they really needed anywhere?
@@ -380,7 +380,7 @@ These heap configurations could be represented by FA what leads to possibility
 of using FA in shape analysis which checks whether it is not possible for the program to reach an error like doule free or
 invalid pointer dereference during its execution.
 
-This chapter provides an overview of the shape analysis based forest automatat introduced in \cite{formalmethods}.
+This chapter provides an overview of the shape analysis based forest automatat introduced in \cite{forester12}.
 Frist, a heap representation using FA is described and then
 we provide overview of symbolic execution that employs framework of abstract interpretation.
 
@@ -414,7 +414,7 @@ related allocated memory cell in the heap so it holds that $l_g(v) \in 2^\Gamma$
 A null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) = \emptyset$
 and undefined selectors of a node $v$ have not corresponding  sub-labels in $l_g(\texttt(v))$.
 
-Consider following example taken from \cite{cav13tr}.
+Consider following example taken from \cite{techrep}.
 We have a singly-linked list where its items are data structures containing pointers to
 a next item and also integer data variable, written in C:
 \begin{center}
@@ -445,7 +445,7 @@ The input port node $sf$ serves in case of shape analysis based on FA for storin
 \section{Symbolic Execution}
 \label{sec:se}
 
-FA-based verification procedure is a standard \emph{abstract interpretation} \cite{cuso}.
+FA-based verification procedure is a standard \emph{abstract interpretation} \cite{cousot:77}.
 The concrete domain assigns to each program location a set of pairs
 $(\sigma,H)$ where a mapping $\sigma$ maps each variable
 to a node in $H$, to a $\texttt{null}$ or to a undefined value, and $H$ is a single heap configuration.
@@ -495,7 +495,7 @@ Each iteration follows this procedure:
 Widening currently consists of repeating the following steps to each $F$ in the abstract configurations of a junction point until the fixpoint is reached:
 \begin{enumerate}
 		\item Box folding of $F$.
-		\item Abstraction -- It is based on framework if \emph{abstract regular (tree) model checking} \cite{artcm}.
+		\item Abstraction -- It is based on framework if \emph{abstract regular (tree) model checking} \cite{artmc}.
 			During abstraction all states $q$, $q'$ are collapsed if it holds that
 			$q$ and $q'$ accepts trees with the same sets of prefixes of height at mose $k$.
 \end{enumerate}
@@ -536,13 +536,13 @@ It was already cover how the heap is decomposed to the forests.
 One part of the decomposition process is identifying the cut-points.
 But it could happen that there is infinitely many cut-points.
 It is the case of e.g. doubly linked list where each node is cutpoint itself.
-This could be resolved by employing boxes (box is a symbol of alphabet of foresta automata of higher level which is also forest automata as it was mentiond in Chapter \ref{sec:prel}).
+This could be resolved by employing boxes (box is a symbol of alphabet of foresta automata of higher level which is also forest automata as it was mentiond in Chapter \ref{ch:prel}).
 Since it is possible for FA to use other FA as symbols we can fold recurring subgraphs to the boxes further used as symbols
 and so reduce the number of cut-points (to a bounded count).
 When it is needed to manipulate a graph described by a FA hidden in the box unfolding is done.
 The steps of verification procedure where folding and unfolding is neede has been mentioned in the beggining of this section
-and its formal defition is given in Chapter \ref{sec:prel}.
-The boxes can be learn during analysing of a program automatically what was proposed in \cite{cav13} or
+and its formal defition is given in Chapter \ref{ch:prel}.
+The boxes can be learn during analysing of a program automatically what was proposed in \cite{forester13} or
 it can be given to the analyzer manually by a user.
 
 \chapter{\vata\ and Forester}
@@ -556,7 +556,7 @@ It currently has its own implementation of TA providing operations over TA neede
 However it is quite impratical to mantain a special TA library inside of Forester
 and it would be more practical to employ some existing efficient TA library.
 One very efficient library is the VATA library which provides implementation of standard operations over TA like union or intersection
-but it also implements state-of-the-art algorithms \cite{tacas11} for language inclusion checking which efficiency
+but it also implements state-of-the-art algorithms \cite{tacas10} for language inclusion checking which efficiency
 is also crucial for performance of Forester.
 It seems logical according to these facts to connect Forester with the VATA library employing VATA like a backend TA library for Forester.
 
@@ -568,12 +568,12 @@ Finally the implementation of Forester using VATA library done as a part of this
 
 \vata\ is open source library for nondeterministic tree automata.
 Its main application is in the field of formal verification.
-VATA is licensed under GPL, version 3, and can be obtained from its official website \cite{www:vata}.
+VATA is licensed under GPL, version 3, and can be obtained from its official website \cite{www:libvata}.
 Implentation programming language is C++.
 It is the only library to our knowledge implementing state-of-the algorithms for checking inclusion of NTA languages
 what makes it suitable for usage as a Forester backend library.
 However, \vata\ does not only provide implementation of algorithms for NTA but also highly efficient implementation of
-algorithms for nondeterministic finite automata \cite{hruska13}.
+algorithms for nondeterministic finite automata \cite{bt:hruska}.
 
 \subsection{Design}
 \vata\ currently provides methods for representation of NTA in explicit encoding and also in semi-symbolic (top-down and bottom-up)
@@ -595,7 +595,7 @@ As you can see there are the three main parts in the library design:
 \begin{figure}[bt]
 \begin{center}
 \input{fig/lib_design.tikz}
-		\caption{The main concept of \vata. Figure is taken from \cite{tacas12}}.
+		\caption{The main concept of \vata. Figure is taken from \cite{libvata}}.
 		\label{fig:vata}
 \end{center}
 \end{figure}
@@ -626,7 +626,7 @@ the other side it does not store anywhere explicitly set of states because it ca
 \begin{figure}[bt]
 \begin{center}
 \input{fig/explicit.tikz}
-	\caption{Explicit representation of NTA by \vata. Figure is taken from \cite{tacas12}}.
+	\caption{Explicit representation of NTA by \vata. Figure is taken from \cite{libvata}}.
 	\label{fig:explnta}
 \end{center}
 \end{figure}
@@ -634,29 +634,30 @@ the other side it does not store anywhere explicitly set of states because it ca
 \begingroup
 \tikzset{every picture/.style={scale=0.8}}%
 \begin{figure}[bt]
-\label{fig:symnta}
 	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
 		\input{fig/mtbdd_td.tikz}
-		\caption{MTBDD Top-down representation of a NTA. Image is taken from \cite{tacas12}.}
+		\caption{MTBDD Top-down representation of a NTA. Image is taken from \cite{libvata}.}
 		\label{fig:mtbdd_td}
 	\end{subfigure}%
 	~
 	\begin{subfigure}{.5\textwidth}
 	\centering
 	\input{fig/mtbdd_bu.tikz}
-	\caption{MTBDD Bottom-up representation of a NTA. Image is taken from \cite{tacas12}.}
+	\caption{MTBDD Bottom-up representation of a NTA. Image is taken from \cite{libvata}.}
 	\label{fig:mtbdd_bu}
 	\end{subfigure}%
+\caption{Semi-symbolic encoding of tree automata.}
+\label{fig:symnta}
 \end{figure}
 \endgroup
 
 Another already implemented encoding is semi-symbolic based on VATA own implementation of MTBDD package.
 This encoding is efficient mainly for TA with large alphabet.
 Because semi-symblic encoding and MTBDD are not in the aim of this thesis the will no be detaily described
-but it is possbile to find such kind of description in \cite{lengal10}.
-The main idea of semi-symbolic encoding is shown in Figure \ref{fig:symnta}.
+but it is possbile to find such kind of description in \cite{mt:lengal}.
+The main principle of semi-symbolic encoding is shown in Figure \ref{fig:symnta}.
 First of all it is necessary to distinguish between (a) top-down and (b) bottom-up variants of this encoding.
 The first one maps each state $q$ of a NTA using MTBDD to the sets of the tuples of states such that that it is possible
 to make transtion from $q$ under a symbol $a$ to a tuple in apropriate set (each set of tuples is dedicated
@@ -685,7 +686,7 @@ Tool is written in C++.
 \subsection{Design}
 
 Forester is implemented as a GCC plugin but it does not analyze directly intermediate code of GCC called GIMPLE but is
-uses Code Listener infrastructure \cite{codelistnere} to provide fronted over GIMPLE.
+uses Code Listener infrastructure \cite{cl11} to provide fronted over GIMPLE.
 
 To get high level overiview of verification process performed by Forester please see Figure \ref{fig:fa_exec}. 
 Forester starts analysis of a program by translation of intermediate code representation provided by Code Listenter
@@ -751,7 +752,7 @@ Since VATA and Forester is developed by the same developers it also easy to adde
 to \vata\ operations needed by Forester.
 Having narrow interface between TA library and the rest of Forester implementation
 also improves code quiality of Forester in the sense of modularity, maintenability and code organization.
-These arguments lead us to implement a version of Forester using the VATA library what will be described in chapter \ref{ch:fova}.
+These arguments lead us to implement a version of Forester using the VATA library what will be described in Section \ref{sec:fova}.
 
 \chapter{Forester with VATA}
 \label{sec:fova}
@@ -767,7 +768,7 @@ so the advantage of the semi-symbolic encoding would not be fully utillizied her
 Forester implementation is currently far from being mature and high structural dependency is
 one of its bottlenecks.
 So the first thing needed to be done is reducing number of dependencies between classes (described in Section \ref{sec:forester_prep}.
-Then it is would be possible to apply design pattern \emph{adapter} \cite{gamma} (described in Section \ref{sec:adapter} to create
+Then it is would be possible to apply design pattern \emph{adapter} \cite{gamma95} (described in Section \ref{sec:adapter} to create
 interface between Forester and \vata (final implementation described in \ref{sec:fova_impl}.
 Applying of adapter design pattern makes possible to include VATA without need of rewriting
 Forester to the names of methods and data used in VATA.
@@ -786,13 +787,13 @@ This set of classes realizing original tree automata library will be further ref
 
 The refactoring is mainly based on reduction of the number data types and data members declared
 to be \emph{public} (in sense of C++ language).
-This is by exploiting features provided by standard C++11 \cite{c++11} which provides methods (keyword \emph{auto})
+This is by exploiting features provided by C++11 \cite{stroustrup13} which brings methods (keyword \emph{auto})
 for auto deduction of the data types by compiler what makes possible to make some of data types of the original tree automata module.
 \emph{Iterator} is another concept often used in combination with auto deduction of types to reduce need to export internals of tree automata module.
 The combination of these two patterns have been used for example when one needs to iterate over all transitions of tree automata or all transition with some
 state as parent.
 Another part of refactoring consists simple replacing access of the class data members by corresponding getters and setters method.
-Reducing of structural dependencies is also done by emphasis application of \emph{Law of Demeter} \cite{something} what practically
+Reducing of structural dependencies is also done by emphasis application of \emph{Law of Demeter} \cite{lod89} what practically
 means that classes using TA explicitly should implement methods providing information about TA instead of providing object representing TA itself.
 E.g. when one class wants to know whether a given state is final in an tree automaton of an forest automaton then FA implementation should
 implement a method instead of providing access to its TA.
@@ -803,7 +804,7 @@ However, Forester coding base is also after this refactoring far from accomplish
 \section{Adapter design pattern}
 \label{sec:adapter}
 
-\emph{Adapter} is structural design patter \cite{gamma} used for creating interface between classes incompatible classes.
+\emph{Adapter} is structural design patter \cite{gamma95} used for creating interface between classes incompatible classes.
 Adapter in notion of UML is shown in Figure \ref{fig:adapter}.
 Adapter consists from a class \emph{Adaptee} what is the class that we want to make compatible with
 another class \emph{Client} which wants to use the methods of Adaptee.
@@ -818,7 +819,7 @@ Adaptor also could add a new method that combines Adaptee methods to achieve wan
 		\includegraphics[scale=0.5]{fig/adapter.png}
 	\end{center}
 	\caption{Adapter design pattern expressed in UML.
-	Picture is taken from \cite{wikihttp://en.wikipedia.org/wiki/Adapter_pattern}}
+	Picture is taken from \cite{wiki:adapter}}
 	\label{fig:adapter}
 \end{figure}
 
@@ -879,7 +880,7 @@ based on forest automata has been also explored to fullfil thesis goal.
 The connection of Forester and \vata\ was designed and implemented after the analysis of the both tools.
 Forester tools had to be refactored for this purposes.
 
-So the first goal has been already reached and Forester tool using the VATA library successfully participated in competition SV-COMP 2015 \cite{svcomp}.
+So the first goal has been already reached and Forester tool using the VATA library successfully participated in competition SV-COMP 2015 \cite{www:svcomp}.
 The knowledge about Forester and related verification procedure gained during the work on the semestral project will be further used for design
 and implementation of backward run in the Forester tool what is the second goal of this master thesis. 
 
