@@ -174,15 +174,15 @@ iff the roots of trees $t_1,\ldots,t_n$ corresponds to the cut-points of $\otime
 so there is a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n\} )\}$ and $cps(\otimes f)$.
 The minimal io-forest is unique to permutations of $t_1,\ldots,t_n$.
 
-We need to defined ordering $\preceq_p$, so called \emph{cannonical ordering}, over cutpoints of $\otimes f$ to be able to define canonicity of the forest $f$.
-The cannonical ordering $\preceq_p \subseteq cps(\otimes f) \times cps(\otimes f)$ is defined as follows $c_1 \preceq_p c_2 \Leftrightarrow \emph{cost of the cheapest path from }
+We need to defined ordering $\preceq_p$, so called \emph{canonical ordering}, over cutpoints of $\otimes f$ to be able to define canonicity of the forest $f$.
+The canonical ordering $\preceq_p \subseteq cps(\otimes f) \times cps(\otimes f)$ is defined as follows $c_1 \preceq_p c_2 \Leftrightarrow \emph{cost of the cheapest path from }
 \phi_1 \emph{ (input port) to } c_1 \emph{ is}$ $\emph{cheaper}$ $\emph{ than cost of the cheapest path from } \phi_1 \emph{ to } c_2$.
 The io-forest $f_c$ is \emph{canonical} iff it is minimal and the trees $t_1,\ldots, t_n$ are ordered by $\preceq_p$ and $\times f$ is accesible.
-The cannonical io-forest is a unique representation of accesbile io-graph.
-The cannonical io-forest can be obtained by depth-first traversal (DFT) of $\otimes f$ what is a graph of a forest $f = (t_1 \cdots t_n, \phi)$.
+The canonical io-forest is a unique representation of accesbile io-graph.
+The canonical io-forest can be obtained by depth-first traversal (DFT) of $\otimes f$ what is a graph of a forest $f = (t_1 \cdots t_n, \phi)$.
 We need to assume that there is odering $\leq_\Sigma$ over labels $\Sigma$ of $\otimes f$ before description of DFT method.
 We create a stack of nodes for DFT initialized with input and output ports ordered by $\preceq_p$ when the smallest node is on the top of the stack.
-Then the DFT is run over $\otimes f$ and we obtain cannonical forest $f_c$ where trees are in the following order.
+Then the DFT is run over $\otimes f$ and we obtain canonical forest $f_c$ where trees are in the following order.
 The first ones are trees corresponding to the ports of $f$ ordered by $\preceq_p$ and the rest of the trees are in the order
 in which they were visited by DFT traversal.
 
@@ -237,8 +237,8 @@ Please note that it is neccessary to add to the cartesian product also sequence 
 and so to be able to construct graph language of $F$.
 The \emph{graph language} of $F$ is the set of io-graph $L(F) = \{\times f\,|\, f \in L_f{F}\}$.
 
-We say that $F$ respects \emph{cannonicity} if $\forall f \in L_f(F): \emph{f is cannonical}$.
-Checking inclusion of languages of forest automata respecting cannonicity could be done \emph{component-wise},
+We say that $F$ respects \emph{canonicity} if $\forall f \in L_f(F): \emph{f is canonical}$.
+Checking inclusion of languages of forest automata respecting canonicity could be done \emph{component-wise},
 i.e. checking language inclusion of their tree automata one by one.
 
 \begin{lemma}
@@ -350,8 +350,8 @@ Please note that the the meaning of $L(F)$ and $L_f(F)$ has not been changed but
 over structured labels.
 
 When we come back definiton of canoncity respecting FA we will find that it is applicable also for FA of higher level.
-A FA $F$ is cannonicity repsecting if $\forall f \in L_f(F): \emph{f is cannonical}$ and since definition of cannonical $f$
-is not affected by extending labels to the structured ones the meaning of cannonicity is same as for basic FA.
+A FA $F$ is canonicity repsecting if $\forall f \in L_f(F): \emph{f is canonical}$ and since definition of canonical $f$
+is not affected by extending labels to the structured ones the meaning of canonicity is same as for basic FA.
 The language inclusion checking is again possible to do component-wise like in the case of basic FA what is
 formulated by Lemma \ref{lemma:hfa_incl}.
 
@@ -401,11 +401,11 @@ The pointer selectors that pointed to the cut-points are now pointed to the root
 of particular tree components (and provides possibility to reconstruct the original graph again).
 Finally, the created tuple of the trees is called a forest.
 Please note, that the mentioned procedure corresponds to the terms defined in Chapter \ref{ch:prel}
-so it is possible to achieve cannonical forest as it was described in Section \ref{subsec:mcforest}.
+so it is possible to achieve canonical forest as it was described in Section \ref{subsec:mcforest}.
 
 Let formalized the idea given above.
 We denote a pointer selector by $PSel$, a data selector by $DSel$ and data domain by $\mathbb{D}$.
-A single heap configuration is a io-graph $g_st$ over the ranked alphabet of the strucutred labels $2^\Gamma$
+A single heap configuration is a io-graph $g_{st}$ over the ranked alphabet of the strucutred labels $2^\Gamma$
 with sub-labels from the ranked alphabet $\Gamma = PSel \cup (DSel \times \mathbb{D})$ having the
 ranking function that assigns $1$ to the pointer selectors and $0$ to the data selelectors.
 Values of data selectors are stored in the structured labels as sub-labels from $DSel \times \mathbb{D}$.
@@ -434,9 +434,8 @@ As you can see, the pointer selector $next_g \in PSel$ representing the pointer 
 has really rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing \texttt{data} variable from \texttt{SLL} structure
 has rank $0$.
 
-As we mentioned described approach could be used for single heap configuration representation but to be able
-to represent the sets of the heap configurations reachable by the analysed program we need
-to employ the forest automata of higher level respecting cannonicity that represents cannonical io-forests
+We need to be able to represent the sets of the heap configurations reachable by the analysed program not only single heap configuration
+what is possible by employing the forest automata of higher level respecting canonicity that represents canonical io-forests
 which modells the heap configurations.
 
 The last technical thing needed to be said is about storing \emph{stack frame} of a function in the analyzed program.
@@ -446,15 +445,105 @@ The input port node $sf$ serves in case of shape analysis based on FA for storin
 \section{Symbolic Execution}
 \label{sec:se}
 
-conrete domain
+FA-based verification procedure is a standard \emph{abstract interpretation} \cite{cuso}.
+The concrete domain assigns to each program location a set of pairs
+$(\sigma,H)$ where a mapping $\sigma$ maps each variable
+to a node in $H$, to a $\texttt{null}$ or to a undefined value, and $H$ is a single heap configuration.
+The abstrat domain than assigns to each program location a finite set of pairs
+$(\sigma, F)$ (called \emph{abstract configuration}) where $\sigma$ maps again each variable to a
+$\texttt{null}$ value or to undefined value or to an index of TA in $F$ and $F$ is a forest automata
+of higher level respecting canonicity representing a set of heaps configurations.
+Please note that it is needed a set of FA in abstract domain to represent one program locations (since
+abstract domain maps to a set of abstract configurations) because FA are not closed under union so it
+is not possible to represent the sets of heaps by single FA.
 
-abstract domain
+The verification starts from initial abstract configuration that consists an FA for initial heap configuration representing io-graph
+$g_{sf}$ where $g$ consists from two nodes.
+The first one is $\texttt{null}$ and the second one is empty stack frame $sf$ with $l_g(sf) = \emptyset$.
+The sequence of \emph{abstract transformers} related to the program statements is then iterativly applied to abstract configuration.
+The process of applying abstract transformers over abstract domain is called \emph{symbolic execution}.
+As it was said each abstract transformer correspond to a statement of the analyzed program.
+It is possible to define a function $f_{\texttt{op}}(g_{st})$ related to a operation \texttt{op} from a intermediate code of the analysed program.
+This function modells semantics of \texttt{op} in concrete domain in such a way that $f_{\texttt{op}}(g_{st})$
+returns a io-graph representing heap configuration after execution of \texttt{op} in real program.
+The abstract transformers $\tau_{\texttt{op}}$ are defined for each operation \texttt{op} reflecting $f(\texttt{op})$.
+The abstract transformer $\tau_{\texttt{op}}$ applied to a FA $S$ representing heap in abstract domain returns a result FA $S' = \tau_{\texttt{op}}$
+such that $\bigcup_{F' \in S'} \llbracket F' \rrbracket = \{ f_{\texttt{op}}(g_{sf}) \,|\, g_{sf} \in \llbracket F \rrbracket \wedge F \in S \}$
+The abstract transformer is applied separately to each forest $F \in S$.
 
-abstract transformers
+The abstract transformers related to a program statement in a program location are applied iterativly until
+abstract configurations in every program location reaches fixpoint.
+Each iteration follows this procedure:
+\begin{enumerate}
+		\item The sets of abstract configurations at each program point are updated by applying abstract transformers following
+			these steps:
+			\begin{enumerate}
+				\item Some boxes of FA in abstract configuration are unfold to uncover accessed part of heaps.
+					This step is called \emph{normalization}.
+				\item The update of abstract configuration is done.
+				\item The new boxes are \emph{learnt} by method described nicely in \emph{cav13}
+					and these boxes are fold again.
+					This is reapted until it is not possible to find the new boxes.
+				\item FA in abstract configuration made canonicity respecting.
+			\end{enumerate}
+		\item At junctions point of the program paths the union of the sets of FA is computed.
+		\item At junctions corresponding to the loops the union is followed by \emph{widening}
+			what brings also checking language inclusion between sets of FA to check whether fixpoint has been reached.
+			It is neccessary to tranform the FA to canonicity respecting form before inclusion checking.
+\end{enumerate}
 
-normalization
+Widening currently consists of repeating the following steps to each $F$ in the abstract configurations of a junction point until the fixpoint is reached:
+\begin{enumerate}
+		\item Box folding of $F$.
+		\item Abstraction -- It is based on framework if \emph{abstract regular (tree) model checking} \cite{artcm}.
+			During abstraction all states $q$, $q'$ are collapsed if it holds that
+			$q$ and $q'$ accepts trees with the same sets of prefixes of height at mose $k$.
+\end{enumerate}
 
-boxes
+It was mentioned that we need canonicity respecting FA to be able checking inclusion of languages of FA.
+This is done by operation called \emph{normalization} further described in Subsection \ref{subsec:norm}.
+Subsection \ref{subsec:boxes} provides brief description of cases when the boxes need to be applied.
+
+\subsection{Normalization}
+\label{subsec:norm}
+
+Normalization is done over a FA $F = (A_1 \cdots A_N,\pi)$ and its result is canonicity respecting FA.
+Normalization consist of the following steps:
+\begin{itemize}
+		\item We obtain form of $F$ in which roots of trees of transformed forests corresponds to
+			cut-points in a uniform way.
+			It meas that $\forall i \in \{1,\ldots,n\}$ and for all accepted forests $f_1,\ldots,f_n$ holds
+			one of the following conditions:
+			\begin{item}
+				\item Root of $f_i$ is the $j-th$ cut-point in the canonical ordering of an accepted forest $\Rightarrow$
+					It is the $j-th$ cut-point in the canonical ordering of all aceepted forests.
+				\item Otherwise, root of $f_i$ is not a cut-point of any accepted forests.
+			\end{item}
+		\item We merge $TA$ to get form of $F$ where roots of accepted forests are cut-points only.
+			So when there is a TA $A$ whose accepted trees are not cut-points in $L(F)$ and there is
+			a a TA $B$ that contains references to the root references to $A$, then $A$ is connected
+			to $B$ at places where $B$ has references to the root of $A$ so a new
+			TA $B_A = (Q_A \cup Q_B, \Gamma, \Delta_{A+B}, R_B)$ is created.
+			Transition rules set $\Delta_{A+B}$ is $\Delta_A \cup \Delta_B$ with substituted transition $q \rightarrow  \overline{a} (q_1 \cdots q_i \cdots q_n) \in \Delta_B$
+			by $q \rightarrow  \overline{a} (q_1 \cdots q_a \cdots q_n) \in \Delta_B$, where $q_i$ is a root reference to $A$ and $q_a$ is the root of $A$. 
+		\item $TA$ of $F$ are reorder by canonical ordering of cut-points.
+\end{itemize}
+
+\subsection{Boxes}
+\label{subsec:boxes}
+
+It was already cover how the heap is decomposed to the forests.
+One part of the decomposition process is identifying the cut-points.
+But it could happen that there is infinitely many cut-points.
+It is the case of e.g. doubly linked list where each node is cutpoint itself.
+This could be resolved by employing boxes (box is a symbol of alphabet of foresta automata of higher level which is also forest automata as it was mentiond in Chapter \ref{sec:prel}).
+Since it is possible for FA to use other FA as symbols we can fold recurring subgraphs to the boxes further used as symbols
+and so reduce the number of cut-points (to a bounded count).
+When it is needed to manipulate a graph described by a FA hidden in the box unfolding is done.
+The steps of verification procedure where folding and unfolding is neede has been mentioned in the beggining of this section
+and its formal defition is given in Chapter \ref{sec:prel}.
+The boxes can be learn during analysing of a program automatically what was proposed in \cite{cav13} or
+it can be given to the analyzer manually by a user.
 
 \chapter{\vata\ and Forester}
 \label{ch:tools}
