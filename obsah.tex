@@ -401,7 +401,7 @@ The pointer selectors that pointed to the cut-points are now pointed to the root
 of particular tree components (and provides possibility to reconstruct the original graph again).
 Finally, the created tuple of the trees is called a forest.
 Please note, that the mentioned procedure corresponds to the terms defined in Chapter \ref{ch:prel}
-so it is possible to achieve cannonical forest as it was described in Section \ref{sec:mcforest}.
+so it is possible to achieve cannonical forest as it was described in Section \ref{subsec:mcforest}.
 
 Let formalized the idea given above.
 We denote a pointer selector by $PSel$, a data selector by $DSel$ and data domain by $\mathbb{D}$.
@@ -439,13 +439,9 @@ to represent the sets of the heap configurations reachable by the analysed progr
 to employ the forest automata of higher level respecting cannonicity that represents cannonical io-forests
 which modells the heap configurations.
 
-TODO stack frame
-
-
-heap is graph over selectors and data
-
-formalize the ideas
-line is set of heaps configuration
+The last technical thing needed to be said is about storing \emph{stack frame} of a function in the analyzed program.
+When we recall definition of io-forests and forest automata so they contains excatly one (index of) input port.
+The input port node $sf$ serves in case of shape analysis based on FA for storing of a stack frame of the analyzed function.
 
 \section{Symbolic Execution}
 \label{sec:se}
