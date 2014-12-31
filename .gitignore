@@ -1,5 +1,6 @@
 *.pdf
 *.swp
+*.bak
 Changelog
 
 ## Core latex/pdflatex auxiliary files:
