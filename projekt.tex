@@ -84,28 +84,28 @@
   keywords.en={forest automata, formal verification, static analysis, complex data structures, tree automata, backward run, predicate abstraction.}, %klicova slova v anglickem jazyce
   %Abstract
   abstract.cs={
-	  Lesní automaty jsou formalismem používaný pro analýzu a verifikaci programu, které manipulují s dynamickými datovými strukturami.
-	  Koncept lesních automatů je založen na stromových automatech a verifikační procedura na nich založená byla implementován v nástroji Forester.
+	  Lesní automaty jsou formalismem používaným pro analýzu a verifikaci programu, které pracují s dynamickými datovými strukturami.
+	  Koncept lesních automatů je založen na stromových automatech a verifikační procedura na lesních automatech založená byla implementována v nástroji Forester.
 	  Ten implementuje vlastní knihovnu pro manipulaci se stromovými automaty.
 	  Nicméně existuje knihovna VATA, která obsahuje vysoce efektivní implementaci algoritmů
 	  pro práci se stromovými automaty a to především algoritmů pro test inkluze jazyků stromových automatů,
-	  což je stěžejní operace i při práci se stromovými automaty.
+	  což je stěžejní operace i při práci s lesními automaty.
 	  Prvním cílem této práce je tedy vytvoření varianty nástroje Forester založené na knihovně VATA.
 	  Druhým cílem je potom rozšíření verifikační procedury založené na lesních automatů o zpětný běh, který
 	  při nalezení chyby ve verifikovaném programu slouží k určení toho, zdali je chyba skutečná nebo byla způsobena
-	  abstrakcí použitou ve verifikační proceduře, což je informace použitelná pro implementaci predikátové abstrakce.
+	  abstrakcí použitou ve verifikační proceduře, což je informace použitelná pro zjemnění predikátové abstrakce.
 	  První cíl byl již splněn a varianta nástroje Forester používající knihovnu VATA se účastnila soutěže SV-COMP 2015.
   }, % abstrakt v ceskem jazyce
   abstract.en={
 	  Forest automata are formalism used for analysis and verification of programs manipulating dynamic data structures.
 	  Forest automata are based on tree automata and shape analysis based on forest automata has been implemented in Forester tool.
 	  Forester has its own implementation of tree automata.
-	  However there is the VATA library which implements the efficient algorithms for tree automata manipulation,
-	  primarily the efficient algorithms for the checking language inclusion of tree automata what is operation
+	  However, there is the VATA library which implements the efficient algorithms for tree automata manipulation,
+	  especially the efficient algorithms for the checking language inclusion of tree automata what is operation
 	  crucial also for verification procedure based on forest automata.
 	  The first goal of this thesis is to implement version of Forester tool that uses VATA library for tree automata manipulation.
 	  The second goal of this thesis is to extend forest automata based verification with backward run that checks whether
-	  a found error is a spurious or real one what could be used for predicate abstraction.
+	  a found error is a spurious or real one what could be used for refinement of predicate abstraction.
 	  The first goal has been already fulfill and the variant of Forester using the VATA library participated in the competition SV-COMP 2015.}, % abstrakt v anglickem jazyce
   %Prohlaseni
   declaration={Prohlašuji, že jsem tuto diplomovou práci vypracoval samostatně pod vedením\\ pana Mgr. Lukáše Holíka, Ph.D.},
@@ -113,9 +113,9 @@
   acknowledgment={Rád bych poděkoval vedoucímu této práce, Mgr. Lukáši Holíkovi, Ph.D., za to, že se mnou byl ochoten sdílet svoje zkušenosti jednoho z nejprestižnějších vědců ve svém oboru.
   Konzultace s ním mě naplňovali štěstím, poskytovali osvětlující náhled do problematiky a přiváděli mě do stavu nirvány plynoucí z pronikání do hlubin poznání v oblasti formální verifikace.
   Dále bych chtěl poděkovat Ing. Ondřeji Lengálovi, skoro-Ph.D., za četné konzultace, při kterých mě pomáhal překonat strastiplnou cestu po temných zákoutích nástroje Forester a svojí odvahou a statečností,
-  se kterou pronikal přes trnité hradby zdrojových kódů, mi byl vzorem.
-  Za konzultace a odborné rady také děkuji Prof. Ing. Tomáši Vojnarovi, Ph.D., a děkuji také za to, že mi poskytnul možnost vypracovat tuto práci v prostředí skupiny VeriFIT a nechal mě sedět přímo
-  vedle sebe, což mi přineslo, mimo jiné, obohacení mé slovní zásoby o mnoho výrazů a slovních spojení, které se mi zcela jistě budou v dalším studiu, ale také odoborné kariéře, hodit.} % nepovinne
+  se kterou pronikal přes trnité hradby zdrojových kódů, mi šel příkladem.
+  Za konzultace a odborné rady také děkuji Prof. Ing. Tomáši Vojnarovi, Ph.D., a děkuji také za to, že mi poskytnul možnost vypracovat tuto práci v prostředí skupiny VeriFIT a nechal mě pracovat
+  po svém boku, což mi přineslo, mimo jiné, obohacení slovní zásoby o mnoho výrazů a slovních spojení, které se mi zcela jistě budou v dalším studiu, ale také odoborné kariéře, hodit.} % nepovinne
 }
 
 %Abstrakt (cesky, anglicky)
