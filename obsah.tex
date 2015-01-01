@@ -55,14 +55,14 @@ The second goal of this thesis is to design and implement \emph{backward run} fo
 The error could be spurious because of too high level of abstraction over FA is used.
 The information gained by backward run could be used for the refinement of \emph{predicate abstraction} (one kind of abstraction over FA)
 what prevents verification procedure from getting the same spurious error again.
-However, Forester does not use predicate abstraction but \emph{heigh abstraction} now because it is not possible to use it when the backward run is not implemented.
+However, Forester does not use predicate abstraction but \emph{height abstraction} now because it is not possible to use it when the backward run is not implemented.
 So a part of this goal is also to complete and test implementation of predicate abstraction in Forester.
 
 The outline of this document is following.
 In Chapter \ref{ch:prel} the preliminaries needed for understanding of further text are given.
-The verfication procedure based on FA is covered in Chapter \ref{ch:fav}.
+The verification procedure based on FA is covered in Chapter \ref{ch:fav}.
 Chapter \ref{ch:tools} provides description of VATA library and Forester tool and Chapter \ref{ch:fova} describes version of Forester tool using \vata.
-The design of backward run for FA base verfication is given in Chapter \ref{ch:backward} and its implementation is documented
+The design of backward run for FA base verification is given in Chapter \ref{ch:backward} and its implementation is documented
 in Chapter \ref{ch:impl}.
 Finally, Chapter \ref{ch:eval} contains an overview of evaluation and Chapter \ref{ch:concl} summarizes this master thesis.
 
@@ -607,7 +607,7 @@ and needed operations over TA and can employ already implemented parses and seri
 
 \subsection{Implemented NTA encodings}
 
-It was mentioned that there are currently implemented two representation of TA and these will be described in the followin subsection.
+It was mentioned that there are currently implemented two representation of TA and these will be described in the following subsection.
 
 Using \emph{explicit encoding} NTA transition relation is represented by a hierarchy of the hash tables as it is shown in Figure \ref{fig:explnta}.
 The first level of the hash tables hierarchy (\emph{top-level look-up tables}) maps each state $q$ of an automaton to 
@@ -725,7 +725,7 @@ like stand alone classes which takes FA as parameters.
 So these operation could be understood like another module \emph{Operation over Forest Automata}.
 Finally, Forester currently has its own implementation of \emph{Tree Automata}.
 It is very lightweighted implementation containing optimized operations like language inclusion checking using simulation needed for (efficient) Forester run.
-The advantage of this implementation is its simplicity and optimization of operation hardly exploited by Forester what makes verification run faste.
+The advantage of this implementation is its simplicity and optimization of operation hardly exploited by Forester what makes verification run faster.
 On the other side, it is not easy to maintain such a optimized implementation when one consider that there are still progress in field of design of the efficient algorithms
 for TA which could bring much higher efficiency then implementation optimization.
 \begin{figure}[bt]
@@ -879,6 +879,6 @@ The connection of Forester and \vata\ was designed and implemented after the ana
 Forester tools had to be refactored for this purposes.
 
 So the first goal has been already reached and Forester tool using the VATA library successfully participated in competition SV-COMP 2015 \cite{www:svcomp}.
-The knowledge about Forester and related verification procedure gained during the work on the semestral project will be further employed for design
+The knowledge about Forester and related verification procedure gained during the work on the term project will be further employed for design
 and implementation of backward run in the Forester tool what is the second goal of this master thesis. 
 
