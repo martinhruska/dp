@@ -17,7 +17,7 @@
 \node [block_cl] (cl) {Code Listener};
 \node [block_compiler, right of=cl] (compiler) {Compiler};
 \node [block_symex, above of=compiler] (microcode) {Microcode instructions};
-\node [block_symex, right of=compiler] (symex) {Symbolic Execition};
+\node [block_symex, right of=compiler] (symex) {Symbolic Execution};
 \node [block_symex, above of=symex] (symstate) {Symbolic State};
 \node [block_symex, below of=symex] (symcnt) {Symbolic Context};
 
