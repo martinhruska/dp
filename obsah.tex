@@ -543,7 +543,7 @@ and its formal definition is given in Chapter \ref{ch:prel}.
 The boxes can be learn during analysing of a program automatically by the method proposed in \cite{forester13} or
 it can be given to the analyzer manually by a user.
 
-\chapter{\Vata\ and Forester}
+\chapter{The VATA Library and Forester}
 \label{ch:tools}
 
 As it was mentioned in the introduction, FA based verification is implemented by a tool
@@ -606,7 +606,7 @@ Finally, automaton could be serialized to an output format.
 When one wants to add her own encoding then she needs to implement only core of encoding (with API for creating automaton itself)
 and needed operations over TA and can employ already implemented parses and serializers in \vata.
 
-\subsection{Implemented NTA encodings}
+\subsection{Implemented NTA Encodings}
 
 It was mentioned that there are currently implemented two representation of TA and both are described in the following subsection.
 
@@ -775,7 +775,7 @@ Forester to the names of methods and data used in VATA.
 It creates also only one place (particularly adapter class) connecting Forester and VATA instead of
 including VATA into many of the Forester classes and so it prevents from creating too strong relation between them.
 
-\section{Forester refactoring}
+\section{Forester Refactoring}
 \label{sec:forester_prep}
 
 The original implementation of tree automata library has not been exception so it was needed
@@ -800,7 +800,7 @@ Applying the Law of Demeter reduces knowledge needed about implementation of TA 
 helps us to make little interface for TA module.
 However, Forester source code is also after this refactoring far from accomplishing the mentioned good practices (and also those not mentioned) all around the code.
 
-\section{Adapter design pattern}
+\section{Adapter Design Pattern}
 \label{sec:adapter}
 
 \emph{Adapter} is structural design patter \cite{gamma95} used for creating interface between classes incompatible classes.
