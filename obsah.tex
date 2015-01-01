@@ -331,7 +331,7 @@ and introduce following two procedures over FA.
 		a FA $F'$, by a graph from $L(F')$.
 		Formally, sub-edge $e\langle i \rangle$ of the graph $g$ has a symbol $a$ and this symbol is a FA $F'$ (so this symbol is a box)
 		and $g'_\phi \in L(a)$ then $h = g \subst{g'_\phi}{e\langle i \rangle}$ is an unfolding of $g$.
-		We will denote unfolding $h$ of $g$ by $g \prec h$.
+		We denote unfolding $h$ of $g$ by $g \prec h$.
 	\item \emph{Folding} is a replacement of $g'_\phi$ by $e \langle i \rangle$ in $h$ obtaining $g$.
 		So we can say that $g'_\phi$ is folded to to $e \langle i \rangle$. 
 \end{itemize}
@@ -557,7 +557,7 @@ but it also implements the state-of-the-art algorithms \cite{tacas10} for langua
 is also crucial for performance of Forester.
 It seems logical according to these facts to connect Forester with the VATA library employing VATA like a backend TA library for Forester.
 
-This chapter will provide a description of the VATA library firstly and then also a description of Forester.
+This chapter provides a description of the VATA library firstly and then also a description of Forester.
 
 \section{\Vata}
 \label{sec:VATA}
@@ -607,7 +607,7 @@ and needed operations over TA and can employ already implemented parses and seri
 
 \subsection{Implemented NTA encodings}
 
-It was mentioned that there are currently implemented two representation of TA and these will be described in the following subsection.
+It was mentioned that there are currently implemented two representation of TA and both are described in the following subsection.
 
 Using \emph{explicit encoding} NTA transition relation is represented by a hierarchy of the hash tables as it is shown in Figure \ref{fig:explnta}.
 The first level of the hash tables hierarchy (\emph{top-level look-up tables}) maps each state $q$ of an automaton to 
@@ -746,12 +746,12 @@ It was already mentioned that substitution of Forester TA implementation by
 VATA could bring some advantages.
 We summarize them here again.
 The first one is fact that it is much easier to maintain one library where
-the state-of-the-art algorithms will be implemented and optimized.
+the state-of-the-art algorithms are implemented and optimized.
 Since VATA and Forester is developed by the same developers it also easy to added
 to \vata\ operations needed by Forester.
 Having narrow interface between TA library and the rest of Forester implementation
 also improves code quality of Forester in the sense of modularity, maintainability and code organization.
-These arguments lead us to implement a version of Forester using the VATA library what will be described in Section \ref{ch:fova}.
+These arguments lead us to implement a version of Forester using the VATA library what is described in Section \ref{ch:fova}.
 
 \chapter{Forester with VATA}
 \label{ch:fova}
@@ -843,7 +843,7 @@ There are methods implemented by adapter not presented in VATA like method \emph
 performing some kind of an unfolding.
 The methods of this kind are very Forester specific so it is not sensible to add them to general purpose library like \vata\ is.
 
-We originally supposed that it will be possible to keep the original TA module along the VATA library adapter
+We originally supposed that it would be possible to keep the original TA module along the VATA library adapter
 to be able to easily switch between them.
 However it has proved that this would bring high overhead in some situation when a conversion of some data types is needed
 compared to situation when there are used directly data types compatible with VATA in the Forester code
@@ -872,8 +872,8 @@ text
 \label{ch:concl}
 
 The main goals of this thesis were (a) to implement version of Forester tool that uses the VATA library for tree automata representation and manipulation
-and (b) extend verification procedure based on forest automata with backward run for detection of the spurious errors find out in a analysed program.
-The theory of forest automata and related theory tree automata has been studied and described in this thesis and the verification procedure
+and (b) to extend verification procedure based on forest automata with backward run for detection of the spurious errors find out in a analysed program.
+The theory of forest automata and related theory of tree automata has been studied and described in this thesis and the verification procedure
 based on forest automata has been also explored to fulfill thesis goals.
 The connection of Forester and \vata\ was designed and implemented after the analysis of the both tools.
 Forester tools had to be refactored for this purposes.
