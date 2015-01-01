@@ -85,7 +85,7 @@
   %Abstract
   abstract.cs={
 	  Lesní automaty jsou formalismem používaným pro analýzu a verifikaci programu, které pracují s dynamickými datovými strukturami.
-	  Koncept lesních automatů je založen na stromových automatech a verifikační procedura na lesních automatech založená byla implementována v nástroji Forester.
+	  Koncept lesních automatů je založen na stromových automatech a verifikační procedura na tomto konceptu postavená byla implementována v nástroji Forester.
 	  Ten implementuje vlastní knihovnu pro manipulaci se stromovými automaty.
 	  Nicméně existuje knihovna VATA, která obsahuje vysoce efektivní implementaci algoritmů
 	  pro práci se stromovými automaty a to především algoritmů pro test inkluze jazyků stromových automatů,
@@ -93,14 +93,14 @@
 	  Prvním cílem této práce je tedy vytvoření varianty nástroje Forester založené na knihovně VATA.
 	  Druhým cílem je potom rozšíření verifikační procedury založené na lesních automatů o zpětný běh, který
 	  při nalezení chyby ve verifikovaném programu slouží k určení toho, zdali je chyba skutečná nebo byla způsobena
-	  abstrakcí použitou ve verifikační proceduře, což je informace použitelná pro zjemnění predikátové abstrakce.
+	  abstrakcí použitou během průběhu verifikace, což je informace použitelná pro zjemnění predikátové abstrakce.
 	  První cíl byl již splněn a varianta nástroje Forester používající knihovnu VATA se účastnila soutěže SV-COMP 2015.
   }, % abstrakt v ceskem jazyce
   abstract.en={
 	  Forest automata are formalism used for analysis and verification of programs manipulating dynamic data structures.
-	  Forest automata are based on tree automata and shape analysis based on forest automata has been implemented in Forester tool.
+	  Forest automata are based on tree automata and shape analysis related to forest automata has been implemented in Forester tool.
 	  Forester has its own implementation of tree automata.
-	  However, there is the VATA library which implements the efficient algorithms for tree automata manipulation,
+	  However, there is the VATA library which implements the efficient algorithms for the tree automata manipulation,
 	  especially the efficient algorithms for the checking language inclusion of tree automata what is operation
 	  crucial also for verification procedure based on forest automata.
 	  The first goal of this thesis is to implement version of Forester tool that uses VATA library for tree automata manipulation.
