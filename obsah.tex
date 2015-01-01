@@ -5,13 +5,13 @@ and we also spend a plenty of time using computers (e.g. personal computers or m
 The computer programs are also often used in very critical instances like autopilot in an airplane.
 But the growing number of applications of computer programs brings also need for their greater safety and security.
 
-However, guarantee of software quality and correctness is not easy task
+However, guarantee of software safety and correctness is not easy task
 because the programs often go through many states during computation
 and it could be very time and (memory) space demanding to check whether no undesirable thing
 happens in any of those states.
 One approach to ensure software quality is \emph{testing} (and dynamic analysis) which is basically based
 on running a program in the different contexts and with the different inputs
-and checking whether a program behavior and the outputs are expected one.
+and checking whether a program behavior and the outputs are the expected one.
 This method can satisfy many of the requirements for software quality and often cover the great space of the program behaviors
 but on the other side it is only possible to prove presence of the errors using testing not their absence \cite{dijkstra}.
 Moreover finding some errors during testing does not mean that all errors are eliminated.
@@ -33,35 +33,36 @@ This thesis deals with specific part of static analysis called \emph{shape analy
 complex data structures (like a different kinds of lists and trees), typically allocated on the heap.
 The properties checked for this class of programs are for example checking whether no dangling
 pointers are dereferenced (no invalid dereference), whether all allocated memory on a heap is also freed (no memory leaks)
-a program execution or whether there is not freed pointer which has not had assigned memory (no invalid free).
+during the program execution or whether there is not freed pointer which has no assigned memory (no invalid free).
 There are different approaches to this kind of static analysis with the different advantages.
-For example approach based on \emph{separation logic} \cite{seplog,seplog07} brings scalability to a verification procedure.
-On the other side, automata based approach, concretely \emph{abstract tree regular model checking} (ATRMC) \cite{artmc}, is
+For example, the approach based on \emph{separation logic} \cite{seplog,seplog07} brings scalability to a verification procedure.
+On the other side, the automata based approach, concretely \emph{abstract tree regular model checking} (ATRMC) \cite{artmc}, is
 superior in flexibility.
-However, this thesis is focused on a verification procedure based on a concept of Forest automata (FA) which tries
-to synthesize benefits of the mentioned approaches.
+However, this thesis is focused on a verification procedure based on a concept of forest automata (FA) which
+synthesizes benefits of the mentioned approaches.
 
-Forest automata has been introduce in \cite{forester11,forester12} and they are extension of finite automata or more precisely extension of finite tree automata (TA).
+Forest automata has been introduce in \cite{forester11,forester12} and they are an extension of finite automata or more precisely extension of finite tree automata (TA).
 They are used as an abstract domain in related verification procedure over which a symbolic execution of a analyzed program is performed.
 A prototype of this verification procedure has been implemented in tool called \emph{Forester}.
-Forester verifies programs in language C and it can detect invalid dereferences, invalid free, memory leaks and also reachability of an error label.
+Forester verifies the programs in language C and it can detect invalid dereferences, invalid free, memory leaks and also reachability of an error label.
 It is yet able to verify non-trivial data structures like skiplist of the second and the third level
 but there is still a room for its improvement what is also a general goal of this master thesis.
 
-Since FA are highly related to finite tree automata the first of goal of the thesis is to connect
-Forester with VATA library -- state-of-the-art library for TA manipulation \cite{libvata}.
-Particularly, this consists creating of an interface between Forester and VATA to employ VATA as TA library for Forester backend.
-The second goal of this thesis is to design and implement \emph{backward run} for FA based verification what enables checking spuriousness of an error found in program.
+Since FA are highly related to the finite tree automata the first of goal of the thesis is to implement
+a version of Forester using \vata\ -- state-of-the-art library for TA manipulation \cite{libvata}.
+Particularly, this consists creating of an interface between Forester and VATA to employ VATA as TA library for Forester backend
+what should bring better maintainability and modularity then having a Forester own TA implementation as it is now.
+The second goal of this thesis is to design and implement \emph{backward run} for FA based verification what enables checking spuriousness of an error found in a program.
 The error could be spurious because of too high level of abstraction over FA is used.
 The information gained by backward run could be used for the refinement of \emph{predicate abstraction} (one kind of abstraction over FA)
 what prevents verification procedure from getting the same spurious error again.
 However, Forester does not use predicate abstraction but \emph{height abstraction} now because it is not possible to use it when the backward run is not implemented.
-So a part of this goal is also to complete and test implementation of predicate abstraction in Forester.
+So a part of this goal is also to complete and to test implementation of predicate abstraction in Forester.
 
 The outline of this document is following.
 In Chapter \ref{ch:prel} the preliminaries needed for understanding of further text are given.
 The verification procedure based on FA is covered in Chapter \ref{ch:fav}.
-Chapter \ref{ch:tools} provides description of VATA library and Forester tool and Chapter \ref{ch:fova} describes version of Forester tool using \vata.
+Chapter \ref{ch:tools} provides description of \vata\ and Forester tool and Chapter \ref{ch:fova} describes an implementation of the version of Forester tool using \vata.
 The design of backward run for FA base verification is given in Chapter \ref{ch:backward} and its implementation is documented
 in Chapter \ref{ch:impl}.
 Finally, Chapter \ref{ch:eval} contains an overview of evaluation and Chapter \ref{ch:concl} summarizes this master thesis.
