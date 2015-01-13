@@ -7,11 +7,11 @@ But the growing number of applications of computer programs brings also need for
 
 However, guarantee of software safety and correctness is not easy task
 because the programs often go through many states during computation
-and it could be very time and (memory) space demanding to check whether no undesirable thing
+and it could be very time and (memory) space demanding or even impossible to check whether no undesirable thing
 happens in any of those states.
 One approach to ensure software quality is \emph{testing} (and dynamic analysis) which is basically based
 on running a program in the different contexts and with the different inputs
-and checking whether a program behavior and the outputs are the expected one.
+and checking whether a program behavior and the outputs are the expected ones.
 This method can satisfy many of the requirements for software quality and often cover the great space of the program behaviors
 but on the other side it is only possible to prove presence of the errors using testing not their absence \cite{dijkstra}.
 Moreover finding some errors during testing does not mean that all errors are eliminated.
@@ -22,12 +22,14 @@ Formal verification is method for checking whether a given system meets a given 
 There are three main branches of formal verification.
 The first one is \emph{model checking} which systematically explores the states of a model (e.g. model of a program) to
 prove that a property holds along the whole model.
-The second approach is static analysis which is done over a source code (or some modification of it) of a system
+The second approach is \emph{static analysis} which is done over a source code (or some modification of it) of a system
 without its explicit execution.
+Another approach is \emph{abstract interpretation} where the analysis is performed by
+applying abstract transformers corresponding to the original program semantics over an abstract domain.
 The last one is \emph{theorem proving}.
 It proves the program in standard mathematical way -- starting from axioms and proving theorems to
 verify the properties of a given system.
-Theorem proving could be more or less automated.
+Theorem proving could be partially automated.
 
 This thesis deals with specific part of static analysis called \emph{shape analysis} which is focused on the verification of the programs manipulating
 complex data structures (like a different kinds of lists and trees), typically allocated on the heap.
@@ -35,32 +37,40 @@ The properties checked for this class of programs are for example checking wheth
 pointers are dereferenced (no invalid dereference), whether all allocated memory on a heap is also freed (no memory leaks)
 during the program execution or whether there is not freed pointer which has no assigned memory (no invalid free).
 There are different approaches to this kind of static analysis with the different advantages.
-For example, the approach based on \emph{separation logic} \cite{seplog,seplog07} brings scalability to a verification procedure.
+For example, the approach based on \emph{separation logic} \cite{seplog,seplog07} provides scalability of a verification procedure.
 On the other side, the automata based approach, concretely \emph{abstract tree regular model checking} (ATRMC) \cite{artmc}, is
 superior in flexibility.
 However, this thesis is focused on a verification procedure based on a concept of forest automata (FA) which
-synthesizes benefits of the mentioned approaches.
+combines benefits of the both mentioned approaches.
 
 Forest automata has been introduce in \cite{forester11,forester12} and they are an extension of finite automata or more precisely extension of finite tree automata (TA).
 They are used as an abstract domain in related verification procedure over which a symbolic execution of a analyzed program is performed.
-A prototype of this verification procedure has been implemented in tool called \emph{Forester}.
-Forester verifies the programs in language C and it can detect invalid dereferences, invalid free, memory leaks and also reachability of an error label.
+A prototype of this verification procedure has been implemented in a tool called \emph{Forester}.
+Forester verifies programs written in C language and it can detect invalid dereferences, invalid free, memory leaks and also reachability of an error label.
 It is yet able to verify non-trivial data structures like skiplist of the second and the third level
-but there is still a room for its improvement what is also a general goal of this master thesis.
+but there is still a room for its improvement.
+E.g. Forester currently does not support complete C language syntax and it is not also yet possible to check whether a found error
+is real or spurious.
+It is also needed to refactore some parts of Forester code before extension of the tool.
+A general goal of this thesis is improving Forester in the areas described further.
 
-Since FA are highly related to the finite tree automata the first of goal of the thesis is to implement
+
+Since FA are highly related to the finite tree automata the first of the goals of the thesis is to implement
 a version of Forester using \vata\ -- state-of-the-art library for TA manipulation \cite{libvata}.
-Particularly, this consists creating of an interface between Forester and VATA to employ VATA as TA library for Forester backend
-what should bring better maintainability and modularity then having a Forester own TA implementation as it is now.
+Particularly, this consists creating an interface between Forester and VATA to employ VATA as a TA library for Forester backend
+which should bring better maintainability and modularity then implement a special TA library inside Forester as it is now.
 The second goal of this thesis is to design and implement \emph{backward run} for FA based verification what enables checking spuriousness of an error found in a program.
 The error could be spurious because of too high level of abstraction over FA is used.
 The information gained by backward run could be used for the refinement of \emph{predicate abstraction} (one kind of abstraction over FA)
 what prevents verification procedure from getting the same spurious error again.
-However, Forester does not use predicate abstraction but \emph{height abstraction} now because it is not possible to use it when the backward run is not implemented.
-So a part of this goal is also to complete and to test implementation of predicate abstraction in Forester.
+However, Forester does not use predicate abstraction but \emph{height abstraction} now
+because predicate abstraction needs the backward run.
+Height abstraction is less precise and less flexible compared to predicate abstraction so implementing predicate abstraction
+enables analysis of even more complex data structures like the red-black trees.
+A part of the second goal is just completing and testing implementation of predicate abstraction in Forester.
 
 The outline of this document is following.
-In Chapter \ref{ch:prel} the preliminaries needed for understanding of further text are given.
+In Chapter \ref{ch:prel} the preliminaries are given.
 The verification procedure based on FA is covered in Chapter \ref{ch:fav}.
 Chapter \ref{ch:tools} provides description of \vata\ and Forester tool and Chapter \ref{ch:fova} describes an implementation of the version of Forester tool using \vata.
 The design of backward run for FA base verification is given in Chapter \ref{ch:backward} and its implementation is documented
@@ -70,23 +80,23 @@ Finally, Chapter \ref{ch:eval} contains an overview of evaluation and Chapter \r
 \chapter{Preliminaries}
 \label{ch:prel}
 
-This chapter gives the definitions of the theoretical foundations of this thesis.
+This chapter contains the definitions of the concepts further used in this thesis.
 First, graphs, trees and forests are defined together along the automata accepting them in Section \ref{sec:graph}.
-Then the previously defined concepts are further extended to hierarchical one in Section \ref{sec:fah}.
-This section follow the definitions and a structure used in \cite{techrep}.
+Then the previously defined concepts are further extended to hierarchical ones in Section \ref{sec:fah}.
+This section follows the definitions and a the structure used in \cite{techrep}.
 
 \section{Graphs, Trees and Forests}
 \label{sec:graph}
 
-Let us suppose a word $w = a_1 \cdots a_n$, we denote $i$-th symbol of $w$ as $a_i$.
-We denote $dom(f)$ domain of a total mapping $\funcdecl{f}{A}{B}$ and its range is denoted by $rng(f)$.
+Assume a word $w = a_1 \cdots a_n$, we denote $i$-th symbol of $w$ as $a_i$.
+We denote $dom(f)$ the domain of a total mapping $\funcdecl{f}{A}{B}$ and its range is denoted by $rng(f)$.
 
 \subsection{Graphs and Trees}
 \label{subsec:graph}
 A \emph{ranked alphabet} is a finite set of symbols $\Sigma$ and a related mapping $\funcdecl{\#}{\Sigma}{\mathbb{N}}$
 assigns to a symbol its rank.
 A (directed, ordered, labelled) \emph{graph} is a total map $\funcdecl{g}{V}{\Sigma \times V^{*}}$ where $V$ is a finite set of nodes.
-The items of set $\Sigma$ are within graph context called \emph{labels}.
+The items of the set $\Sigma$ are in context of the graphs called \emph{labels}.
 Map $g$ maps each node $v\in V$ to:
 \begin{enumerate}
 	\item a label $\alpha \in \Sigma$ that we denote by $l_g(v)$.
@@ -101,7 +111,7 @@ An \emph{edge} of $g$ is a pair $v \mapsto (a, v_1 \cdots v_n))$ where $v, v_1, 
 $a \in \Sigma$ such that $g(v) = (a, v_1 \cdots v_n)$.
 \emph{In-degree} of a node $v' \in V$ in graph $g$ is the overall number of its occurrences in $g(v)$ for any $v \in V$.
 We denote in-degree of a node $v \in V$ by $idg_g(v)$ and we omit again subscript $g$ whenever it is possible.
-More formal, in-degree is defined as $idg(v') = |\{v \mapsto (a, v_1 \cdots v_n) \,|\, v \mapsto (a, v_1 \cdots v_n) \emph{ is an edge such that } \exists i \in \{1,\ldots,n\}: v' = v_i\}|$.
+More formally, in-degree is defined as $idg(v') = |\{v \mapsto (a, v_1 \cdots v_n) \,|\, v \mapsto (a, v_1 \cdots v_n) \emph{ is an edge such that } \exists i \in \{1,\ldots,n\}: v' = v_i\}|$.
 The \emph{joins} of $g$ are nodes $v \in V$ such that $idg(v') > 1$.
 
 A \emph{path} from $v\in V$ to $v' \in V$ is a sequence $p=v_0, i_1, v_1, \ldots, i_n, v_n$ where $v=v_0, v' = v_n$
@@ -112,8 +122,8 @@ The path $p$ is acyclic if $\forall u_i,u_j \in p: i \neq j \Rightarrow u_i \neq
 A \emph{cost} of an acyclic path is sequence $i_1, \ldots, i_n$.
 The path $p$ is \emph{cheaper} than another path $p'$ iff the cost of $p$ is lexicographically smaller than that of $p'$. 
 A node $u \in V$ is \emph{reachable} from a node $v \in V$ iff that is a path from $v$ to $u$ or $u=v$.
-A node $u \in V$ is \emph{root} of $g$ iff all nodes $v \in V$ are reachable from $u$.
-We use term $root$ also for a mapping $\funcdecl{root}{g}{V}$ which maps a graph to its root.
+A node $u \in V$ is a \emph{root} of $g$ iff all nodes $v \in V$ are reachable from $u$.
+We use the term $root$ also for a mapping $\funcdecl{root}{g}{V}$ which maps a graph to its root.
 When there is a root in a graph then the graph is called \emph{rooted}.
 
 A \emph{tree} $t$ is a graph which is either empty, or it has exactly one root and $\forall v \in V: idg(v) \leq 1$ (informally,
@@ -123,12 +133,12 @@ each node is a successor of at most one of the other nodes).
 \label{subsec:forests}
 
 Let us suppose without loss of generality that $\Sigma \cap \mathbb{N} = \emptyset$.
-A $\Sigma$-labelled \emph{forest} is a sequence of tree $t_1 \cdots t_n$ over ($\Sigma \cup \{1,\ldots,n\}$)
+A $\Sigma$-labelled \emph{forest} is a sequence of trees $t_1 \cdots t_n$ over ($\Sigma \cup \{1,\ldots,n\}$)
 where $\forall i \in \{1,\ldots,n\}: \#i = 0$.
-\emph{Root preferences} are leaves labelled $i \in \mathbb{N}$.
-The forest $t_1 \cdots t_n$ (we suppose that their nodes sets are disjoint) represents the graph $\fagr$ that could
-be constructed by interconnecting their roots by the related root reference.
-E.g. when there is a root reference $2$ in $t_1$ then this leaf is replaced by the root node of $t_2$.
+\emph{Root references} are leaves labelled by $i \in \mathbb{N}$.
+The forest $t_1 \cdots t_n$ (we suppose that the sets of nodes of the trees are disjoint) represents the graph $\fagr$ that could
+be constructed by interconnecting roots by the related root reference.
+E.g., a root reference $2$ in $t_1$ would be replaced by the root node of $t_2$.
 Let's formalize the idea of construction of $\fagr$.
 $\fagr$ contains an edge $v \mapsto (a,v_1 \cdots v_m)$ iff $\exists i \in \{1, \ldots, n\} \ \exists(v \mapsto (a, v_1' \cdots v_m')) \in edges(t_i)
 \ \forall j \in \{1,\ldots,m\}: v_j = h(v_j')$ where $edges(t_i)$ is the set of all edges of the tree $t_i$ and
@@ -141,13 +151,13 @@ $\fagr$ contains an edge $v \mapsto (a,v_1 \cdots v_m)$ iff $\exists i \in \{1, 
 \subsection{Graphs and Forests with Ports}
 \label{subsec:gfp}
 
-We extend graphs and forests with concept of the \emph{ports} which should
+We extend graphs and forests with concept of \emph{ports} which should
 serve for marking input and output nodes.
 An \emph{input-output-graph} (io-graph) is a pair $(g,\phi)$ (in sense of brevity also denoted by $g_\phi$)
 where $g$ is a graph and $\phi=(\phi_1 \cdots \phi_n) \in dom(g)^+$ is a sequence of ports, $\phi_1$
 is an input port and $\phi_1 \cdots \phi_n$ is a sequence of output ports.
 The ports in $\phi$ are unique.
-If a root of $g_\phi$ is $\phi_1$ then $g_\phi$ is \emph{accessible}.
+If a root of $g_\phi$ is $\phi_1$ then $g_\phi$ is called \emph{accessible}.
 
 The \emph{cut-points} of a graph $g_\phi$ is the set of its ports and joins and we denote this set by $cps(g_\phi)$.
 Formally, $cps(g_\phi)=\{v \in V\,|\, v \in \phi \vee idg(v) > 1\}$.
@@ -155,30 +165,33 @@ Formally, $cps(g_\phi)=\{v \in V\,|\, v \in \phi \vee idg(v) > 1\}$.
 An \emph{io-forest} is a pair $f=(t_1 \cdots t_n, \pi)$ such that $n \geq 1$ and $\pi \in \{1,\ldots,n\}^n$
 is a sequence of port indices, where $\pi_1$ is a input port index and $\pi_2 \ldots \pi_{|\pi|}$ is a sequence
 of the output ports indices.
-The indices are unique as in the case of ports.
-It is also possible to construct a io-graph $\otimes f$ from a forest $f$ such that
+As in the case of the ports the indices are unique .
+It is also possible to construct an io-graph $\otimes f$ from a forest $f$ such that
 $\otimes f = (\otimes t_1 \cdots t_n,root(t_{\pi_{1}},\ldots,t_{\pi_{n}}))$.
-So the port of $\otimes f$ are roots of the trees indexed by indices in $\pi$.
-This means that a root of tree pointed by $\pi_1$ is an input port of $\otimes f$ and
-the roots of trees pointed by the other indices in $\pi$ are the output ports of $\otimes f$.
+So the ports of $\otimes f$ are roots of the trees indexed by indices in $\pi$.
+This means that a root of the tree pointed by $\pi_1$ is an input port of $\otimes f$ and
+the roots of the trees pointed by the other indices in $\pi$ are the output ports of $\otimes f$.
 
 
 \subsection{Minimal and Canonical Forest}
 \label{subsec:mcforest}
 
-There are two properties of forests called that we will further need.
+There are two properties of the forests, minimality and canonicity, that we will further employ.
+The properties make possible to represent an io-forest in unique way what makes possible
+to manipulate it in deterministic way.
 An io-forest $f_m=(t_1 \cdots t_n, \phi)$ representing a graph $\otimes f$ is \emph{minimal}
 iff the roots of trees $t_1,\ldots,t_n$ corresponds to the cut-points of $\otimes f$,
 so there is a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n\} )\}$ and $cps(\otimes f)$.
-The minimal io-forest is unique to permutations of $t_1,\ldots,t_n$.
+The minimal io-forest is unique up-tp to permutations of $t_1,\ldots,t_n$.
 
 We need to defined ordering $\preceq_p$, so called \emph{canonical ordering}, over cut-points of $\otimes f$ to be able to define canonicity of the forest $f$.
-The canonical ordering $\preceq_p \subseteq cps(\otimes f) \times cps(\otimes f)$ is defined as follows $c_1 \preceq_p c_2 \Leftrightarrow \emph{the cost of the cheapest path from }
+The canonical ordering $\preceq_p \subseteq cps(\otimes f) \times cps(\otimes f)$ is defined as follows: $c_1 \preceq_p c_2 \Leftrightarrow \emph{the cost of the cheapest path from }
 \phi_1 \emph{ (input port) to } c_1 \emph{ is}$ $\emph{cheaper}$ $\emph{ than the cost of the cheapest path from } \phi_1 \emph{ to } c_2$.
-The io-forest $f_c$ is \emph{canonical} iff it is minimal and the trees $t_1,\ldots, t_n$ are ordered by $\preceq_p$ and $\otimes f$ is accessible.
-The canonical io-forest is a unique representation of accessible io-graph.
-The canonical io-forest can be obtained by depth-first traversal (DFT) \cite{taocp} of $\otimes f$ what is a graph of a forest $f = (t_1 \cdots t_n, \phi)$ \cite{forester11}.
-We need to assume that there is ordering $\leq_\Sigma$ over labels $\Sigma$ of $\otimes f$ before description of DFT method.
+The io-forest $f_c$ is \emph{canonical} iff it is minimal, the trees $t_1,\ldots, t_n$ are ordered by $\preceq_p$, and $\otimes f$ is accessible.
+The canonical io-forest is a unique representation of a accessible io-graph.
+The canonical io-forest can be obtained by depth-first traversal (DFT)\cite{taocp} of $\otimes f$.
+We need to assume that there is an ordering $\leq_\Sigma$ over labels $\Sigma$ of $\otimes f$ before description of DFT method to
+make DFT traversal deterministic and hence the ordering of the trees unique.
 We create a stack of nodes initialized with input and output ports ordered by $\preceq_p$ when the smallest node is on the top of the stack.
 Then the DFT is run over $\otimes f$ and we obtain canonical forest $f_c$ where trees are in the following order.
 The first ones are trees corresponding to the ports of $f$ ordered by $\preceq_p$ and the rest of the trees are in the order
@@ -211,31 +224,34 @@ We could symmetrically define also bottom-up tree automata as quadruple $B = (Q,
 
 We will further consider top-down tree automata as default.
 
-Since syntax of a TA is already defined we are going to define its semantics.
-A \emph{run} of a TA $A$ over a tree $t$ is mapping $\funcdecl{\rho}{dom(t)}{Q}$ such that
+Now the semantics of TA will be defined.
+A \emph{run} of $A$ over a tree $t$ is mapping $\funcdecl{\rho}{dom(t)}{Q}$ such that
 $\forall v \in dom(t)\ \exists (q \xrightarrow{a} (q_1 \cdots q_n)) \in \Delta:  q=\rho(v) \wedge  \forall i \in \{1, \ldots, |S(v)|\}: q_i=\rho(S(v)_i)$.
-We use $t \Rightarrow_{\rho} q$ to denote a run $\rho$ of TA A over tree $t$ s.t. $\rho(root(t)) = q$ and we use $t \Rightarrow q$ to denote that there exists
-a run $\rho$ over $t$ to $q$.
-Finally, we can define language of a TA.
+We use $t \Rightarrow_{\rho} q$ to denote a run $\rho$ of $A$ over tree $t$ s.t. $\rho(root(t)) = q$ and we use $t \Rightarrow q$ to denote that there exists
+run $\rho$ over $t$ to $q$.
+Finally, we can define the language of TA.
 The \emph{language} of a state $q\in Q$ is defined by $L(q) = \{t\,|\, t \Rightarrow q\}$.
-The \emph{language} of a NTA $A$ is defined by $L(A) = \bigcup_{q\in R} L(q)$.
+The \emph{language} of $A$ is defined by $L(A) = \bigcup_{q\in R} L(q)$.
 
 \subsection{Forest Automata}
 \label{subsec:fa}
 
 A \emph{Forest Automata} (FA) over $\Sigma$ is a pair $F=(A_1\cdots A_n, \pi)$
-where $A_1 \cdots A_n$ is a sequence of tree automata defined over alphabet $\Sigma \cup \{1,\ldots,n\}$
+where $A_1 \cdots A_n$ is a sequence of tree automata defined over the alphabet $\Sigma \cup \{1,\ldots,n\}$
 and $\pi = I_1 \cdots I_n$ where $I_1,\ldots, I_n \in \{1, \ldots, n\}$ is a sequence of port indices.
 There are two kinds of languages related to FA.
-The first one is forest language obtained by cartesian product of the languages of particular TA (and port indices) of FA
-what gives a set of io-forests.
-The second one is graph language obtained by connection of the io-forests from forest language to a io-graph.
-Formally, The \emph{forest language} of the FA $F$ is the set of io-forests $L_f(F)= L(A_1) \times \ldots L(A_n) \times \{\pi\}$.
-Please note that it is necessary to add to the cartesian product also sequence of indices to preserve structure of io-forests
-and so to be able to construct graph language of $F$.
+The first one is forest language obtained by Cartesian product of the languages of particular TA (and port indices) of FA
+and hence the forest language is a set of the io-forests.
+The second one is the graph language obtained by connecting of the io-forests from forest language to io-graphs.
+Formally, the \emph{forest language} of the FA $F$ is the set of io-forests $L_f(F)= L(A_1) \times \ldots L(A_n) \times \{\pi\}$.
+Note that it is necessary to add to the Cartesian product also the sequence of indices to preserve structure of io-forests
+and hence to be able to construct graph language of $F$ in deterministic way.
 The \emph{graph language} of $F$ is the set of io-graph $L(F) = \{\otimes f\,|\, f \in L_f(F)\}$.
-
 We say that $F$ respects \emph{canonicity} if $\forall f \in L_f(F): \emph{f is canonical}$.
+
+One of the most important operation over forest automata performed in analysis of a program is checking
+language inclusion of two forest automata.
+This operation is performed to check whether a fixpoint in a program point is reached during symbolic execution.
 Checking inclusion of languages of forest automata respecting canonicity could be done \emph{component-wise},
 i.e. checking language inclusion of their tree automata one by one.
 
@@ -256,9 +272,13 @@ i.e. checking language inclusion of their tree automata one by one.
 \section{Forest Automata of Higher Level}
 \label{sec:fah}
 
-We have worked with symbols that have no inner structure but
-we need to define also automata over \emph{structured labels} to be a
-able to apply FA for shape analysis of more complex data structures.
+We are able to represent some data structures, like singly-linked lists or trees, by already defined forest automata
+but we need to define hierarchical forest automata to be able to represent
+another class of data structures (further described in \ref{subsec:boxes}), like doubly-linked lists or trees with root pointers.
+For creating the hierarchy of forest automata we need to introduce \emph{structured labels}.
+This labels could contain another forest automata.
+The hierarchy then comes from the fact that forest automata of a certain level
+are defined over structured labels containing FA of lower levels.
 
 \subsection{Structured Labels}
 
@@ -277,13 +297,13 @@ A graph $g$ is \emph{unambiguously determined} by $SE(g)$ if $g$ has no isolated
 
 \subsection{Tree Automata over Structured Labels}
 
-Since we already extended the labels to structure ones we also define tree automata over these labels.
+Since we already extended the labels to structures ones we also define tree automata over these labels.
 A (finite, non-deterministic, top-down) \emph{tree automata} (over structured labels) is quadruple $A=(Q,2^\Gamma, \delta, R)$ where
 \begin{itemize}
 	\item $Q$ is a finite set of states.
 	\item $\Gamma$ is a ranked alphabet.
-	\item $\Delta$ is a transition rules set with rules in form $(q,\{a_1,\ldots,a_m\},q_1 \cdots q_n)$ where $q,q_1,\ldots,q_n \in Q$, $\{a_1,\ldots,a_m\} \in \Gamma$.
-	Each rule consists sequence of the \emph{rule-terms} $d\langle 1\rangle = q \mapsto (a_1,q_1 \cdots q_{\#a_1}) \cdots d\langle n\rangle= q \mapsto (a_m,q_{n-\#a_m+1} \cdots q_n)$ and
+	\item $\Delta$ is a set of transition rules set with rules in the form $(q,\{a_1,\ldots,a_m\},q_1 \cdots q_n)$ where $q,q_1,\ldots,q_n \in Q$, $\{a_1,\ldots,a_m\} \in \Gamma$.
+	Each rule could be interpreted as a sequence of the \emph{rule-terms} $d\langle 1\rangle = q \mapsto (a_1,q_1 \cdots q_{\#a_1}) \cdots d\langle n\rangle= q \mapsto (a_m,q_{n-\#a_m+1} \cdots q_n)$ and
 	we denote the $i$-th rule term of sequence again by $d\langle i\rangle$ where $i \in \{1,\ldots,m\}$.
 	\item $R\subseteq Q$ is a finite set of root states.
 \end{itemize}
@@ -291,13 +311,13 @@ A (finite, non-deterministic, top-down) \emph{tree automata} (over structured la
 \subsection{Forest Automata of Higher Level}
 
 Finally, we can extend also FA to a version defined over structured labels.
-Informally, an forest automaton of higher level has another forest automata (of lower lever) as the symbols on its edges.
+Informally, a forest automaton of a higher level has another forest automata (of lower lever) as the symbols on its edges.
 This makes possible to build a hierarchy of forest automata.
 Let formalize this idea.
 We start from forest automata of \emph{level} 1.
 So let $\Gamma_1$ be a set of all forest automata over $2^\Gamma$ and let the elements of this set be called \emph{forest automata of level 1}.
-All forest automata of \emph{level $i$} forms a set $\Gamma_i$.
-A forest automaton $F$ of level $i$ is defined over ranked alphabet $2^{\Gamma \cup \Delta}$ where $\Delta$ is a subset of forest automata of
+All forest automata of \emph{level $i$} form the set $\Gamma_i$.
+A forest automaton $F$ of level $i$ is defined over the ranked alphabet $2^{\Gamma \cup \Delta}$ where $\Delta$ is a subset of forest automata of
 level $i-1$ which are called \emph{boxes} of $F$.
 The \emph{Rank} $F$ of an FA $F$ is the number of its output port indices.
 Finally, the set of all forest automata of all levels $\sum_{i \geq 0} \Gamma_i$ is denoted by $\Gamma^{*}$ and it is ordered by a total ordering $\sqsubset_{\Gamma_*}$.
@@ -334,49 +354,35 @@ and introduce following two procedures over FA.
 		and $g'_\phi \in L(a)$ then $h = g \subst{g'_\phi}{e\langle i \rangle}$ is an unfolding of $g$.
 		We denote unfolding $h$ of $g$ by $g \prec h$.
 	\item \emph{Folding} is a replacement of $g'_\phi$ by $e \langle i \rangle$ in $h$ obtaining $g$.
-		So we can say that $g'_\phi$ is folded to to $e \langle i \rangle$. 
+		So we can say that $g'_\phi$ is folded to $e \langle i \rangle$. 
 \end{itemize}
 
 A transitive reflective closure of $\prec$ is denoted by $\prec^*$.
-A set of all graphs get by repeatedly application of unfolding to a graph $g$ over ranked alphabet $\Gamma$ is called
-\emph{$\Gamma$-semantics} and it is formally defined as a set of graphs $g'$ such that $g \prec^* g'$
-what we denote as $\llbracket g \rrbracket_\Gamma$ or just simply $\llbracket g \rrbracket$ when it is
+A set of all graphs obtained by repeated application of unfolding from
+a graph $g$ over ranked alphabet $\Gamma$ is called \emph{$\Gamma$-semantics}. 
+\emph{$\Gamma$-semantics} is formally defined as a set of graphs $g'$ such that $g \prec^* g'$.
+We denote it as $\llbracket g \rrbracket_\Gamma$ or just simply $\llbracket g \rrbracket$ when it is
 clear what alphabet we speak about.
-Finally, having a FA $F$ of higher level then $\llbracket F \rrbracket = \bigcup_{g_\phi \in L(F)} (\llbracket g \rrbracket \times \{\phi\})$.
+Finally, \emph{$\Gamma$-semantics} is defined for a FA $F$ of higher level as follows $\llbracket F \rrbracket = \bigcup_{g_\phi \in L(F)} (\llbracket g \rrbracket \times \{\phi\})$.
 Please note that the the meaning of $L(F)$ and $L_f(F)$ has not been changed so the both sets (languages) can contain just graphs (or forests)
 over structured labels.
 
-When we recall definition of canonicity respecting FA we will find that it is applicable also for FA of higher level.
+When we recall the definition of canonicity respecting FA we will find that it is applicable also for FA of higher level.
 A FA $F$ is canonicity respecting if $\forall f \in L_f(F): \emph{f is canonical}$ and since definition of canonical $f$
 is not affected by extending labels to the structured ones the meaning of canonicity is same as for basic FA.
 The language inclusion checking is again possible in component-wise way like in the case of basic FA what is
-formulated by Lemma \ref{lemma:hfa_incl}.
-
-\begin{lemma}
-	Let $F^1 = (A_1^1\cdots A_{n_1}^1, \pi^1)$ and $F^2 = (A_1^2\cdots A_{n_2}^2, \pi^2)$
-	be two FA of higher level respecting canonicity.
-	Then $L(F^1) \subseteq L(F^2)$ iff
-	\begin{itemize}
-			\item $n_1$ = $n_2$
-			\item $\pi^1 = \pi^2$
-			\item $\forall i \in \{1,\ldots,n_1\}: L(A_i^1) \subseteq L(A_i^2)$
-	\end{itemize}
-	\label{lemma:hfa_incl}
-\end{lemma}
-\begin{proof}
-	Proof can found in \cite{forester:techrep}.
-\end{proof}
+proofed in \cite{forester:techrep}.
 
 %TODO sets of FA. are they really needed anywhere?
 
 \chapter{Forest Automata based Verification}
 \label{ch:fav}
 
-A program using complex dynamic data structures can reach the different heap configurations
-during its execution.
-These heap configurations could be represented by FA what leads to possibility
-of using FA in shape analysis which checks whether it is possible for the program to reach an error like double free or
-invalid pointer dereference during its execution.
+The different heap configurations could be reached during execution of a program.
+The aim of the shape analysis is to prove that it is not possible to reach such a heap configuration in which
+an error like double free or invalid pointer can occur.
+The heap configurations could be represented by FA and hence it is possible
+to use FA in shape analysis.
 
 This chapter provides an overview of the shape analysis based forest automata introduced in \cite{forester12}.
 First, a heap representation using FA is described and then
@@ -387,13 +393,13 @@ we provide overview of symbolic execution that employs framework of abstract int
 
 It is possible to view a \emph{heap} (more precisely, a single heap configuration)
 as a (directed) graph where each allocated heap cells corresponds to a node in the graph \cite{forester13}.
-The heap cells consists \emph{pointer selectors} and \emph{data selectors} that picks a data from some finite data domain.
+The heap cells consists of \emph{pointer selectors} and \emph{data selectors} that picks a data from some finite data domain.
 A pointer selectors could point to another graph node or to the value \emph{null} or it could be undefined.
 A data selector then references its node to the data from data domain.
 %When we consider the pointer variables of a program it also holds that they can have pointer and data selectors.
 A heap graph could be split to the trees in the following manner.
 We identify the heap cut-points (corresponding to the already defined term \emph{cut-points})
-what are the heap cells pointed by a pointer variable or by more then one other heap cells by their pointer selectors.
+which are the heap cells pointed by a pointer variable or by more then one other heap cells by their pointer selectors.
 The heap is then split to the trees whose roots nodes are cut-points identified in the previous step.
 The pointer selectors that pointed to the cut-points are redirected to the corresponding root references what interconnects
 particular tree components (and provides possibility to reconstruct the original graph again).
@@ -401,7 +407,7 @@ Finally, the created tuple of the trees is called a forest.
 Please note, that the mentioned procedure corresponds to the terms defined in Chapter \ref{ch:prel}
 so it is possible to achieve canonical forest as it was described in Section \ref{subsec:mcforest}.
 
-Let formalized the idea given above.
+Let us formalize the idea given above.
 We denote a pointer selector by $PSel$, a data selector by $DSel$ and data domain by $\mathbb{D}$ \cite{techrep}.
 A single heap configuration is a io-graph $g_{st}$ over the ranked alphabet of the structured labels from $2^\Gamma$
 with sub-labels from the ranked alphabet $\Gamma = PSel \cup (DSel \times \mathbb{D})$ having the
@@ -413,7 +419,7 @@ A null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) =
 and undefined selectors of a node $v$ have not corresponding  sub-labels in $l_g(\texttt{v})$.
 
 We illustrate described principle of heap representation with an example taken from \cite{techrep}.
-We have a singly-linked list whose items are data structures containing pointers to
+We consider a singly-linked list whose items are data structures containing pointers to
 a next item and also integer data variable, written in C:
 \begin{center}
 \begin{minipage}{0.3\textwidth}
@@ -432,11 +438,11 @@ As you can see, the pointer selector $next_g \in PSel$ representing the pointer 
 has really rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing \texttt{data} variable from \texttt{SLL} structure
 has rank $0$.
 
-We need to represent the sets of the heap configurations reachable by the analysed program not only single heap configuration.
+We need to represent the sets of the heap configurations reachable by the analysed program, not only single heap configuration.
 That would be possible by employing the forest automata of higher level respecting canonicity that represents io-forests
-which models the set of heap configurations.
+which model the set of heap configurations.
 
-The last technical thing needed to be said is about storing \emph{stack frame} of a function in the analyzed program.
+The another thing needed to be represented by FA is a \emph{stack frame} of a function in the analyzed program.
 When we recall definition of io-forests and forest automata so they contains exactly one (index of) input port.
 The input port node $sf$ serves in case of shape analysis based on FA for storing of a stack frame of the analyzed function.
 
@@ -446,25 +452,25 @@ The input port node $sf$ serves in case of shape analysis based on FA for storin
 FA-based verification procedure is a standard \emph{abstract interpretation} \cite{cousot:77}.
 The concrete domain assigns to each program location a set of pairs
 $(\sigma,H)$ where a mapping $\sigma$ maps each variable
-to a node in $H$, to a $\texttt{null}$ or to a undefined value, and $H$ is a single heap configuration.
+to a node in $H$, to a $\texttt{null}$ or to an undefined value, and $H$ is a single heap configuration.
 The abstract domain than assigns to each program location a finite set of pairs
 $(\sigma, F)$ (called \emph{abstract configuration}) where $\sigma$ maps again each variable to a
 $\texttt{null}$ value or to undefined value or to an index of TA in $F$ and $F$ is a forest automata
 of higher level respecting canonicity representing a set of heaps configurations.
-Please note that a set of FA is needed in abstract domain to represent one program locations (since
-abstract domain maps to the set of abstract configurations) because FA are not closed under union so it
-is not possible to represent the sets of heaps by single FA.
+Note that a set of FA is needed in abstract domain to represent one program locations (since
+abstract domain maps to the set of abstract configurations).
+FA are not closed under union so it is not possible to represent the sets of heaps by single FA.
 
 The verification starts from initial abstract configuration that consists an FA for initial heap configuration representing io-graph
-$g_{sf}$ where $g$ consists from two nodes.
-The first one is $\texttt{null}$ and the second one is empty stack frame $sf$ with $l_g(sf) = \emptyset$.
+$g_{\mathit{sf}}$ where $g$ consists from two nodes.
+The first one is $\texttt{null}$ and the second one is empty stack frame $sf$ with $l_g(\mathit{sf}) = \emptyset$.
 The sequence of \emph{abstract transformers} related to the program statements is then iteratively applied to the abstract configurations.
 The process of applying abstract transformers over abstract domain is called \emph{symbolic execution}.
-As it was said each abstract transformer correspond to a statement of the analyzed program.
-It is possible to define a function $f_{\texttt{op}}(g_{st})$ related to a operation \texttt{op} from a intermediate code of the analysed program.
-This function models semantics of \texttt{op} in concrete domain in such way that $f_{\texttt{op}}(g_{st})$
-returns a io-graph representing heap configuration after execution of \texttt{op} in real program.
-The abstract transformers $\tau_{\texttt{op}}$ are defined for each operation \texttt{op} reflecting $f(\texttt{op})$.
+As it was said, each abstract transformer correspond to a statement of the analyzed program.
+It is possible to define a function $f_{\texttt{op}}(g_{st})$ related to an operation \texttt{op} from the intermediate code of the analysed program.
+This function models semantics of \texttt{op} in concrete domain in such way that $f_{\texttt{op}}(g_{\mathit{st}})$
+returns an io-graph representing the heap configuration obtained after execution of the concrete operation \texttt{op} over concrete domain.
+The abstract transformers $\tau_{\texttt{op}}$ are defined for each concrete operation \texttt{op} reflecting semantics of $f(\texttt{op})$.
 The abstract transformer $\tau_{\texttt{op}}$ applied to a FA $S$ representing heap in abstract domain returns a result FA $S' = \tau_{\texttt{op}}(S)$
 such that $\bigcup_{F' \in S'} \llbracket F' \rrbracket = \{ f_{\texttt{op}}(g_{sf}) \,|\, g_{sf} \in \llbracket F \rrbracket \wedge F \in S \}$.
 The abstract transformer is applied separately to each forest $F \in S$.
@@ -484,7 +490,6 @@ Each iteration follows this procedure:
 					This is repeated until it is not possible to find the new boxes.
 				\item FA in abstract configuration made canonicity respecting.
 			\end{enumerate}
-		\item At junctions point of the program paths the union of the sets of FA is computed.
 		\item At junctions corresponding to the loops the union is followed by \emph{widening}
 			what brings also checking language inclusion between sets of FA to check whether fixpoint has been reached.
 			It is also necessary to transform the FA to canonicity respecting form before inclusion checking.
@@ -517,22 +522,22 @@ Normalization consist of the following steps:
 					It is the $j-th$ cut-point in the canonical ordering of all accepted forests.
 				\item Otherwise, root of $f_i$ is not a cut-point of any accepted forests.
 			\end{itemize}
-		\item We merge $TA$ to get form of $F$ where roots of accepted forests are cut-points only.
+		\item We merge $TA$ of $F$ into a form where roots of accepted forests are cut-points only.
 			So when there is a TA $A$ whose accepted trees are not cut-points in $L(F)$ and there is
-			a a TA $B$ that contains references to the root references to $A$, then $A$ is connected
+			a TA $B$ that contains references to the root references to $A$, then $A$ is connected
 			to $B$ at places where $B$ has references to the root of $A$ so a new
 			TA $B_A = (Q_A \cup Q_B, \Gamma, \Delta_{A+B}, R_B)$ is created.
 			Transition rules set $\Delta_{A+B}$ is $\Delta_A \cup \Delta_B$ with substituted transition $q \rightarrow  \overline{a} (q_1 \cdots q_i \cdots q_n) \in \Delta_B$
 			by $q \rightarrow  \overline{a} (q_1 \cdots q_a \cdots q_n) \in \Delta_B$, where $q_i$ is a root reference to $A$ and $q_a$ is the root of $A$. 
-		\item $TA$ of $F$ are reorder by canonical ordering of cut-points.
+		\item $TA$ of $F$ are reordered by canonical ordering of cut-points.
 \end{itemize}
 
 \subsection{Boxes}
 \label{subsec:boxes}
 
-It was already covered how the heap is decomposed to the forests.
+It was already explained how the heap is decomposed to the forests.
 One part of the decomposition process is identifying the cut-points.
-But it could happen that there is infinitely many cut-points.
+But it could happen that there is infinitely many cut-points in the graphs representing the heaps.
 It is the case of e.g. doubly linked list where each node is cut-point itself.
 This could be resolved by employing boxes (box is a symbol of alphabet of forest automata of higher level which is also forest automata as it was mentioned in Chapter \ref{ch:prel}).
 Since it is possible for FA to use other FA as symbols we can fold recurring sub-graphs to the boxes that are further used as the labels
@@ -558,7 +563,7 @@ but it also implements the state-of-the-art algorithms \cite{tacas10} for langua
 is also crucial for performance of Forester.
 It seems logical according to these facts to connect Forester with the VATA library employing VATA like a backend TA library for Forester.
 
-This chapter provides a description of the VATA library firstly and then also a description of Forester.
+This chapter provides a description of the VATA library followed by a description of Forester.
 
 \section{\Vata}
 \label{sec:VATA}
@@ -567,17 +572,17 @@ This chapter provides a description of the VATA library firstly and then also a 
 Its main application is in the field of formal verification.
 VATA is licensed under GPL, version 3, and can be obtained from its official website \cite{www:libvata}.
 Implementation programming language is C++.
-It is the only library to our knowledge implementing state-of-the algorithms for checking inclusion of NTA languages
+It is the only library to our knowledge implementing state-of-the-art algorithms for checking inclusion of NTA languages
 what makes it suitable for use as a Forester backend library.
 However, \vata\ does not only provide implementation of algorithms for NTA but also the highly efficient implementation of
-algorithms for nondeterministic finite automata \cite{bt:hruska}.
+algorithms for checking language inclusion of nondeterministic finite automata \cite{bt:hruska}.
 
 \subsection{Design}
 \Vata\ currently provides methods for representation of NTA in explicit encoding and also in semi-symbolic (top-down and bottom-up)
 encoding using \emph{MTBDD} but it has been designed to be easy extended by other encodings (for others automata).
-The library provides API for creating and manipulating NTA to other programs and also command line interface (cli) build around
+The library provides API for creating and manipulating NTA and also command line interface (cli) build around
 the API for experimenting with a tree automata defined in a text format directly from command line.
-The main idea of the design of the library is given in Figure \ref{fig:vata}.
+The main concept of the design of the library is given in Figure \ref{fig:vata}.
 As you can see there are the three main parts in the library design:
 \begin{enumerate}
 	\item \emph{Parsers} -- Parsing an input automaton from a text file.
@@ -599,7 +604,7 @@ As you can see there are the three main parts in the library design:
 
 A \emph{program} (e.g. cli of VATA) employing the three parts of \vata\ works as follows.
 An input automaton is loaded by one of the parsers to an intermediate representation.
-The wrapping program chooses internal encoding of NTA to which is automaton stored from intermediate encoding (please note that it is also
+The wrapping program chooses internal encoding of NTA to which is automaton stored from intermediate encoding (note that it is also
 possible to create automaton in the chosen encoding directly using API provided by VATA).
 Then the automaton is processed by applying the operations implemented by module of the chosen encoding.
 Finally, automaton could be serialized to an output format.
@@ -685,17 +690,17 @@ Tool is written in C++.
 
 \subsection{Design}
 
-Forester is implemented as a GCC plugin but it does not analyze directly intermediate code of GCC called GIMPLE but is
+Forester is implemented as a GCC plugin but it does not analyze directly intermediate code of GCC called GIMPLE but it
 uses Code Listener infrastructure \cite{cl11} to provide fronted over GIMPLE.
 
 Please see Figure \ref{fig:fa_exec} to get a high level overview of the verification process performed by Forester. 
 Forester starts analysis of a program by translation of intermediate code representation provided by Code Listener
 to its own microcode.
-Microcode represents each program statement by one or few instruction which are indeed abstract transformers.
+Microcode represents each program statement by one or few instructions associated abstract transformers.
 Symbolic execution is then execute over this microcode.
 Abstract domain represented by FA (which are also the core part of a symbolic state) is gradually transformed by the abstract transformers
 represented by the microcode instructions during the symbolic execution.
-When Forester detects an error the symbolic execution is aborted and the analyzed program is determined as incorrect one.
+When Forester detects an error the symbolic execution is aborted and the analyzed program is claimed as incorrect one.
 When symbolic execution is over then Forester checks whether there is no left garbage (of course, garbage is gradually checked also during the symbolic execution)
 and if it is not then a shape invariant has been found and the analyzed program is determined as correct.
 
@@ -718,17 +723,21 @@ Symbolic execution then execute microcode instructions (abstract transformers) w
 also \emph{Forest Automata} included in symbolic states.
 Symbolic execution also need \emph{Symbol Context} which is created for each function (and also for global space)
 and keeps information about variables used in the function, about function arguments or about stack frame layout.
-A symbolic state provides information about state of heap which is represented by FA and it also keeps the information about
-corresponding microcode instruction.
+A symbolic state provides information about the state of the heap which is represented by a FA and it also keeps the information about
+the corresponding microcode instructions.
 \emph{Forest Automata} module provides methods for manipulation FA need during verification procedure.
 The operations like normalization or abstraction over FA are not part of the module containing FA implementation but are provided
-like stand alone classes which takes FA as parameters.
-So these operation could be understood like another module \emph{Operation over Forest Automata}.
+like classes which take FA as parameters.
+So these operation could be understood as another module \emph{Operation over Forest Automata}.
 Finally, Forester currently has its own implementation of \emph{Tree Automata}.
-It is very lightweighted implementation containing optimized operations like language inclusion checking using simulation needed for (efficient) Forester run.
-The advantage of this implementation is its simplicity and optimization of operation hardly exploited by Forester what makes verification run faster.
-On the other side, it is not easy to maintain such a optimized implementation when one consider that there are still progress in field of design of the efficient algorithms
-for TA which could bring much higher efficiency then implementation optimization.
+It is very lightweighted implementation containing optimized operations directly for Forester purposes.
+One of them is operation for language inclusion checking using simulation which efficiency is also crucial for Forester performance.
+The advantage of this implementation is its simplicity and
+the efficiency get by optimizing the implementation specially to the Forester.
+On the other side, it is not easy to maintain such a optimized implementation.
+Especially, when one considers that there is still progress in field of design of the efficient algorithms
+and the improvement of an algorithm brings much higher efficiency then implementation optimization.
+
 \begin{figure}[bt]
 	\begin{center}
 		\input{fig/fa_design.tikz}
@@ -740,19 +749,19 @@ for TA which could bring much higher efficiency then implementation optimization
 Please note, this is just the conceptual high level view of Forester design.
 A real implementation is much more complicated (e.g. Forest automata are implemented by two classes: \emph{FA} and \emph{FAE})
 and full of the technical details.
-A full description of the implementation is also not aim of this text and it is not
-also possible due to a size which could such documentation take.
+A full description of the implementation is also not the aim of this text.
 
 It was already mentioned that substitution of Forester TA implementation by
 VATA could bring some advantages.
 We summarize them here again.
-The first one is fact that it is much easier to maintain one library where
+The first one is that it is much easier to maintain one library where
 the state-of-the-art algorithms are implemented and optimized.
 Since VATA and Forester is developed by the same developers it also easy to added
-to \vata\ operations needed by Forester.
-Having narrow interface between TA library and the rest of Forester implementation
+to VATA operations needed by Forester.
+Having narrow interface between TA library and the rest of Forester
 also improves code quality of Forester in the sense of modularity, maintainability and code organization.
-These arguments lead us to implement a version of Forester using the VATA library what is described in Section \ref{ch:fova}.
+These arguments lead us to implement a version of Forester using VATA.
+This is described in Section \ref{ch:fova}.
 
 \chapter{Forester with VATA}
 \label{ch:fova}
@@ -778,27 +787,30 @@ including VATA into many of the Forester classes and so it prevents from creatin
 \section{Forester Refactoring}
 \label{sec:forester_prep}
 
-The original implementation of tree automata library has not been exception so it was needed
-to refactore implementation before it was be possible to create adapter class for \vata\ API.
+The original implementation of tree automata library has also strong dependencies
+the other classes.
+Hence it was needed to refactore implementation before it was possible to create adapter class for VATA API.
 The core class of original tree automata is class \emph{TA} and there are also related classes,
-e.g. class \emph{TT} for transitions representation or class \emph{Antichain} language inclusion checking using the Antichain algorithm from \cite{tacas10}.
-This set of classes realizing original tree automata library will be further referred as tree automata module.
+e.g. class \emph{TT} for transitions representation or class \emph{Antichain} for language inclusion checking using the Antichain algorithm from \cite{tacas10}.
+This set of classes realizing original tree automata library will be further referred as \emph{tree automata module}.
 
-The refactoring is mainly based on reduction of the number data types and data members declared
+The refactoring is mainly based on reduction of a number of data types and data members declared
 to be \emph{public} (in sense of the C++ programming language).
 This is by exploiting features provided by C++11 \cite{stroustrup13} which brings methods (keyword \emph{auto})
-for auto deduction of the data types by compiler what makes possible to make some of data types of the original tree automata module \emph{private}.
-\emph{Iterator} is another concept often used in combination with auto deduction of types to reduce need to export internals of tree automata module.
+for auto deduction of the data types by compiler.
+That provides possibility to make some of data types of the original tree automata module \emph{private}.
+\emph{Iterator} is another concept often used in combination with auto deduction of types to reduce the need to export internals of tree automata module.
 The combination of these two patterns are used for example when one needs to iterate over all transitions of tree automata or all transition with some
 state as parent what is quite common operation in Forester.
-Another part of refactoring consists simple replacing access of the class data members by the corresponding getters and setters method.
+Another part of refactoring consists of simple replacing access of the class data members by the corresponding getters and setters method.
 Reducing of structural dependencies is also done by emphasis application of \emph{Law of Demeter} \cite{lod89} what practically
 means that classes using TA explicitly should implement methods providing information about TA instead of providing object representing TA itself.
-E.g. when one class wants to know whether a given state is final in an tree automaton of an forest automaton then FA implementation should
+E.g., when one class wants to know whether a given state is final in an tree automaton of an forest automaton then FA implementation should
 implement a method providing this information instead of providing access to its TA.
-Applying the Law of Demeter reduces knowledge needed about implementation of TA module across the whole project what
-helps us to make little interface for TA module.
-However, Forester source code is also after this refactoring far from accomplishing the mentioned good practices (and also those not mentioned) all around the code.
+Applying the Law of Demeter reduces knowledge needed about implementation of TA module across the whole project.
+That helps us to make a smaller interface for TA module.
+However, also after this refactoring Forester source code is still far from accomplishing the mentioned good practices (and also those not mentioned)
+in the whole source code.
 
 \section{Adapter Design Pattern}
 \label{sec:adapter}
@@ -808,7 +820,7 @@ Adapter in notion of UML is shown in Figure \ref{fig:adapter}.
 Adapter consists from a class \emph{Adaptee} what is the class that we want to make compatible with
 another class \emph{Client} which wants to use the methods of Adaptee.
 Class \emph{Adaptor} is the one providing connection between Client and Adaptee.
-Adaptor could be implemented as inherited class from Adaptee and employs concept of inheritance to redirect
+Adaptor could be implemented as inherited class from Adaptee and employs the concept of inheritance to redirect
 method calls to its parent (with some possible preprocessing).
 Another possible implementation is composing Adaptee to Adaptor and using Adaptor like an interface to Adaptee.
 Adaptor also could add a new method that combines Adaptee methods to achieve wanted operations.
@@ -822,34 +834,35 @@ Adaptor also could add a new method that combines Adaptee methods to achieve wan
 	\label{fig:adapter}
 \end{figure}
 
-Let show what are the mentioned roles in our case.
-Adaptee is API of \vata, specifically it is the class \emph{ExplicitTreeAut} implementing representation of a tree automaton in explicit encoding.
-Client is not in our case just one class but it is a set of the Forester classes using somehow TA library
-and Adaptor is newly implemented class \emph{VATAAdapter} which description is in the following section.
+Let us show what the mentioned roles are in our case.
+Adaptee is the API of \vata, specifically it is the class \emph{ExplicitTreeAut} implementing representation of a tree automaton in explicit encoding.
+Client is in our case not just one class but it is a set of the Forester classes using TA library.
+Adaptor is a newly implemented class \emph{VATAAdapter} which description is in the following section.
 
 \section{Implementation}
 \label{sec:fova_impl}
 
-The main part of adapter design patter is in our case newly implemented class \emph{VATAAdapter} playing role of Adaptor.
-We decided to used the implementation approach to Adaptor preferring composition over inheritance
+The main part of the adapter design patter is in our case newly implemented class \emph{VATAAdapter} playing role of Adaptor.
+We decided to used the implementation approach to Adaptor, preferring composition over inheritance,
 because it is more suitable for our purposes since we often needs to rename methods 
-(name of a method in Forester differs with name of a method in VATA performing same operation)
+(name of a method in Forester differs from name of a method in VATA performing same operation)
 or conversion of parameters data type (e.g. from vector to set). 
 
-So class \emph{VATAAdapter} instantiates class \emph{ExplicitTreeAut} from VATA as its private data member
-and redirect to this instance method calls from Forester (the names of methods of VATAAdapter are the same as they were
+The class \emph{VATAAdapter} instantiates class \emph{ExplicitTreeAut} from VATA as its private data member
+and redirects to this instance method calls from Forester (the names of methods of VATAAdapter are the same as they were
 in the original TA library).
-\emph{VATAAdapter} also sometimes performs mentioned data types conversion.
+\emph{VATAAdapter} also sometimes performs mentioned conversion of the data types.
 There are methods implemented by adapter not presented in VATA like method \emph{unfoldAtRoot}
 performing some kind of an unfolding.
-The methods of this kind are very Forester specific so it is not sensible to add them to general purpose library like \vata\ is.
+The methods of this kind are very Forester specific so it is not sensible to add them to general purpose library like VATA is.
 
-We originally supposed that it would be possible to keep the original TA module along the VATA library adapter
+We originally supposed that it would be possible to keep the original TA module along VATA adapter
 to be able to easily switch between them.
-However it has proved that this would bring high overhead in some situation when a conversion of some data types is needed
-compared to situation when there are used directly data types compatible with VATA in the Forester code
-so we decided to remove the original tree automata module and further support only version of Forester with \vata.
+However it has proved that this would bring high overhead in some situations.
+A conversion of some data types is needed compared to situation when there are used directly data types compatible with VATA in the Forester code.
+Hence we decided to remove the original tree automata module and further support only version of Forester with \vata.
 
+\begin{comment}
 \chapter{template$<$class Text$>$ Backward Run in Forest Automata Based Verification(Text text)}
 \label{ch:backward}
 text
@@ -868,18 +881,19 @@ text
 \chapter{template$<$class Text$>$ Evaluation(Text text)}
 \label{ch:eval}
 text
+\end{comment}
 
 \chapter{Conclusion}
 \label{ch:concl}
 
 The main goals of this thesis were (a) to implement version of Forester tool that uses the VATA library for tree automata representation and manipulation
-and (b) to extend verification procedure based on forest automata with backward run for detection of the spurious errors find out in a analysed program.
+and (b) to extend verification procedure based on forest automata with backward run for detection of the spurious errors found in the analysed program.
 The theory of forest automata and related theory of tree automata has been studied and described in this thesis and the verification procedure
-based on forest automata has been also explored to fulfill thesis goals.
+based on forest automata has been also explored to fulfill the thesis goals.
 The connection of Forester and \vata\ was designed and implemented after the analysis of the both tools.
-Forester tools had to be refactored for this purposes.
+Forester had to be refactored for this purposes.
 
-So the first goal has been already reached and Forester tool using the VATA library successfully participated in competition SV-COMP 2015 \cite{www:svcomp}.
+The first goal has been already reached and the version of Forester using the VATA library successfully participated in competition SV-COMP 2015 \cite{www:svcomp}.
 The knowledge about Forester and related verification procedure gained during the work on the term project will be further employed for design
-and implementation of backward run in the Forester tool what is the second goal of this master thesis. 
+and implementation of backward run in the Forester tool which is the second goal of this master thesis.
 
