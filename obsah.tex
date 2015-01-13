@@ -59,7 +59,8 @@ Since FA are highly related to the finite tree automata the first of the goals o
 a version of Forester using \vata\ -- state-of-the-art library for TA manipulation \cite{libvata}.
 Particularly, this consists creating an interface between Forester and VATA to employ VATA as a TA library for Forester backend
 which should bring better maintainability and modularity then implement a special TA library inside Forester as it is now.
-The second goal of this thesis is to design and implement \emph{backward run} for FA based verification what enables checking spuriousness of an error found in a program.
+The second goal of this thesis is to design and implement \emph{backward run} for FA based verification
+which enables checking spuriousness of an error found in a program.
 The error could be spurious because of too high level of abstraction over FA is used.
 The information gained by backward run could be used for the refinement of \emph{predicate abstraction} (one kind of abstraction over FA)
 what prevents verification procedure from getting the same spurious error again.
@@ -177,8 +178,8 @@ the roots of the trees pointed by the other indices in $\pi$ are the output port
 \label{subsec:mcforest}
 
 There are two properties of the forests, minimality and canonicity, that we will further employ.
-The properties make possible to represent an io-forest in unique way what makes possible
-to manipulate it in deterministic way.
+The properties make possible to represent an io-forest in unique way.
+That enables manipulating with io-forest it in deterministic way.
 An io-forest $f_m=(t_1 \cdots t_n, \phi)$ representing a graph $\otimes f$ is \emph{minimal}
 iff the roots of trees $t_1,\ldots,t_n$ corresponds to the cut-points of $\otimes f$,
 so there is a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n\} )\}$ and $cps(\otimes f)$.
@@ -362,7 +363,7 @@ A set of all graphs obtained by repeated application of unfolding from
 a graph $g$ over ranked alphabet $\Gamma$ is called \emph{$\Gamma$-semantics}. 
 \emph{$\Gamma$-semantics} is formally defined as a set of graphs $g'$ such that $g \prec^* g'$.
 We denote it as $\llbracket g \rrbracket_\Gamma$ or just simply $\llbracket g \rrbracket$ when it is
-clear what alphabet we speak about.
+clear which alphabet we speak about.
 Finally, \emph{$\Gamma$-semantics} is defined for a FA $F$ of higher level as follows $\llbracket F \rrbracket = \bigcup_{g_\phi \in L(F)} (\llbracket g \rrbracket \times \{\phi\})$.
 Please note that the the meaning of $L(F)$ and $L_f(F)$ has not been changed so the both sets (languages) can contain just graphs (or forests)
 over structured labels.
@@ -401,7 +402,7 @@ A heap graph could be split to the trees in the following manner.
 We identify the heap cut-points (corresponding to the already defined term \emph{cut-points})
 which are the heap cells pointed by a pointer variable or by more then one other heap cells by their pointer selectors.
 The heap is then split to the trees whose roots nodes are cut-points identified in the previous step.
-The pointer selectors that pointed to the cut-points are redirected to the corresponding root references what interconnects
+The pointer selectors that pointed to the cut-points are redirected to the corresponding root references which interconnects
 particular tree components (and provides possibility to reconstruct the original graph again).
 Finally, the created tuple of the trees is called a forest.
 Please note, that the mentioned procedure corresponds to the terms defined in Chapter \ref{ch:prel}
@@ -490,8 +491,8 @@ Each iteration follows this procedure:
 					This is repeated until it is not possible to find the new boxes.
 				\item FA in abstract configuration made canonicity respecting.
 			\end{enumerate}
-		\item At junctions corresponding to the loops the union is followed by \emph{widening}
-			what brings also checking language inclusion between sets of FA to check whether fixpoint has been reached.
+		\item At junctions corresponding to the loops the union is followed by \emph{widening}.
+			This requires also checking language inclusion between sets of FA to check whether fixpoint has been reached.
 			It is also necessary to transform the FA to canonicity respecting form before inclusion checking.
 \end{enumerate}
 
@@ -622,7 +623,7 @@ are presented in the transition where $q$ is at left-handed side.
 Each symbol $a$ in a transition cluster is mapped to a pointer to a set in the third level of hierarchy (\emph{sets of pointers to tuples}).
 The set contains pointers to tuples which are at right-handed side in a transition with $q$ at left-handed side and with $a$ as a symbol.
 The tuples are stored at a special set where every tuples is stored only once.
-Please note, that it also possible to share part of transition relation between different automata what
+Note that it also possible to share part of transition relation between different automata what
 brings higher efficiency in space complexity of implementation.
 Module for explicit encoding also stores explicitly a set of the final states of a NFA but on
 the other side it does not explicitly store a set of all states because it can be obtained from the transition relation.
@@ -800,8 +801,9 @@ This is by exploiting features provided by C++11 \cite{stroustrup13} which bring
 for auto deduction of the data types by compiler.
 That provides possibility to make some of data types of the original tree automata module \emph{private}.
 \emph{Iterator} is another concept often used in combination with auto deduction of types to reduce the need to export internals of tree automata module.
-The combination of these two patterns are used for example when one needs to iterate over all transitions of tree automata or all transition with some
-state as parent what is quite common operation in Forester.
+The combination of these two patterns are used for example when one needs to iterate over all transitions of tree automata or all transitions which
+have same state as parent.
+These kinds of iterations are quite common in Forester.
 Another part of refactoring consists of simple replacing access of the class data members by the corresponding getters and setters method.
 Reducing of structural dependencies is also done by emphasis application of \emph{Law of Demeter} \cite{lod89} what practically
 means that classes using TA explicitly should implement methods providing information about TA instead of providing object representing TA itself.
