@@ -63,7 +63,7 @@ The second goal of this thesis is to design and implement \emph{backward run} fo
 which enables checking spuriousness of an error found in a program.
 The error could be spurious because of too high level of abstraction over FA is used.
 The information gained by backward run could be used for the refinement of \emph{predicate abstraction} (one kind of abstraction over FA)
-what prevents verification procedure from getting the same spurious error again.
+to prevent verification procedure from getting the same spurious error again.
 However, Forester does not use predicate abstraction but \emph{height abstraction} now
 because predicate abstraction needs the backward run.
 Height abstraction is less precise and less flexible compared to predicate abstraction so implementing predicate abstraction
@@ -183,7 +183,7 @@ That enables manipulating with io-forest it in deterministic way.
 An io-forest $f_m=(t_1 \cdots t_n, \phi)$ representing a graph $\otimes f$ is \emph{minimal}
 iff the roots of trees $t_1,\ldots,t_n$ corresponds to the cut-points of $\otimes f$,
 so there is a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n\} )\}$ and $cps(\otimes f)$.
-The minimal io-forest is unique up-tp to permutations of $t_1,\ldots,t_n$.
+The minimal io-forest is unique up-to to permutations of $t_1,\ldots,t_n$.
 
 We need to defined ordering $\preceq_p$, so called \emph{canonical ordering}, over cut-points of $\otimes f$ to be able to define canonicity of the forest $f$.
 The canonical ordering $\preceq_p \subseteq cps(\otimes f) \times cps(\otimes f)$ is defined as follows: $c_1 \preceq_p c_2 \Leftrightarrow \emph{the cost of the cheapest path from }
@@ -819,7 +819,7 @@ in the whole source code.
 
 \emph{Adapter} is structural design patter \cite{gamma95} used for creating interface between classes incompatible classes.
 Adapter in notion of UML is shown in Figure \ref{fig:adapter}.
-Adapter consists from a class \emph{Adaptee} what is the class that we want to make compatible with
+Adapter consists from a class \emph{Adaptee} which is the class that we want to make compatible with
 another class \emph{Client} which wants to use the methods of Adaptee.
 Class \emph{Adaptor} is the one providing connection between Client and Adaptee.
 Adaptor could be implemented as inherited class from Adaptee and employs the concept of inheritance to redirect
