@@ -19,12 +19,12 @@ Moreover finding some errors during testing does not mean that all errors are el
 The mentioned weakness of testing can be resolved by \emph{formal verification}
 which is another approach to checking program correctness.
 Formal verification is method for checking whether a given system meets a given specification \cite{fav:lecture}.
-There are three main branches of formal verification.
+There are four main branches of formal verification.
 The first one is \emph{model checking} which systematically explores the states of a model (e.g. model of a program) to
 prove that a property holds along the whole model.
 The second approach is \emph{static analysis} which is done over a source code (or some modification of it) of a system
 without its explicit execution.
-Another approach is \emph{abstract interpretation} where the analysis is performed by
+The third approach is \emph{abstract interpretation} where the analysis is performed by
 applying abstract transformers corresponding to the original program semantics over an abstract domain.
 The last one is \emph{theorem proving}.
 It proves the program in standard mathematical way -- starting from axioms and proving theorems to
@@ -47,10 +47,10 @@ Forest automata has been introduce in \cite{forester11,forester12} and they are 
 They are used as an abstract domain in related verification procedure over which a symbolic execution of a analyzed program is performed.
 A prototype of this verification procedure has been implemented in a tool called \emph{Forester}.
 Forester verifies programs written in C language and it can detect invalid dereferences, invalid free, memory leaks and also reachability of an error label.
-It is yet able to verify non-trivial data structures like skiplist of the second and the third level
+It is yet able to verify non-trivial data structures like skip-list of the second and the third level
 but there is still a room for its improvement.
-E.g. Forester currently does not support complete C language syntax and it is not also yet possible to check whether a found error
-is real or spurious.
+E.g. Forester currently does not support complete C language syntax and
+it is not also yet possible to check whether a found error is real or spurious.
 It is also needed to refactore some parts of Forester code before extension of the tool.
 A general goal of this thesis is improving Forester in the areas described further.
 
@@ -74,9 +74,13 @@ The outline of this document is following.
 In Chapter \ref{ch:prel} the preliminaries are given.
 The verification procedure based on FA is covered in Chapter \ref{ch:fav}.
 Chapter \ref{ch:tools} provides description of \vata\ and Forester tool and Chapter \ref{ch:fova} describes an implementation of the version of Forester tool using \vata.
+\begin{comment}
 The design of backward run for FA base verification is given in Chapter \ref{ch:backward} and its implementation is documented
 in Chapter \ref{ch:impl}.
-Finally, Chapter \ref{ch:eval} contains an overview of evaluation and Chapter \ref{ch:concl} summarizes this master thesis.
+\end{comment}
+Finally,
+%Chapter \ref{ch:eval} contains an overview of evaluation and 
+Chapter \ref{ch:concl} summarizes this term project.% master thesis.
 
 \chapter{Preliminaries}
 \label{ch:prel}
@@ -230,7 +234,7 @@ A \emph{run} of $A$ over a tree $t$ is mapping $\funcdecl{\rho}{dom(t)}{Q}$ such
 $\forall v \in dom(t)\ \exists (q \xrightarrow{a} (q_1 \cdots q_n)) \in \Delta:  q=\rho(v) \wedge  \forall i \in \{1, \ldots, |S(v)|\}: q_i=\rho(S(v)_i)$.
 We use $t \Rightarrow_{\rho} q$ to denote a run $\rho$ of $A$ over tree $t$ s.t. $\rho(root(t)) = q$ and we use $t \Rightarrow q$ to denote that there exists
 run $\rho$ over $t$ to $q$.
-Finally, we can define the language of TA.
+Finally, we can define the language of $A$.
 The \emph{language} of a state $q\in Q$ is defined by $L(q) = \{t\,|\, t \Rightarrow q\}$.
 The \emph{language} of $A$ is defined by $L(A) = \bigcup_{q\in R} L(q)$.
 
@@ -243,7 +247,7 @@ and $\pi = I_1 \cdots I_n$ where $I_1,\ldots, I_n \in \{1, \ldots, n\}$ is a seq
 There are two kinds of languages related to FA.
 The first one is forest language obtained by Cartesian product of the languages of particular TA (and port indices) of FA
 and hence the forest language is a set of the io-forests.
-The second one is the graph language obtained by connecting of the io-forests from forest language to io-graphs.
+The second one is the graph language obtained by connecting the io-forests from forest language to io-graphs.
 Formally, the \emph{forest language} of the FA $F$ is the set of io-forests $L_f(F)= L(A_1) \times \ldots L(A_n) \times \{\pi\}$.
 Note that it is necessary to add to the Cartesian product also the sequence of indices to preserve structure of io-forests
 and hence to be able to construct graph language of $F$ in deterministic way.
@@ -832,7 +836,7 @@ Adaptor also could add a new method that combines Adaptee methods to achieve wan
 		\includegraphics[scale=0.5]{fig/adapter.png}
 	\end{center}
 	\caption{Adapter design pattern expressed in UML.
-	Picture is taken from \cite{wiki:adapter}}
+	Picture is taken from \cite{wiki:adapter}}.
 	\label{fig:adapter}
 \end{figure}
 
@@ -844,7 +848,7 @@ Adaptor is a newly implemented class \emph{VATAAdapter} which description is in 
 \section{Implementation}
 \label{sec:fova_impl}
 
-The main part of the adapter design patter is in our case newly implemented class \emph{VATAAdapter} playing role of Adaptor.
+The main part of the adapter patter is in our case newly implemented class \emph{VATAAdapter} playing role of Adaptor.
 We decided to used the implementation approach to Adaptor, preferring composition over inheritance,
 because it is more suitable for our purposes since we often needs to rename methods 
 (name of a method in Forester differs from name of a method in VATA performing same operation)
