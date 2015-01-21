@@ -1,0 +1,9 @@
+\begin{tikzpicture}[
+  scale=0.8,
+  tnode/.style={circle, text centered, draw=black},
+  line/.style={draw, -}
+  ]
+
+\node [tnode] (v1) {$v_1$};
+
+\end{tikzpicture}
