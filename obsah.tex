@@ -74,13 +74,11 @@ The outline of this document is following.
 In Chapter \ref{ch:prel} the preliminaries are given.
 The verification procedure based on FA is covered in Chapter \ref{ch:fav}.
 Chapter \ref{ch:tools} provides description of \vata\ and Forester tool and Chapter \ref{ch:fova} describes an implementation of the version of Forester tool using \vata.
-\begin{comment}
 The design of backward run for FA base verification is given in Chapter \ref{ch:backward} and its implementation is documented
 in Chapter \ref{ch:impl}.
-\end{comment}
 Finally,
-%Chapter \ref{ch:eval} contains an overview of evaluation and 
-Chapter \ref{ch:concl} summarizes this term project.% master thesis.
+Chapter \ref{ch:eval} contains an overview of evaluation and 
+Chapter \ref{ch:concl} summarizes this master thesis.
 
 \chapter{Preliminaries}
 \label{ch:prel}
@@ -133,6 +131,14 @@ When there is a root in a graph then the graph is called \emph{rooted}.
 
 A \emph{tree} $t$ is a graph which is either empty, or it has exactly one root and $\forall v \in V: idg(v) \leq 1$ (informally,
 each node is a successor of at most one of the other nodes).
+
+\begin{figure}[bt]
+	\begin{center}
+		\input{fig/prel/tree.tikz}
+	\end{center}
+	\caption{A tree}
+	\label{fig:graph_tree}
+\end{figure}
 
 \subsection{Forests}
 \label{subsec:forests}
@@ -868,7 +874,6 @@ However it has proved that this would bring high overhead in some situations.
 A conversion of some data types is needed compared to situation when there are used directly data types compatible with VATA in the Forester code.
 Hence we decided to remove the original tree automata module and further support only version of Forester with \vata.
 
-\begin{comment}
 \chapter{template$<$class Text$>$ Backward Run in Forest Automata Based Verification(Text text)}
 \label{ch:backward}
 text
@@ -887,7 +892,6 @@ text
 \chapter{template$<$class Text$>$ Evaluation(Text text)}
 \label{ch:eval}
 text
-\end{comment}
 
 \chapter{Conclusion}
 \label{ch:concl}
