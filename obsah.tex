@@ -155,7 +155,7 @@ Finally, no node in $s$ has more the one incoming edge hence $t$ is a tree.
 		\caption{A graph $t$ that has attributes of a tree.}
 		\label{fig:graph_tree}
 	\end{figure}
-
+	\label{ex:graph}
 \eexmp
 
 \subsection{Forests}
@@ -176,6 +176,47 @@ $\fagr$ contains an edge $v \mapsto (a,v_1 \cdots v_m)$ iff $\exists i \in \{1, 
   root(t_k) & \quad \text{if $v_j'$ is a root reference with $l(v_j') = k$}\\
   v_j'   & \quad \text{otherwise}
   \end{array} \right.\]
+
+\bexmp
+We illustrate notion of forest in an example.
+Consider a forest $f$ in Figure \ref{fig:forest}.
+The forest $f$ consists three trees, $t_1$ with a root $u_1$,
+$t_2$ with a root $v_1$ and $t_3$ with a root $w_1$.
+The alphabet $\Sigma$ of the trees is same as in Example \ref{ex:graph} but $f$
+is defined over $\Sigma \cup \{\overline{2}, \overline{3}\}$
+where $\overline{2}, \overline{3}$ denotes the root references $u_5$, $v_3$.
+to the second and the third tree.
+
+We can obtain a graph $\otimes t_1,t_2,t_3$ shown in Figure from $t_1, t_2, t_3$.
+The edges with root references are replaced by another edges leading to the roots
+of referenced trees.
+
+	\begin{figure}[bth]
+	\begin{center}
+		\scalebox{1}
+		{
+			\input{fig/prel/for1.tikz}
+			\hspace{0.55cm}
+			\input{fig/prel/for2.tikz}
+			\hspace{0.55cm}
+			\input{fig/prel/for3.tikz}
+		}
+		\caption{A forest $f$ constisting the three trees $t_1, t_2, t_3$ with roots $u_1, v_1, w_1$}.
+	  \label{fig:forest}
+	\end{center}
+	\end{figure}
+
+	\begin{figure}[bth]
+	\begin{center}
+		\scalebox{1}
+		{
+			\input{fig/prel/for_graph.tikz}
+		}
+		\caption{A graph $\otimes t_1,t_2,t_3$ obtained from a forest in Figure \ref{fig:forest}}.
+	  \label{fig:forest_graph}
+	\end{center}
+	\end{figure}
+\eexmp
 
 \subsection{Graphs and Forests with Ports}
 \label{subsec:gfp}
