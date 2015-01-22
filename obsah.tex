@@ -114,7 +114,8 @@ An \emph{edge} of $g$ is a pair $v \mapsto (a, v_1 \cdots v_n))$ where $v, v_1, 
 $a \in \Sigma$ such that $g(v) = (a, v_1 \cdots v_n)$.
 \emph{In-degree} of a node $v' \in V$ in graph $g$ is the overall number of its occurrences in $g(v)$ for any $v \in V$.
 We denote in-degree of a node $v \in V$ by $idg_g(v)$ and we omit again subscript $g$ whenever it is possible.
-More formally, in-degree is defined as $idg(v') = |\{v \mapsto (a, v_1 \cdots v_n) \,|\, v \mapsto (a, v_1 \cdots v_n) \emph{ is an edge such that } \exists i \in \{1,\ldots,n\}: v' = v_i\}|$.
+More formally, in-degree is defined as $idg(v') = |\{v \mapsto (a, v_1 \cdots v_n) \,|\, v \mapsto (a, v_1 \cdots v_n)
+\emph{ is an edge such that } \exists i \in \{1,\ldots,n\}: v' = v_i\}|$.
 The \emph{joins} of $g$ are nodes $v \in V$ such that $idg(v') > 1$.
 
 A \emph{path} from $v\in V$ to $v' \in V$ is a sequence $p=v_0, i_1, v_1, \ldots, i_n, v_n$ where $v=v_0, v' = v_n$
@@ -132,13 +133,30 @@ When there is a root in a graph then the graph is called \emph{rooted}.
 A \emph{tree} $t$ is a graph which is either empty, or it has exactly one root and $\forall v \in V: idg(v) \leq 1$ (informally,
 each node is a successor of at most one of the other nodes).
 
-\begin{figure}[bt]
-	\begin{center}
-		\input{fig/prel/tree.tikz}
-	\end{center}
-	\caption{A tree}
-	\label{fig:graph_tree}
-\end{figure}
+\bexmp
+We illustrate some terms about graphs and trees related to a graph $t$ in Figure \ref{fig:graph_tree}.
+There is a set of nodes $V=\{v_1,v_2,v_3,v_4,v_5\}$ and
+an alphabet $\Sigma = \{a,b\}$ with a ranking function $\#$ such that $\#(a) = 2$ and $\#(b) = 0$.
+Then the graph $t$ is mapping $t(v_1) = (a, (v_2,v_3))$, $t(v_2) = (b, ())$,
+$t(v_3) = (a, (v_4, v_5))$, $t(v_4) = (b, ())$, $t(v_5) = (b, ())$.
+The leaves of $t$ are $v_2, v_4, v_5$.
+The edges correspond to the definition of $t$ so there is for example
+edge $v_1 \mapsto (a,(v_2,v_3))$.
+There different paths but to illustrate the concept of path we give
+definition of path from $v_1$ to $v_5$ which is $v_1, 2, v_3, 2, v_5$.
+Thus we can say that $v_5$ is reachable form $v_1$.
+Since all nodes are reachable from $v_1$ then $v_1$ is a root of $t$.
+Finally, no node in $s$ has more the one incoming edge hence $t$ is a tree.
+
+	\begin{figure}[bth]
+		\begin{center}
+			\input{fig/prel/tree.tikz}
+		\end{center}
+		\caption{A graph $t$ that has attributes of a tree.}
+		\label{fig:graph_tree}
+	\end{figure}
+
+\eexmp
 
 \subsection{Forests}
 \label{subsec:forests}
