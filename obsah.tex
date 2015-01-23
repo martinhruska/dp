@@ -177,8 +177,9 @@ $\fagr$ contains an edge $v \mapsto (a,v_1 \cdots v_m)$ iff $\exists i \in \{1, 
   v_j'   & \quad \text{otherwise}
   \end{array} \right.\]
 
+\pagebreak
 \bexmp
-We illustrate notion of forest in an example.
+We illustrate the notion of forest in an example.
 Consider a forest $f$ in Figure \ref{fig:forest}.
 The forest $f$ consists three trees, $t_1$ with a root $u_1$,
 $t_2$ with a root $v_1$ and $t_3$ with a root $w_1$.
@@ -189,7 +190,8 @@ to the second and the third tree.
 
 We can obtain a graph $\otimes t_1,t_2,t_3$ shown in Figure from $t_1, t_2, t_3$.
 The edges with root references are replaced by another edges leading to the roots
-of referenced trees.
+of the referenced trees.
+A created graph is in Figure \ref{fig:forest_graph}.
 
 	\begin{figure}[bth]
 	\begin{center}
@@ -208,11 +210,9 @@ of referenced trees.
 
 	\begin{figure}[bth]
 	\begin{center}
-		\scalebox{1}
-		{
-			\input{fig/prel/for_graph.tikz}
-		}
-		\caption{A graph $\otimes t_1,t_2,t_3$ obtained from a forest in Figure \ref{fig:forest}}.
+		\input{fig/prel/for_graph.tikz}
+		\caption{A graph $\otimes t_1,t_2,t_3$ obtained from a forest in Figure \ref{fig:forest}.
+		The green edges are the ones added to create the graph from forest}.
 	  \label{fig:forest_graph}
 	\end{center}
 	\end{figure}
@@ -235,13 +235,30 @@ Formally, $cps(g_\phi)=\{v \in V\,|\, v \in \phi \vee idg(v) > 1\}$.
 An \emph{io-forest} is a pair $f=(t_1 \cdots t_n, \pi)$ such that $n \geq 1$ and $\pi \in \{1,\ldots,n\}^n$
 is a sequence of port indices, where $\pi_1$ is a input port index and $\pi_2 \ldots \pi_{|\pi|}$ is a sequence
 of the output ports indices.
-As in the case of the ports the indices are unique .
+As in the case of the ports the indices are unique.
 It is also possible to construct an io-graph $\otimes f$ from a forest $f$ such that
 $\otimes f = (\otimes t_1 \cdots t_n,root(t_{\pi_{1}},\ldots,t_{\pi_{n}}))$.
 So the ports of $\otimes f$ are roots of the trees indexed by indices in $\pi$.
 This means that a root of the tree pointed by $\pi_1$ is an input port of $\otimes f$ and
 the roots of the trees pointed by the other indices in $\pi$ are the output ports of $\otimes f$.
 
+\bexmp
+Recall graph $t$ from Figure \ref{fig:graph_tree}.
+We can extend it to a io-graph $t_\phi$ where $t$ is unchanged and
+$\phi=(v_1,v_4,v_5)$ (of course, there are different ways how to define the ports).
+The io-graph $t_\phi$ has an input port $v_1$ and the output ports are $v_2,v_3$.
+Because $v_1$ is the root the tree $t_\phi$ is accesible.
+The cutpoints of $t_\phi$ are $v_1, v_4, v_5$.
+
+In Figure \ref{fig:forest} we shown the forest $f$.
+This forest could be extended to a io-forest $f_{io}=((t_1,t_2,t_3),\pi)$ by defining sequence of port indices $\pi$
+which could be e.g., $(1,3)$.
+Then a graph $\otimes f_{io}$ is a pair $(\otimes (t_1,t_2,t_3)$, $(u_1,w_1))$.
+The graph $\otimes (t_1,t_2,t_3)$ is the same as in Figure \ref{fig:forest_graph}.
+The inpurt port $u_1$ is related to the input port index $1$ of $f_{io}$
+and the output port $w_1$ is related to the output port index $3$.
+\label{ex:iograph}
+\eexmp
 
 \subsection{Minimal and Canonical Forest}
 \label{subsec:mcforest}
@@ -303,6 +320,19 @@ Finally, we can define the language of $A$.
 The \emph{language} of a state $q\in Q$ is defined by $L(q) = \{t\,|\, t \Rightarrow q\}$.
 The \emph{language} of $A$ is defined by $L(A) = \bigcup_{q\in R} L(q)$.
 
+\bexmp
+Let define a tree automata $A=(Q,\Sigma,\Delta, R)$
+where $Q=\{q_1,q_2,q_3,q_4,q_5\}$, $\Sigma = \{a,b\}$,
+such that $\#(a) = 2, \#(b) =0$, $R=\{q_1\}$,
+and $\Delta=\{q_1 \xrightarrow{a} (q_2,q_3), q_2 \xrightarrow{b} (),
+q_3 \xrightarrow{b} (q_4,q_5), q_4 \xrightarrow{b} (), q_4 \xrightarrow{b} ()\}$.
+Then a run $\rho$ of $A$ over the tree $t$ from Figure \ref{fig:graph_tree}
+is defined as follows: $\forall i \in \{1,\ldots,5\}: \rho(v_i) = q_i$.
+Since $\rho(root(t)) = \rho(v_1) = q_1$ then $t \in L(q_1)$ and becasue $q \in R$
+it also holds $t \in L(A)$.
+\label{ex:ta}
+\eexmp
+
 \subsection{Forest Automata}
 \label{subsec:fa}
 
@@ -338,6 +368,29 @@ i.e. checking language inclusion of their tree automata one by one.
 \begin{proof}
 	Proof can be found in \cite{forester:techrep}.
 \end{proof}
+
+\bexmp
+We consider the io-forest $f_{io}=((t_1,t_2,t_3), (1,3))$ from Example \ref{ex:iograph}.
+The tree $t_1$ (which is the same as the tree $t$) belongs to the language of TA $A$
+defined in Example \ref{ex:ta}.
+We further define a TA $B=(Q_B,\Sigma, \Delta_B, R_B)$ where $Q_B=\{p_1,p_2,p_3\}$,
+$\Sigma$ is same as in Example \ref{ex:ta},
+$\Delta=\{p_1 \xrightarrow{a} (p_2,p_3),
+p_2 \xrightarrow{b} (),
+p_3 \xrightarrow{b} ()\}$
+and $R\{p_1\}$.
+TA $B$ has $t_2$ in its language.
+Finally, we define a TA $C=(Q_C,\Sigma, \Delta_C, R_C)$ where $Q_C=\{r_1\}$,
+$\Sigma$ is again the same as before,
+$\Delta= r_1 \xrightarrow{b} ()\}$
+and $R\{r_1\}$.
+A set $L(C)$ contains $t_3$.
+Putting all defined automata together we can construct a forest automata $F=((A,B,C),(1,3))$.
+The io-forest $f_{io}$ is in the forest language $L_f(F)$ of $F$ because it belongs
+to $L(A) \times L(B) \times L(C) \times \{(1,3)\}$.
+Hence the graph $\otimes f_{io} = (\otimes (t_1,t_2,t_3),(u_1,w_1))$
+(also defined in Example \ref{ex:iograph}) is in the graph language $L(F)$.
+\eexmp
 
 \section{Forest Automata of Higher Level}
 \label{sec:fah}
@@ -488,6 +541,7 @@ related allocated memory cell in the heap so it holds that $l_g(v) \in 2^\Gamma$
 A null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) = \emptyset$
 and undefined selectors of a node $v$ have not corresponding  sub-labels in $l_g(\texttt{v})$.
 
+\bexmp
 We illustrate described principle of heap representation with an example taken from \cite{techrep}.
 We consider a singly-linked list whose items are data structures containing pointers to
 a next item and also integer data variable, written in C:
@@ -507,6 +561,7 @@ by a node $s$ with following label $l_g(s) = \{next_g(s_{next}),(data_g,13),()\}
 As you can see, the pointer selector $next_g \in PSel$ representing the pointer variable \texttt{next} from \texttt{SLL} structure
 has really rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing \texttt{data} variable from \texttt{SLL} structure
 has rank $0$.
+\eexmp
 
 We need to represent the sets of the heap configurations reachable by the analysed program, not only single heap configuration.
 That would be possible by employing the forest automata of higher level respecting canonicity that represents io-forests
