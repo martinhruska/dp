@@ -888,6 +888,78 @@ also improves code quality of Forester in the sense of modularity, maintainabili
 These arguments lead us to implement a version of Forester using VATA.
 This is described in Section \ref{ch:fova}.
 
+
+\subsection{Implementation of Forest Automata concepts}
+
+This subsection describes implementation of forest automata in Forester.
+The core of forest automata module is class \emph{FA}.
+The implementation corresponds to the definitions given in \ref{ch:prel}.
+Class FA has a data member representing vector of tree automata $(t_1 \ldots t_n)$.
+It also contains references to an automaton representing global variable and
+the automata representing variables of current function. %TODO define ABP
+The labels of TA are represented by structure \emph{NodeLabel}.
+This structure consists a data member determining type of node
+(whether it is a general node, a data or a vector of data).
+The structure also contains information related to the corresponding type
+so it has either a data or some kind of box. 
+The basic operations over FA (like adding or removing a TA from FA) are also encapsulated in class FA.
+The other class providing operations over FA is \emph{FAE}. 
+
+As it was already mentioned the forest automata are further used in symbolic state representation.
+An implementation of symbolic state is in class \emph{SymState}.
+The class keeps reference to abstract instruction to which symbol state corresponds.
+It also has a forest automaton (instance of class \emph{FAE}) representing actual memory state and
+a vector of data representing state of registers in such symbolic state.
+Data are represented by structure \emph{Data}.
+The structure consists data members keeping information about type of data, its size and
+also value of data or information about its nested members.
+The operation for manipulation with symbolic state are partially provided by class \emph{SymState}
+and some additional operations are provided by class \emph{VirtualMachine}.
+Class \emph{VirtualMachine} has one data member which is a instance of class \emph{FAE}.
+So the class has mainly the operations for manipulation with nodes of forest automata or
+with references stored in FAE.
+
+We already described the data structures used for implemetation of forest automata concepts
+and relate symbolic execution.
+The symbolic execution using this data structures is realized by gradually appending
+and removing symbolic states to a queue.
+When a symbolic state is taken from the queue an instruction contained in
+the symbolic state is executed.
+Some instructions during its execution appends a new symbolic state to the queue.
+Now we give description of semantics of the Forester microcode instructions.
+\begin{itemize}
+	\item \emph{FI\_cond} instruction represents condition in original code.
+		It creates a new symbolic state with same forest automaton and appends
+		it to the queue.
+		The new state contains an instruction which corresponds to a \textit{then}
+		or \textit{else} branch of the condition.
+		The instruction for the new states is chosen according to
+		the content of \emph{FI\_cond} instruction symbolic state register.
+	\item \emph{FI\_load\_cst} instruction loads a constant to a register.
+		So it creates a new symbolic state which differs only in register content.
+	\item \emph{FI\_move\_reg} instructions creates a new symbolic state where
+		is just a value from a register moved to another register.
+	\item \emph{FI\_bnot, FI\_inot} instructions negate a value in a register and
+		creates a new symbolic state with the negated value in the register.
+		FI\_bnot negates integer and FI\_inot negates boolean value.
+	\item \emph{FI\_move\_reg\_offs} instruction access a reference to a tree automaton
+		in a source register and increase its \emph{displacement} value by a given offset.
+		The new value is moved a destination register.
+	\item \emph{FI\_move\_reg\_inc} instruction do same thing as the previous one but
+		it increases a displacement by a value in the second source register (which is
+		present for this instruction).
+	\item \emph{FI\_get\_greg} loads a value from a global register to
+		a local register.
+	\item \emph{FI\_set\_greg} loads a value from a local register to
+		a global register.
+	\item \emph{FI\_get\_ABP} loads a reference to a FA representing
+		a memory pointed by local variables.
+	\item \emph{FI\_get\_GLB} loads a reference to a FA representing
+		a memory of local function to a local register.
+
+\end{itemize}
+
+
 \chapter{Forester with VATA}
 \label{ch:fova}
 
