@@ -935,6 +935,11 @@ Now we give description of semantics of the Forester microcode instructions.
 		or \textit{else} branch of the condition.
 		The instruction for the new states is chosen according to
 		the content of \emph{FI\_cond} instruction symbolic state register.
+	\item \emph{FI\_acc\_sel} isolates a single selector which is the $i$-th
+		successor of a given root of TA. The root of TA is defined by a destination
+		register and $i$ is a parameter of the instruction.
+	\item \emph{FI\_acc\_set,FI\_acc\_all} instruction does the same thing as the previous one
+		but for a set of selectors or for all selectors.
 	\item \emph{FI\_load\_cst} instruction loads a constant to a register.
 		So it creates a new symbolic state which differs only in register content.
 	\item \emph{FI\_move\_reg} instructions creates a new symbolic state where
@@ -977,7 +982,7 @@ Now we give description of semantics of the Forester microcode instructions.
 		A reference to new TA is stored to a destination register.
 		A type info of the new node and its size is obtained from source
 		register.
-	\item \emph{FI\_node\_delete} instruction deletes a node in FA and
+	\item \emph{FI\_node\_free} instruction deletes a node in FA and
 		invalidate all references to it.
 	\item \emph{FI\_iadd, FI\_imull} instructions performs integer
 		addition and multiplication.
