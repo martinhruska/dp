@@ -954,8 +954,58 @@ Now we give description of semantics of the Forester microcode instructions.
 		a global register.
 	\item \emph{FI\_get\_ABP} loads a reference to a FA representing
 		a memory pointed by local variables.
-	\item \emph{FI\_get\_GLB} loads a reference to a FA representing
+	\item \emph{FI\_get\_GLOB} loads a reference to a FA representing
 		a memory of local function to a local register.
+	\item \emph{FI\_load} loads a value from a FA pointed
+		by a value in source register to a destination register.
+		The value is value of $i$-the successor of the root pointed
+		by source register value, where $i$ is a value of offset.
+		The offset is paramter of FI\_load instruction.
+	\item \emph{FI\_load\_ABP, FI\_load\_GLOB} same as the previous instruction
+		but loads a value from a FA pointed by ABP or GLOB register.
+	\item \emph{FI\_store} instruction stores a value from a FA pointed by source
+		register to a location in a FA pointed by destination register.
+		The location is $i$-th successor of a root of the FA where $i$ is offset
+		obtained as a parameter of this instruction.
+	\item \emph{FI\_loads, FI\_stores} instructions do same as the previous
+		one but manipulates the structures.
+	\item \emph{FI\_alloc} instruction creates a new instance of \emph{Data} structure
+		that represents allocated memory.
+		The created instance will be further used for creating of a new TA.
+	\item \emph{FI\_node\_create} instructions creates a new node
+		(and hereby also a new TA) which is a root node of the new TA.
+		A reference to new TA is stored to a destination register.
+		A type info of the new node and its size is obtained from source
+		register.
+	\item \emph{FI\_node\_delete} instruction deletes a node in FA and
+		invalidate all references to it.
+	\item \emph{FI\_iadd, FI\_imull} instructions performs integer
+		addition and multiplication.
+	\item \emph{FI\_check} instruction checks whether there is not
+		garbage.
+	\item \emph{FI\_abort} instruction aborts program execution.
+	\item \emph{FI\_assert} instruction checks whether a value
+		in a givem register is the same one as a constant.
+		Both register and constant are parameters of this instruction.
+	\item \emph{FI\_build\_struct} instruction creates a structure from a
+		content of registers and result stores to a destination register.
+		The source registers are defined by a index of start register and
+		vector of offsets from this register which points to another registers
+		that are used for creating structure.
+	\item \emph{FI\_push\_greg} instruction creates a new global register
+		and fills it with a value in a source register.
+	\item \emph{FI\_pop\_greg} instruction takes a value in the last created
+		global register and stores it to a local register.
+		The global register is then deleted.
+	\item \emph{FI\_error} instruction throws an exception representing
+		a local error in program.
+	\item \emph{FI\_noret} instruction quits program symbolic execution when
+		no return function end is reached.
+	\item \emph{FI\_eq, FI\_neq, FI\_ge, FI\_gt, FI\_le, FI\_lt} instructions
+		makes a comparison corresponding to their names.
+		The result of the comparison stores to a destination register.
+	\item \emph{FI\_abs, FI\_fix} instructions computes fixpoint with (FI\_abs) or
+		without (FI\_fix) abstraction.
 
 \end{itemize}
 
