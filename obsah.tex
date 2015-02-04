@@ -894,8 +894,8 @@ This is described in Section \ref{ch:fova}.
 This subsection describes implementation of forest automata in Forester.
 The core of forest automata module is class \emph{FA}.
 The implementation corresponds to the definitions given in \ref{ch:prel}.
-Class FA has a data member representing vector of tree automata $(t_1 \ldots t_n)$.
-It also contains references to an automaton representing global variable and
+Class FA has a data member representing vector of tree automata $(t_1 \cdots t_n)$.
+It also contains a reference to an automaton representing global variable and a reference
 the automata representing variables of current function. %TODO define ABP
 The labels of TA are represented by structure \emph{NodeLabel}.
 This structure consists a data member determining type of node
@@ -907,12 +907,22 @@ The other class providing operations over FA is \emph{FAE}.
 
 As it was already mentioned the forest automata are further used in symbolic state representation.
 An implementation of symbolic state is in class \emph{SymState}.
-The class keeps reference to abstract instruction to which symbol state corresponds.
-It also has a forest automaton (instance of class \emph{FAE}) representing actual memory state and
-a vector of data representing state of registers in such symbolic state.
+The class keeps reference to an abstract instruction $I$ to which symbolic state corresponds.
+It also has a forest automaton $F$ (instance of class \emph{FAE}) representing actual memory state and
+a set of reigsters $\regsset$ with data values in the symbolic state.
+We denote $\regsset$ by $\regs$. 
+Putting together information stored in class \emph{SymState},
+we can define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
 Data are represented by structure \emph{Data}.
-The structure consists data members keeping information about type of data, its size and
-also value of data or information about its nested members.
+The structure consists data members keeping information about type of data $T$, its size $S$ and
+also value of data $V$ or information about its nested members $MBS$.
+We can again fomally define data as $D = (T,S,V,MB)$ where
+$T$ is a data type, $S \in \natnum$, $MB=(D_1 \cdots D_n)$, $D_i$ is another instance of data,
+$V$ is a value of type in $T$.
+$V$ could be value of integer, boolean or could contain adress to memory.
+It could be also root reference $RR$ which is defined (in implementation) as $RR=(\emph{Root},\emph{Displ})$
+where $\emph{Root} \in \natnum$ is index of a tree automaton in $F$
+and $\emph{Displ} \in \natnum$ is index of successor of a root pointed by $\emph{Root}$.
 The operation for manipulation with symbolic state are partially provided by class \emph{SymState}
 and some additional operations are provided by class \emph{VirtualMachine}.
 Class \emph{VirtualMachine} has one data member which is a instance of class \emph{FAE}.
@@ -920,13 +930,27 @@ So the class has mainly the operations for manipulation with nodes of forest aut
 with references stored in FAE.
 
 We already described the data structures used for implemetation of forest automata concepts
-and relate symbolic execution.
+and related symbolic execution.
 The symbolic execution using this data structures is realized by gradually appending
 and removing symbolic states to a queue.
 When a symbolic state is taken from the queue an instruction contained in
 the symbolic state is executed.
 Some instructions during its execution appends a new symbolic state to the queue.
 Now we give description of semantics of the Forester microcode instructions.
+In the following text the source and destination registers are paramters of
+a instruction.
+We use $r_s \in \regs$ to denote the source register and $r_d \in \regs$ the destination register.
+The registers are parameters of some instructions.
+We use $\regssub{r}{r'}$ to denote a set of registers which has same registers as $\regs$
+excluding $r$ that has value $r'$.
+A symbol $I_n$ denotes a next instruction following an instruction actually executed.
+We define semantics of each instruction formally using a function 
+$f: \instrset \times \symset \rightarrow \symset$
+where $\symset$ is a set of all symbolic states and $\instrset$ is a set of all instruction.
+When it is clear for which instruction is $f$ defined
+we ommit the first parameter of $f$.
+The function $f$ defines an effect of instruction as transformation of current
+symbolic state $s$ to a new symbolic state $s'$.
 \begin{itemize}
 	\item \emph{FI\_cond} instruction represents condition in original code.
 		It creates a new symbolic state with same forest automaton and appends
@@ -935,6 +959,9 @@ Now we give description of semantics of the Forester microcode instructions.
 		or \textit{else} branch of the condition.
 		The instruction for the new states is chosen according to
 		the content of \emph{FI\_cond} instruction symbolic state register.
+		Formally, $f(\stdsym) = \symstate{F}{\regs}{r_s ? I_t : I_f}$
+		where $I_t$ is instruction used when $r_s$ has true value and
+		$I_f$ is instruction used otherwise.
 	\item \emph{FI\_acc\_sel} isolates a single selector which is the $i$-th
 		successor of a given root of TA. The root of TA is defined by a destination
 		register and $i$ is a parameter of the instruction.
@@ -942,14 +969,20 @@ Now we give description of semantics of the Forester microcode instructions.
 		but for a set of selectors or for all selectors.
 	\item \emph{FI\_load\_cst} instruction loads a constant to a register.
 		So it creates a new symbolic state which differs only in register content.
+		Formally, $f(\stdsym) = \symstate{F}{\regssub{r_d}{c}}{I_n})$ where
+		$c$ is a constant which is parameter of this instruction.
 	\item \emph{FI\_move\_reg} instructions creates a new symbolic state where
-		is just a value from a register moved to another register.
+		a value from $r_s$ is moved to register $r_d$.
+		Formally, $f(\stdsym) = \symstate{F}{\regssub{r_d}{r_s}}{I_n}$.
 	\item \emph{FI\_bnot, FI\_inot} instructions negate a value in a register and
 		creates a new symbolic state with the negated value in the register.
 		FI\_bnot negates integer and FI\_inot negates boolean value.
+		Formally, $f(\stdsym) = \symstate{F}{\regssub{r_d}{\neg r_d}}{I_n}$.
 	\item \emph{FI\_move\_reg\_offs} instruction access a reference to a tree automaton
 		in a source register and increase its \emph{displacement} value by a given offset.
 		The new value is moved a destination register.
+		Formally, $f(\stdsym) = \symstate{F}{\regssub{r_d}{(\lfunc{d}{d.RR.Displ = d.RR.Displ + o})(r_s)}}{I_n}$
+		where $o$ is offset which is parameter of this instruction.
 	\item \emph{FI\_move\_reg\_inc} instruction do same thing as the previous one but
 		it increases a displacement by a value in the second source register (which is
 		present for this instruction).
