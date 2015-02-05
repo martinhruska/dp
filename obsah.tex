@@ -972,13 +972,12 @@ in the notion of function $f$.
 		$f(\stdsym) = \symstate{F}{\regs}{r_s ? I_t : I_f}$
 		where $I_t$ is instruction used when $r_s$ has true value and
 		$I_f$ is instruction used otherwise.
-	\item \emph{FI\_acc\_sel} isolates a single selector which is the $i$-th
-		successor of a given root of TA.
+	\item \emph{FI\_acc\_sel} isolates the $i-th$ selector which is a given root of TA.
 		The root of TA is defined by destination register.
 		
 		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
 		where $F'$ is a new FA obtained from $F$ by isolating
-		the $i-th$ successor of TA $t$.
+		the $i-th$ selector of root of TA $t$.
 		The register $r_d$ contains root reference $RR=(Root, Displ)$
 		such that $Root$ points to TA $t$ and $i=Displ+o$ where $o$ is a offset which is a parameter
 		of this instruction.
