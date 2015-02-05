@@ -6,11 +6,15 @@
 \newcommand{\bexmp}[0]{\noindent\rule{\textwidth}{0.4pt} \begin{example}}
 \newcommand{\eexmp}[0]{\end{example} \noindent\rule{\textwidth}{0.4pt}}
 \newcommand{\symset}[0]{\mathbb{S}}
-\newcommand{\instrset}[0]{\mathbb{I\,S}}
+\newcommand{\instrset}[0]{\mathbb{I}}
 \newcommand{\regs}[0]{\mathbb{G}}
 \newcommand{\regsset}[0]{\{r_1, \ldots, r_m\}}
 \newcommand{\regssub}[2]{\regs [#1 := #2]}
+\newcommand{\regssubmin}[3]{\regs \setminus \{#3\} [#1 := #2]}
 \newcommand{\symstate}[3]{(#1, #2, #3)}
 \newcommand{\stdsym}[0]{\symstate{F}{\regs}{I}}
 \newcommand{\natnum}[0]{\mathbb{N}}
-\newcommand{\lfunc}[2]{\lambda #1 \,:\, #2]}
+\newcommand{\lfunc}[2]{\lambda #1 \,:\, #2}
+\newcommand{\lfuncp}[3]{(\lambda #1 \,:\, #2)(#3)}
+\newcommand{\ddispl}[1]{#1.RR.Displ}
+\newcommand{\droot}[1]{#1.RR.Root}

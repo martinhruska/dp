@@ -891,66 +891,75 @@ This is described in Section \ref{ch:fova}.
 
 \subsection{Implementation of Forest Automata concepts}
 
-This subsection describes implementation of forest automata in Forester.
+This subsection describes implementation of forest automata based verification procedure in Forester.
 The core of forest automata module is class \emph{FA}.
-The implementation corresponds to the definitions given in \ref{ch:prel}.
+The implementation corresponds to the definitions given in Chapter \ref{ch:prel}.
 Class FA has a data member representing vector of tree automata $(t_1 \cdots t_n)$.
-It also contains a reference to an automaton representing global variable and a reference
-the automata representing variables of current function. %TODO define ABP
+It also has the data member keeping a reference to an automaton representing global variables
+and a reference to the automata representing variables of current function. %TODO define ABP
 The labels of TA are represented by structure \emph{NodeLabel}.
 This structure consists a data member determining type of node
-(whether it is a general node, a data or a vector of data).
-The structure also contains information related to the corresponding type
-so it has either a data or some kind of box. 
+(whether it is a general node, a data node or a node containing vector of data).
+The structure also has data member that keeps value of type that is stored in label.
 The basic operations over FA (like adding or removing a TA from FA) are also encapsulated in class FA.
 The other class providing operations over FA is \emph{FAE}. 
 
 As it was already mentioned the forest automata are further used in symbolic state representation.
 An implementation of symbolic state is in class \emph{SymState}.
-The class keeps reference to an abstract instruction $I$ to which symbolic state corresponds.
-It also has a forest automaton $F$ (instance of class \emph{FAE}) representing actual memory state and
-a set of reigsters $\regsset$ with data values in the symbolic state.
+The class keeps reference to a Forester microcode instruction $I$ to which symbolic state corresponds.
+It also has data member that is a pointer to forest automaton $F$ (instance of class \emph{FAE})
+representing actual memory state.
+Class SymState also stores a set of registers $\regsset$ with data values in the symbolic state.
 We denote $\regsset$ by $\regs$. 
-Putting together information stored in class \emph{SymState},
+There are two kinds of registers, local and global registers.
+Putting together data members class \emph{SymState}
 we can define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
-Data are represented by structure \emph{Data}.
-The structure consists data members keeping information about type of data $T$, its size $S$ and
-also value of data $V$ or information about its nested members $MBS$.
-We can again fomally define data as $D = (T,S,V,MB)$ where
-$T$ is a data type, $S \in \natnum$, $MB=(D_1 \cdots D_n)$, $D_i$ is another instance of data,
-$V$ is a value of type in $T$.
-$V$ could be value of integer, boolean or could contain adress to memory.
-It could be also root reference $RR$ which is defined (in implementation) as $RR=(\emph{Root},\emph{Displ})$
+The values of register are instances of a structure \emph{Data}.
+The structure consists data members keeping information about type of data $T$, its size $S$,
+also value $V$ of type $T$ and information about its nested members $MBS$.
+We can again fomally define structure Data as $D = (T,S,V,MB)$ where
+$T$ is a data type,
+$S \in \natnum$ is size of data,
+$V$ is a value of type $T$,
+$MB=(D_1 \cdots D_n)$ could represent nested data (this is the case when $D$ represents a data structure),
+$D_i$ is another instance of data.
+$T$ could be one of the following data types: pointer, reference to a TA, integer, boolean, structure, some other data type.
+$T$ could be also undefined or it could state that type is unknown.
+One of types is root reference which is defined as $RR=(\emph{Root},\emph{Displ})$
 where $\emph{Root} \in \natnum$ is index of a tree automaton in $F$
 and $\emph{Displ} \in \natnum$ is index of successor of a root pointed by $\emph{Root}$.
 The operation for manipulation with symbolic state are partially provided by class \emph{SymState}
 and some additional operations are provided by class \emph{VirtualMachine}.
-Class \emph{VirtualMachine} has one data member which is a instance of class \emph{FAE}.
-So the class has mainly the operations for manipulation with nodes of forest automata or
-with references stored in FAE.
 
 We already described the data structures used for implemetation of forest automata concepts
 and related symbolic execution.
 The symbolic execution using this data structures is realized by gradually appending
-and removing symbolic states to a queue.
-When a symbolic state is taken from the queue an instruction contained in
+and removing symbolic states from a queue.
+When a symbolic state is taken from the queue a microcode instruction contained in
 the symbolic state is executed.
 Some instructions during its execution appends a new symbolic state to the queue.
-Now we give description of semantics of the Forester microcode instructions.
-In the following text the source and destination registers are paramters of
-a instruction.
-We use $r_s \in \regs$ to denote the source register and $r_d \in \regs$ the destination register.
-The registers are parameters of some instructions.
-We use $\regssub{r}{r'}$ to denote a set of registers which has same registers as $\regs$
+Before describing semantics of the Forester microcode instructions itself
+the notion used further are given first.
+We use $r_s \in \regs$ to denote the source register,
+$r_d \in \regs$ to denote the destination register,
+$r_l \in \regs$ to denote a local register and
+$r_g \in \regs$ to denote a global register.
+Note that source register is also global or local and same holds for the destination register.
+The source and destination registers are parameters of some instructions in the following text.
+We use $\regssub{r}{r'}$ to denote a set of registers which has the same values as registers in $\regs$
 excluding $r$ that has value $r'$.
-A symbol $I_n$ denotes a next instruction following an instruction actually executed.
+A symbol $I_n$ denotes next instruction following an instruction actually executed.
 We define semantics of each instruction formally using a function 
 $f: \instrset \times \symset \rightarrow \symset$
-where $\symset$ is a set of all symbolic states and $\instrset$ is a set of all instruction.
-When it is clear for which instruction is $f$ defined
-we ommit the first parameter of $f$.
+where $\symset$ is a set of all symbolic states and $\instrset$ is a set of all instructions.
+When it is clear for which instruction is used we ommit the first parameter of $f$.
 The function $f$ defines an effect of instruction as transformation of current
 symbolic state $s$ to a new symbolic state $s'$.
+
+A list of microcode instructions used in Forester with description
+of their semantics follows.
+Each instruction is described infromally first and then its effect is defined
+in the notion of function $f$.
 \begin{itemize}
 	\item \emph{FI\_cond} instruction represents condition in original code.
 		It creates a new symbolic state with same forest automaton and appends
@@ -986,55 +995,138 @@ symbolic state $s$ to a new symbolic state $s'$.
 	\item \emph{FI\_move\_reg\_inc} instruction do same thing as the previous one but
 		it increases a displacement by a value in the second source register (which is
 		present for this instruction).
+		Formally, $f(\stdsym) = \symstate{F}{\regssub{r_d}{(\lfunc{d,i}{d.RR.Displ = d.RR.Displ + i})(r_{s1}, r_{s2})}}{I_n}$
+		where $r_{s1} \in \regs, r_{s2} \in \regs$ are source register such that
+		$r_{s1}$ has root reference value and $r_{s2}$ has integer value.
 	\item \emph{FI\_get\_greg} loads a value from a global register to
 		a local register.
+		Formally, $f(\stdsym) = \symstate{F}{\regssub{r_{ld}}{r_{gs}}}{I_n}$.
 	\item \emph{FI\_set\_greg} loads a value from a local register to
 		a global register.
-	\item \emph{FI\_get\_ABP} loads a reference to a FA representing
-		a memory pointed by local variables.
-	\item \emph{FI\_get\_GLOB} loads a reference to a FA representing
-		a memory of local function to a local register.
+		Formally, $f(\stdsym) = \symstate{F}{\regssub{r_{gd}}{r_{ls}}}{I_n}$.
+	\item \emph{FI\_get\_ABP} loads a root reference to a FA representing
+		a memory pointed by local variables and adds an offset to a displacement
+		in the root reference.
+		Formally, $f(\stdsym) = \symstate{F}{\regssub{r_{d}}{
+				(\lfuncp{d}{d.RR.Displ = d.RR.Displ + o}{r_{ABP}})}
+			{I_n}}$ where $r_{ABP}$ is the register containing root
+			reference to FA representing local memory and $o$ is offset
+			which is parameter of this function.
+	\item \emph{FI\_get\_GLOB} loads a root reference to a FA representing
+		a memory of local function to a local register
+		and adds an offset to a displacement in the root reference.
+		Formally, $f(\stdsym) = \symstate{F}
+			{\regssub{r_{d}}}{
+				\lfuncp{d}{\ddispl{d} = \ddispl{d} + o}{r_{GLOB}
+			}}
+			{I_n}$ where $r_{GLOB}$ is the register containing root
+			reference to FA representing global memory and $o$ is offset
+			which is a parameter of this instruction.
 	\item \emph{FI\_load} loads a value from a FA pointed
-		by a value in source register to a destination register.
+		by a root reference in source register to a destination register.
 		The value is value of $i$-the successor of the root pointed
 		by source register value, where $i$ is a value of offset.
-		The offset is paramter of FI\_load instruction.
+		Formally, $f(\stdsym) = \symstate{F}
+			{\regssub{r_{d}}{
+				\lfuncp{d}{S_{F[\droot{d}]}^{\droot{d} + o}}{r_{s}}
+			}}
+			{I_n}$
+			where $F[\droot{d}]$ is a TA of F referenced by
+			$\droot{d}$ reference and $o$ is offset	which is a parameter of this instruction.
 	\item \emph{FI\_load\_ABP, FI\_load\_GLOB} same as the previous instruction
 		but loads a value from a FA pointed by ABP or GLOB register.
-	\item \emph{FI\_store} instruction stores a value from a FA pointed by source
-		register to a location in a FA pointed by destination register.
+		Fomally it could be defined as the previous instruction but
+		$r_{ABP}$ and $r_{GLOB}$ are used instead of $r_s$.
+	\item \emph{FI\_store} instruction stores a value from source register
+		to a TA pointed by destination register.
 		The location is $i$-th successor of a root of the FA where $i$ is offset
 		obtained as a parameter of this instruction.
+		Formally, $f(\stdsym) = \symstate{F'}{\regs}{I_n}$
+		where $F'$ is a FA obtained from $F$ by assignemnt
+		$S_{F[\droot{d}]}^{\ddispl{d} + o} = r_{d}$,
+		$F[\droot{d}]$ is a TA of $F$ referenced by $\droot{d}$ reference
+		and $o$ is offset which is a parameter of this instruction.
 	\item \emph{FI\_loads, FI\_stores} instructions do same as the previous
 		one but manipulates the structures.
-	\item \emph{FI\_alloc} instruction creates a new instance of \emph{Data} structure
+		Formal definition is also same but result in the register $r_d$ (in case of FI\_loads)
+		and or in the corresponding (in case of FI\_stores) has a different typed
+		(concretely it is a structure).
+	\item \emph{FI\_alloc} instruction creates a new instance of structure \emph{Data}
 		that represents allocated memory.
 		The created instance will be further used for creating of a new TA.
+		Formally, $f(\stdsym) = \symstate{F}{
+		\regssub{
+			r_{d}}
+			{x}}
+		{I_n}$
+		where $x=(\emph{void\_ptr},\emph{undef},S',\emptyset)$ is an instance of structure Data
+		such that $S'$ is a size stored in $r_s$ (where should be stored an integer value). 
 	\item \emph{FI\_node\_create} instructions creates a new node
 		(and hereby also a new TA) which is a root node of the new TA.
-		A reference to new TA is stored to a destination register.
+		A reference to the new TA is stored to destination register.
 		A type info of the new node and its size is obtained from source
 		register.
+		Formally, $f(\stdsym) = \symstate{F'}{
+		\regssub{
+			r_{d}}
+			x}
+		{I_n}$
+		where $F'$ is a new FA created by adding newly created TA $t$ to $F$
+		and $x$ is a reference to $t$.
+		TA $t$ has selectors defined in $r_s$. 
+		Note that reference to $t$ is not added to a TA in $F$ in this step
+		but it is done by instruction assigning a register value to a
+		node of TA.
 	\item \emph{FI\_node\_free} instruction deletes a node in FA and
 		invalidate all references to it.
+		Formally, $f(\stdsym) = \symstate{F'}
+		{\regs}
+		{I_n}$
+		where $F'$ is obtained from $F$ by deleting a TA $t$ referenced
+		by a value of $r_s$ and removing all reference to $t$ from TA of $F$.
 	\item \emph{FI\_iadd, FI\_imull} instructions performs integer
 		addition and multiplication.
+		Formally, $f(\stdsym) = \symstate{F}
+		{\regssub{r_d}{r_{s_1} +/* r_{s_2}}}
+		{I_n}$
+		where $r_{s1} \in \regs, r_{s2} \in \regs$ are two source registers
+		with values of integer type.
 	\item \emph{FI\_check} instruction checks whether there is not
 		garbage.
+		Formally, $f(\stdsym) = \symstate{F'}
+		{\regs}
+		{I_n}$
+		where $F'$ is obtained from $F$ by removing all unreachable
+		TA.
 	\item \emph{FI\_abort} instruction aborts program execution.
 	\item \emph{FI\_assert} instruction checks whether a value
 		in a givem register is the same one as a constant.
-		Both register and constant are parameters of this instruction.
+		Formally $f(\stdsym) = \stdsym$ if $r_s = c$, otherwise
+		symbolic execution is aborted.
+		Constant $c$ is a parameter of this instruction.
 	\item \emph{FI\_build\_struct} instruction creates a structure from a
 		content of registers and result stores to a destination register.
-		The source registers are defined by a index of start register and
+		The source registers are defined by an index of the first register and
 		vector of offsets from this register which points to another registers
 		that are used for creating structure.
+		Formally, $f(\stdsym) = \symstate{F}
+		{\regssub{r_d}{x}}
+		{I_n}$
+		where $x$ is a structure created from values of registers $r_s,r_{s+i_1},r_{s+i_2}, \ldots, r_{s+i_n}$.
+		The values $i_1, i_2, \ldots, i_n$ are offsets defined as parameters of this instruction.
 	\item \emph{FI\_push\_greg} instruction creates a new global register
 		and fills it with a value in a source register.
+		Formally, $f(\stdsym) = \symstate{F}
+		{\regs\cup \{r_g\}}
+		{I_n}$
+		where $r_g$ is a new global register such that $r_g = r_s$.
 	\item \emph{FI\_pop\_greg} instruction takes a value in the last created
 		global register and stores it to a local register.
 		The global register is then deleted.
+		Formally, $f(\stdsym) = \symstate{F}
+		{\regssubmin{r_g}{r_d}{r_g} \cup \{r_g\}}
+		{I_n}$
+		where $r_g$ is the lastly created global register.
 	\item \emph{FI\_error} instruction throws an exception representing
 		a local error in program.
 	\item \emph{FI\_noret} instruction quits program symbolic execution when
@@ -1042,8 +1134,17 @@ symbolic state $s$ to a new symbolic state $s'$.
 	\item \emph{FI\_eq, FI\_neq, FI\_ge, FI\_gt, FI\_le, FI\_lt} instructions
 		makes a comparison corresponding to their names.
 		The result of the comparison stores to a destination register.
+		Formally, $f(\stdsym) = \symstate{F}
+		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
+		{I_n}$
+		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are two source registers
+		and $\otimes \in \{=,\neq, <,>,\leq,\geq\}$.
 	\item \emph{FI\_abs, FI\_fix} instructions computes fixpoint with (FI\_abs) or
 		without (FI\_fix) abstraction.
+		Formally, $f(\stdsym) = \symstate{F'}
+		{\regs}
+		{I_n}$
+		where $F'$ is a new FA obtained from $F$ by computing fixpoint with or without abstraction.
 
 \end{itemize}
 
