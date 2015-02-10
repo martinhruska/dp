@@ -890,6 +890,7 @@ This is described in Section \ref{ch:fova}.
 
 
 \subsection{Implementation of Forest Automata concepts}
+\label{subsec:faimpl}
 
 This subsection describes implementation of forest automata based verification procedure in Forester.
 The core of forest automata module is class {\tt FA}.
@@ -946,6 +947,7 @@ Symbolic execution finishes when queue is empty.
 The microcode instructions executed during symbolic execution are described in folowing Section \ref{subsec:instrs}
 
 \subsection{The Microcode Instructions}
+\label{subsec:microinstr}
 
 This sections provides a description of the Forester microcode instruction
 but before describing their semantics itself the notion used further is given first.
@@ -970,7 +972,6 @@ of their semantics follows.
 Each instruction is described informally first and then its effect is defined
 in the notion of function $f$.
 Firstly, the most crucial instructions are described then the complete list is finished.
-%TODO example
 \begin{itemize}
 	\item {\tt FI\_acc\_sel} isolates the $i$-th selector which is a given root of TA.
 		The root of TA is defined by a destination register.
@@ -1393,11 +1394,101 @@ However it has proved that this would bring high overhead in some situations.
 A conversion of some data types is needed compared to situation when there are used directly data types compatible with VATA in the Forester code.
 Hence we decided to remove the original tree automata module and further support only version of Forester with \vata.
 
-\chapter{template$<$class Text$>$ Backward Run in Forest Automata Based Verification(Text text)}
+\chapter{Backward Run in Forest Automata Based Verification(Text text)}
 \label{ch:backward}
 text
 
 \section{Backward Run over Symbolic Context}
+
+This sections provides a description of the reverse operations for
+each instruction of Forester microcode which were introduced in Section \ref{subsec:microinstr}.
+We describe each instruction informally first and then the instruction is defined in notion
+of a function $\grev: \grevinter$ which should has reverse semantics to the function $f$ from Section \ref{subsec:microinstr}.
+So $\grev$ takes as parameter a symbolic state and an instruction and returns a new symbolic state representing
+a symbolic state in the forward symbolic execution right before execution of the instruction.
+Note that not all instructions need to be reversed but only those
+modifying forest automata or those affecting further modification of forest automata.
+All the notion used in the following text is the same as the one defined in Section \ref{subsec:microinstr,subsec:faimpl}.
+We present the crucial instructions first then the rest is given.
+\begin{itemize}
+	\item {\tt FI\_acc\_sel}
+		
+	\item {\tt FI\_acc\_set,FI\_acc\_all}
+
+	\item {\tt FI\_alloc}
+
+	\item {\tt FI\_node\_create}
+	
+	\item {\tt FI\_node\_free}
+
+	\item {\tt FI\_abs, FI\_fix}
+
+\end{itemize}
+
+Since we already covere the most crucial instructions we describe
+the rest of the instructions now.
+The following instructions are used for manipulating registers.
+
+\begin{itemize}
+
+	\item {\tt FI\_load\_cst}
+
+	\item {\tt FI\_move\_reg}
+
+	\item {\tt FI\_bnot, FI\_inot}
+
+	\item {\tt FI\_move\_reg\_offs}
+
+	\item {\tt FI\_move\_reg\_inc}
+
+	\item {\tt FI\_get\_greg}
+
+	\item {\tt FI\_set\_greg}
+
+	\item {\tt FI\_get\_ABP}
+
+	\item {\tt FI\_get\_GLOB}
+
+	\item {\tt FI\_load}
+	
+	\item {\tt FI\_load\_ABP, FI\_load\_GLOB}
+	
+	\item {\tt FI\_store}
+
+	\item {\tt FI\_loads, FI\_stores}
+
+	\item {\tt FI\_push\_greg}
+	
+	\item {\tt FI\_pop\_greg}
+
+	\end{itemize}
+
+	Finally, the remaining instructions do not perform a specific operations
+	but perform the various operations like conditions, arithmetic operations or
+	aborting the symbolic execution, etc.
+
+	\begin{itemize}
+
+	\item {\tt FI\_cond}
+
+	\item {\tt FI\_iadd, FI\_imull}
+
+	\item {\tt FI\_eq, FI\_neq, FI\_ge, FI\_gt, FI\_le, FI\_lt}
+	
+	\item {\tt FI\_build\_struct}
+
+	\item {\tt FI\_check}
+
+	\item {\tt FI\_abort}
+	
+	\item {\tt FI\_assert}
+
+	\item {\tt FI\_error}
+
+	\item {\tt FI\_noret}
+
+\end{itemize}
+
 
 \section{Intersection of Forest Automata}
 
