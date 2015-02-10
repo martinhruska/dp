@@ -912,7 +912,11 @@ representing actual memory state.
 Another data member of class SymState is a set of registers $\regsset$ with data values in the symbolic state.
 We denote set $\regsset$ by $\regs$. 
 The register can be local or global ones.
-Putting together data members if class {\tt SymState}
+The global registers contain the references to the forest automata modelling
+the global state of a program what is a forest automata modelling the block of global variables.
+The local registers serve as temporary memory used in
+the microcode instructions for data manipulation.
+Putting together data members of class {\tt SymState}
 we can define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
 The values of register are instances of a structure {\tt Data}.
 The structure consists data members keeping information about type of data $T$, its size $S$,
@@ -966,9 +970,17 @@ of their semantics follows.
 Each instruction is described informally first and then its effect is defined
 in the notion of function $f$.
 Firstly, the most crucial instructions are described then the complete list is finished.
+%TODO example
 \begin{itemize}
 	\item {\tt FI\_acc\_sel} isolates the $i$-th selector which is a given root of TA.
-		The root of TA is defined by destination register.
+		The root of TA is defined by a destination register.
+		This instruction checks whether a selector pointed by the destination register
+		selects a node that represents allocated memory node or undefined pointer.
+		In the first case the node is isolated to an new TA and the original node in the
+		orignal TA is replaced by a root reference to a new TA.
+		In the second case nothing changes.
+		Note that this basically corresponds to identification of the cut-points
+		and their seperation to a new TA.
 		
 		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
 		where $F'$ is a new FA obtained from $F$ by isolating
@@ -1032,23 +1044,8 @@ Firstly, the most crucial instructions are described then the complete list is f
 Since we already covere the most crucial instructions we describe
 the rest of the instructions now.
 The following instructions are used for manipulating registers.
-%TODO sublists of instruction
-%TODO local vs global register
-%TODO example
 
 \begin{itemize}
-	\item {\tt FI\_cond} instruction represents condition in original code.
-		It creates a new symbolic state with same forest automaton and appends
-		it to the queue.
-		The new state contains an instruction which corresponds to a \textit{then}
-		or \textit{else} branch of the condition.
-		The instruction for the new state is chosen according to
-		the content of {\tt FI\_cond} instruction symbolic state register.
-		
-		$f(\stdsym) = \symstate{F}{\regs}{r_s ? I_t : I_f}$
-		where $I_t$ is instruction used when $r_s$ has true value and
-		$I_f$ is instruction used otherwise.
-
 
 	\item {\tt FI\_load\_cst} instruction loads a constant to a register.
 		So it creates a new symbolic state which differs only in register content.
@@ -1155,7 +1152,45 @@ The following instructions are used for manipulating registers.
 		Formal definition is also same but result in the register $r_d$ (in case of {\tt FI\_loads})
 		and or in the corresponding (in case of {\tt FI\_stores}) has a different typed
 		(concretely it is a structure).
+
+	\item {\tt FI\_push\_greg} instruction creates a new global register
+		and fills it with a value in a source register.
+		
+		$f(\stdsym) = \symstate{F}
+		{\regs\cup \{r_g\}}
+		{I_n}$
+		where $r_g$ is a new global register such that $r_g = r_s$.
 	
+	\item {\tt FI\_pop\_greg} instruction takes a value in the last created
+		global register and stores it to a local register.
+		The global register is then deleted.
+		
+		$f(\stdsym) = \symstate{F}
+		{\regssubmin{r_g}{r_d}{r_g}}
+		{I_n}$
+		where $r_g$ is the lastly created global register.
+
+	\end{itemize}
+
+	Finally, the remaining instructions do not perform a specific operations
+	but perform the various operations like conditions, arithmetic operations or
+	aborting the symbolic execution, etc.
+
+	\begin{itemize}
+
+	\item {\tt FI\_cond} instruction represents condition in original code.
+		It creates a new symbolic state with same forest automaton and appends
+		it to the queue.
+		The new state contains an instruction which corresponds to a \textit{then}
+		or \textit{else} branch of the condition.
+		The instruction for the new state is chosen according to
+		the content of {\tt FI\_cond} instruction symbolic state register.
+		
+		$f(\stdsym) = \symstate{F}{\regs}{r_s ? I_t : I_f}$
+		where $I_t$ is instruction used when $r_s$ has true value and
+		$I_f$ is instruction used otherwise.
+
+
 	\item {\tt FI\_iadd, FI\_imull} instructions performs integer
 		addition and multiplication.
 		
@@ -1164,7 +1199,29 @@ The following instructions are used for manipulating registers.
 		{I_n}$
 		where $r_{s1} \in \regs, r_{s2} \in \regs$, $\otimes \in \{+,*\}$
 		are two source registers with values of integer type.
+
+	\item {\tt FI\_eq, FI\_neq, FI\_ge, FI\_gt, FI\_le, FI\_lt} instructions
+		makes a comparison corresponding to their names.
+		The result of the comparison stores to a destination register.
+		
+		$f(\stdsym) = \symstate{F}
+		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
+		{I_n}$
+		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are two source registers
+		and $\otimes \in \{=,\neq, <,>,\leq,\geq\}$.
 	
+	\item {\tt FI\_build\_struct} instruction creates a structure from a
+		content of registers and result stores to a destination register.
+		The source registers are defined by an index of the first register and
+		vector of offsets from this register which points to another registers
+		that are used for creating structure.
+		
+		$f(\stdsym) = \symstate{F}
+		{\regssub{r_d}{x}}
+		{I_n}$
+		where $x$ is a structure created from values of registers $r_s,r_{s+i_1},r_{s+i_2}, \ldots, r_{s+i_n}$.
+		The values $i_1, i_2, \ldots, i_n$ are offsets defined as parameters of this instruction.
+
 	\item {\tt FI\_check} instruction checks whether there is not
 		garbage.
 		
@@ -1183,50 +1240,11 @@ The following instructions are used for manipulating registers.
 		symbolic execution is aborted.
 		Constant $c$ is a parameter of this instruction.
 	
-	\item {\tt FI\_build\_struct} instruction creates a structure from a
-		content of registers and result stores to a destination register.
-		The source registers are defined by an index of the first register and
-		vector of offsets from this register which points to another registers
-		that are used for creating structure.
-		
-		$f(\stdsym) = \symstate{F}
-		{\regssub{r_d}{x}}
-		{I_n}$
-		where $x$ is a structure created from values of registers $r_s,r_{s+i_1},r_{s+i_2}, \ldots, r_{s+i_n}$.
-		The values $i_1, i_2, \ldots, i_n$ are offsets defined as parameters of this instruction.
-	
-	\item {\tt FI\_push\_greg} instruction creates a new global register
-		and fills it with a value in a source register.
-		
-		$f(\stdsym) = \symstate{F}
-		{\regs\cup \{r_g\}}
-		{I_n}$
-		where $r_g$ is a new global register such that $r_g = r_s$.
-	
-	\item {\tt FI\_pop\_greg} instruction takes a value in the last created
-		global register and stores it to a local register.
-		The global register is then deleted.
-		
-		$f(\stdsym) = \symstate{F}
-		{\regssubmin{r_g}{r_d}{r_g}}
-		{I_n}$
-		where $r_g$ is the lastly created global register.
-	
 	\item {\tt FI\_error} instruction throws an exception representing
 		a local error in program.
 	
 	\item {\tt FI\_noret} instruction quits program symbolic execution when
 		no return function end is reached.
-	
-	\item {\tt FI\_eq, FI\_neq, FI\_ge, FI\_gt, FI\_le, FI\_lt} instructions
-		makes a comparison corresponding to their names.
-		The result of the comparison stores to a destination register.
-		
-		$f(\stdsym) = \symstate{F}
-		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
-		{I_n}$
-		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are two source registers
-		and $\otimes \in \{=,\neq, <,>,\leq,\geq\}$.
 
 \end{itemize}
 
