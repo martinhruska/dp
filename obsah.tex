@@ -921,7 +921,7 @@ we can define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
 The values of register are instances of a structure {\tt Data}.
 The structure consists data members keeping information about type of data $T$, its size $S$,
 value $V$ of type $T$ and information about its nested members $MBS$.
-We can again fomally define structure Data as $D = (T,S,V,MB)$ where
+We can again fomally define structure Data as $\ddata$ where
 $T$ is a data type,
 $S \in \natnum$ is size of data,
 $V$ is a value of type $T$,
@@ -992,8 +992,9 @@ Firstly, the most crucial instructions are described then the complete list is f
 	\item {\tt FI\_acc\_set,FI\_acc\_all} instruction does the same thing as the previous one
 		but for a set of selectors or for all selectors of a given root of TA.
 
-	\item {\tt FI\_alloc} instruction creates a new instance of structure {\tt Data}
+	\item {\tt FI\_alloc} instruction creates a new instance of structure {\tt Data} $\ddata$
 		that represents allocated memory.
+		The size $S$ of $D$ is determined by an integer value in the source register.
 		The created instance will be further used for creating of a new TA.
 		
 		$f(\stdsym) = \symstate{F}{
@@ -1248,6 +1249,49 @@ The following instructions are used for manipulating registers.
 
 \end{itemize}
 
+\bexmp
+	We illustrate how a program in C is represented by the described instructions.
+	Consider the following C program.
+
+	\begin{quote}
+	\begin{verbatim}
+	1: struct T {
+	2:    struct T* next;
+	3: };
+
+	4: int main()
+	5: {
+	6:    struct T* x;
+
+	7:    x = (struct T*) malloc(sizeof(struct T));
+	8:    free(x);
+
+	9:    return 0;
+	10:}
+	\end{verbatim}
+	\end{quote}
+
+	Now we present a microcode instructions to which the statement at the line $7$ is translated.
+	\begin{quote}
+	\begin{verbatim}
+	1: mov r0, (int)4
+	2: alloc r0, r0
+	3: node r0, r0, next[0:4:+0]
+	4: mov r1, ABP + 0
+	5: mov [r1 + 12], r0    
+	6: check
+	\end{verbatim}
+	\end{quote}
+
+	Firstly the size of a new allocated (in this case size is $4$) data is stored to register $r_0$ at line $1$.
+	Then the new instance of structure {\tt Data} $D$ is created and stored to $r_0$ at line $2$.
+	A new TA $t$ is created at line $3$.
+	The TA $t$ has one transition from the root with label that consists one pointer selector {\tt next} whose
+	displacement in label is $0$ and size is $4$.
+	A root reference to $t$ is stored to $r_0$.
+	Finally lines $5$ a $6$ performs adding root reference pointing to $t$ is added to a TA that represents
+	a memory state of the actually executed function (which is in this case {\tt main}).
+\eexmp
 
 \chapter{Forester with VATA}
 \label{ch:fova}
