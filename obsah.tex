@@ -203,7 +203,7 @@ A created graph is in Figure \ref{fig:forest_graph}.
 			\hspace{0.55cm}
 			\input{fig/prel/for3.tikz}
 		}
-		\caption{A forest $f$ constisting the three trees $t_1, t_2, t_3$ with roots $u_1, v_1, w_1$}.
+		\caption{A forest $f$ consisting the three trees $t_1, t_2, t_3$ with roots $u_1, v_1, w_1$}.
 	  \label{fig:forest}
 	\end{center}
 	\end{figure}
@@ -247,15 +247,15 @@ Recall graph $t$ from Figure \ref{fig:graph_tree}.
 We can extend it to a io-graph $t_\phi$ where $t$ is unchanged and
 $\phi=(v_1,v_4,v_5)$ (of course, there are different ways how to define the ports).
 The io-graph $t_\phi$ has an input port $v_1$ and the output ports are $v_2,v_3$.
-Because $v_1$ is the root the tree $t_\phi$ is accesible.
-The cutpoints of $t_\phi$ are $v_1, v_4, v_5$.
+Because $v_1$ is the root the tree $t_\phi$ is accessible.
+The cut-points of $t_\phi$ are $v_1, v_4, v_5$.
 
 In Figure \ref{fig:forest} we shown the forest $f$.
 This forest could be extended to a io-forest $f_{io}=((t_1,t_2,t_3),\pi)$ by defining sequence of port indices $\pi$
 which could be e.g., $(1,3)$.
 Then a graph $\otimes f_{io}$ is a pair $(\otimes (t_1,t_2,t_3)$, $(u_1,w_1))$.
 The graph $\otimes (t_1,t_2,t_3)$ is the same as in Figure \ref{fig:forest_graph}.
-The inpurt port $u_1$ is related to the input port index $1$ of $f_{io}$
+The input port $u_1$ is related to the input port index $1$ of $f_{io}$
 and the output port $w_1$ is related to the output port index $3$.
 \label{ex:iograph}
 \eexmp
@@ -328,7 +328,7 @@ and $\Delta=\{q_1 \xrightarrow{a} (q_2,q_3), q_2 \xrightarrow{b} (),
 q_3 \xrightarrow{b} (q_4,q_5), q_4 \xrightarrow{b} (), q_4 \xrightarrow{b} ()\}$.
 Then a run $\rho$ of $A$ over the tree $t$ from Figure \ref{fig:graph_tree}
 is defined as follows: $\forall i \in \{1,\ldots,5\}: \rho(v_i) = q_i$.
-Since $\rho(root(t)) = \rho(v_1) = q_1$ then $t \in L(q_1)$ and becasue $q \in R$
+Since $\rho(root(t)) = \rho(v_1) = q_1$ then $t \in L(q_1)$ and because $q \in R$
 it also holds $t \in L(A)$.
 \label{ex:ta}
 \eexmp
@@ -898,7 +898,7 @@ The implementation corresponds to the definitions given in Chapter \ref{ch:prel}
 Class FA has a data member representing a vector of tree automata $(t_1 \cdots t_n)$.
 It also has a data member keeping a reference to an automaton representing the global variables
 and a reference to the automata representing the local variables of the current function. %TODO define ABP
-The labels of the TA transtions are represented by the structure {\tt NodeLabel}.
+The labels of the TA transitions are represented by the structure {\tt NodeLabel}.
 This structure contains a data member determining the type of the root node of a transition
 (whether it is a general node, a data node or a node containing a vector of data).
 A value related to the type of the node is also stored as a data member of the structure.
@@ -921,7 +921,7 @@ Putting together the data members of class {\tt SymState}
 we can define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
 
 The values of the registers are instances of a structure {\tt Data}.
-We can fomally define structure Data as $\ddata$ where
+We can formally define structure Data as $\ddata$ where
 $T$ is a data type,
 $S \in \natnum$ is size of data,
 $V$ is a value of type $T$,
@@ -937,7 +937,7 @@ the transition from the TA root pointed by ${\tt Root}$.
 The operations for manipulation with a symbolic state are partially provided by class {\tt SymState}
 and some additional operations are provided by class {\tt VirtualMachine}.
 
-We already described the data structures used for the implemetation of the forest automata concepts
+We already described the data structures used for the implementation of the forest automata concepts
 and the related symbolic execution.
 The symbolic execution using this data structures is realized by gradually appending
 and removing the symbolic states from a queue.
@@ -945,7 +945,7 @@ When a symbolic state is taken from the queue a microcode instruction contained 
 the symbolic state is executed.
 Some instructions during its execution appends a new symbolic state to the queue.
 Symbolic execution finishes when the queue is empty.
-The microcode instructions executed during the symbolic execution are described in the folowing section.
+The microcode instructions executed during the symbolic execution are described in the following section.
 
 \subsection{The Microcode Instructions}
 \label{subsec:microinstr}
@@ -964,7 +964,7 @@ A symbol $I_n$ denotes next instruction following an instruction actually execut
 We define semantics of each instruction formally using a function 
 $f: \instrset \times \symset \rightarrow \symset$
 where $\symset$ is a set of all symbolic states and $\instrset$ is a set of all instructions.
-When it is clear for which instruction is used we ommit the first parameter of $f$.
+When it is clear for which instruction is used we omit the first parameter of $f$.
 The function $f$ defines an effect of the instruction as transformation of
 the current symbolic state $s$ to a new symbolic state $s'$.
 
@@ -981,10 +981,10 @@ Firstly, the most crucial instructions are described then the instruction list i
 		This instruction checks whether a selector pointed by the destination register
 		selects a node that represents allocated memory node or undefined pointer.
 		In the first case the node is isolated to a new TA and the original node in the
-		orignal TA is replaced by a root reference to the new TA.
+		original TA is replaced by a root reference to the new TA.
 		In the second case nothing changes.
 		Note that this basically corresponds to identification of the cut-points
-		and their seperation to a new TA.
+		and their separation to a new TA.
 		
 		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
 		where $F'$ is a new FA obtained from $F$ by isolating
@@ -1136,7 +1136,7 @@ The following instructions are used for manipulating registers.
 	\item {\tt FI\_load\_ABP, FI\_load\_GLOB} same as the previous instruction
 		but loads a value from a FA pointed by $r_{ABP}$ or $r_{GLOB}$ register.
 		
-		Fomally it could be defined as the previous instruction but
+		Formally it could be defined as the previous instruction but
 		$r_{ABP}$ and $r_{GLOB}$ are used instead of $r_s$.
 	
 	\item {\tt FI\_store} instruction stores a value from the source register
@@ -1145,7 +1145,7 @@ The following instructions are used for manipulating registers.
 		obtained as a parameter of this instruction.
 		
 		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
-		where $F'$ is a FA obtained from $F$ by assignemnt
+		where $F'$ is a FA obtained from $F$ by assignment
 		$S_{F[i]}^{displ} = r_{d}$,
 		$F[i]$ is a TA of $F$ referenced by a root reference $\rref$ stored in $r_s$ register,
 		$o$ is an offset which is a parameter of this instruction,
@@ -1238,7 +1238,7 @@ The following instructions are used for manipulating registers.
 	\item {\tt FI\_abort} instruction aborts program execution.
 	
 	\item {\tt FI\_assert} instruction checks whether a value
-		in a givem register is the same one as a constant.
+		in a given register is the same one as a constant.
 		
 		$f(\stdsym) = \stdsym$ if $r_s = c$, otherwise
 		symbolic execution is aborted.
@@ -1427,7 +1427,7 @@ We present the crucial instructions first then the rest is given.
 
 \end{itemize}
 
-Since we already covere the most crucial instructions we describe
+Since we already covered the most crucial instructions we describe
 the rest of the instructions now.
 The following instructions are used for manipulating registers.
 
