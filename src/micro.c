@@ -17,6 +17,9 @@ int main()
 	x->data = 0;
 	y->data = 0;
 	x->data = y->data;
+	if (x == y) {
+		return 0;
+	}
 
 	free(x);
 	free(y);

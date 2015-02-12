@@ -1308,10 +1308,10 @@ The following instructions are used for manipulating registers.
 	\end{verbatim}
 	\end{quote}
 
-	The first instruction stores a reference to the $x$ pointer selector to the register $0$.
+	The first instruction stores a reference to the \codix{x} pointer selector to the register $0$.
 	The second instruction performs isolation of this selector.
 	That causes a creating of a new TA if \codix{x->next} points to an allocated memory (because a new
-	cut-point is created when pointer $y$ also points to this memory.
+	cut-point is created when pointer \codix{y} also points to this memory.
 	Otherwise the instruction does not do anything.
 	The instruction at line $3$ loads to register $0$ a root reference from a selector from a label
 	in the transition from the root of TA referenced by register $0$.
@@ -1319,7 +1319,7 @@ The following instructions are used for manipulating registers.
 	its value is $0$ in this case.
 	The instruction at line $4$ moves a reference to TA that represents a local memory state to register $1$.
 	Finally, the instruction at line $5$ copies the root reference from register $0$ to
-	a TA node pointed by pointer $y$ selector.
+	a TA node pointed by pointer \codix{y} selector.
 	The last instruction checks whether no garbage is presented.
 \eexmp
 
@@ -1335,7 +1335,7 @@ The following instructions are used for manipulating registers.
 	\end{quote}
 
 	The first instruction loads to register $0$ a root reference pointed by a selector
-	of the pointer $y$.
+	of the pointer \codix{y}.
 	The second one isolates all selectors of the TA referenced by register $0$
 	abd then the third instruction removes node pointed by register $0$
 	and finally invalidates all references to it.
@@ -1346,44 +1346,32 @@ The following instructions are used for manipulating registers.
 	The statement \codix{x->data = y->data;} is performed by these instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov r0, [ABP + 12]
-	2: acca [r0]
-	3: free r0
-	4: check
-	\end{verbatim}
-	\end{quote}
-
-	The first instruction loads to register $0$ a root reference pointed by a selector
-	of the pointer $y$.
-	The second one isolates all selectors of the TA referenced by register $0$
-	and then the third instruction removes node pointed by register $0$
-	and finally invalidates all references to it.
-\eexmp
-
-\bexmp
-	The statement \codix{x->data = y->data;} is performed by these instructions:
-	\begin{quote}
-	\begin{verbatim}
-    1: mov   	r3, [ABP + 16]
-    2: acc   	[r3 + 4]
-	3: mov   	r3, [r3 + 4]
-    4: mov   	r1, [ABP + 12]
-    5: acc   	[r1 + 4]
-    6: mov   	[r1 + 4], r3
-	7: check
+    1: mov r3, [ABP + 16]
+    2: acc [r3 + 4]
+    3: mov r3, [r3 + 4]
+    4: mov r1, [ABP + 12]
+    5: acc [r1 + 4]
+    6: mov [r1 + 4], r3
+    7: check
 	\end{verbatim}
 	\end{quote}
 
 	The first instruction loads to register $3$ a root reference pointed by a selector
-	of the pointer $x$ (which is in this $4$-th selector of a label under the referenced root).
-	Then the data selector $x->data$ is isolated and a data value from this selector
+	of the pointer \codix{x} (which is in this $4$-th selector of a label under the referenced root).
+	Then the data selector \codix{x->data} is isolated and a data value from this selector
 	is loaded to register $r$ by the instructions at line $2$ and $3$.
-	The instructions at line $4$ and $5$ prepares data selector $y->data$ in the same way
-	as the selector $y->data$ has been prepared.
+	The instructions at line $4$ and $5$ prepares data selector \codix{y->data} in the same way
+	as the selector \codix{y->data} has been prepared.
 	Finally at line $6$ the data value in register $3$ is coppied to TA node referenced by
-	the selector $y->data$.
+	the selector \codix{y->data}.
 	The last operation is again check of garbage.
 \eexmp
+
+\begin{comment}
+mov   	r0, [ABP + 12]   ; /home/martin/dp/tex/src/micro.c:20:5:  #1048577 = (#1964:x == #1965:y)
+                  mov   	r1, [ABP + 16]   
+                  eq    	r5, r0, r1  
+\end{comment}
 
 \chapter{Forester with VATA}
 \label{ch:fova}
