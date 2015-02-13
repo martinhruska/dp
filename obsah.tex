@@ -950,330 +950,41 @@ The microcode instructions executed during the symbolic execution are described 
 \subsection{The Microcode Instructions}
 \label{subsec:microinstr}
 
-This sections provides a description of the Forester microcode instructions
-but before describing their semantics itself the notion used further is given.
-We use $r_s \in \regs$ to denote the source register,
-$r_d \in \regs$ to denote the destination register,
-$r_l \in \regs$ to denote a local register and
-$r_g \in \regs$ to denote a global register.
-Note that the source register is also global or local and the same holds for the destination register.
-The source and destination registers are parameters of some instructions.
-We use $\regssub{r}{r'}$ to denote a set of the registers which has the same values as
-the registers in $\regs$ excluding $r$ that has a value $r'$.
-A symbol $I_n$ denotes next instruction following an instruction actually executed.
-We define semantics of each instruction formally using a function 
-$f: \instrset \times \symset \rightarrow \symset$
-where $\symset$ is a set of all symbolic states and $\instrset$ is a set of all instructions.
-When it is clear for which instruction is used we omit the first parameter of $f$.
-The function $f$ defines an effect of the instruction as transformation of
-the current symbolic state $s$ to a new symbolic state $s'$.
+This sections provides a description of the Forester microcode instructions.
+Firstly, we introduce some examples how the C statements are trasnlated
+to the Forester microcode instructions, then we define the instructions
+more formally and we give a complete list of them.
 
-A list of the microcode instructions used in Forester with description
-of their semantics follows.
-Each instruction is described informally first and then its effect is defined
-in the notion of function $f$.
-Firstly, the most crucial instructions are described then the instruction list is completed.
-%TODO are all these the registers manipulating forest automata
-\begin{itemize}
-	\item {\tt FI\_acc\_sel} isolates the $i$-th selector of a label
-		in the transition from the root of a given TA.
-		The root of TA is defined by a destination register.
-		This instruction checks whether a selector pointed by the destination register
-		selects a node that represents allocated memory node or undefined pointer.
-		In the first case the node is isolated to a new TA and the original node in the
-		original TA is replaced by a root reference to the new TA.
-		In the second case nothing changes.
-		Note that this basically corresponds to identification of the cut-points
-		and their separation to a new TA.
-		
-		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
-		where $F'$ is a new FA obtained from $F$ by isolating
-		the $i$-th selector of a label of a transition of the root of TA $t$.
-		TA $t$ and the related selector are determined by a root reference $RR=(Root, Displ)$
-		in the register $r_d$ such that $Root$ points to $t$ and $i=Displ+o$
-		where $o$ is a offset which is a parameter of this instruction.
-
-	\item {\tt FI\_acc\_set,FI\_acc\_all} instruction does the same thing as the previous one
-		but for a set of selectors or for all selectors of a given root of TA.
-
-	\item {\tt FI\_alloc} instruction creates a new instance of structure {\tt Data} $\ddata$
-		that represents allocated memory.
-		The size $S$ of $D$ is determined by an integer value in the source register.
-		The created instance will be further used for creating of a new TA.
-		
-		$f(\stdsym) = \symstate{F}{
-		\regssub{
-			r_{d}}
-			{x}}
-		{I_n}$
-		where $x=({\tt void\_ptr},{\tt undef},S',\emptyset)$ is an instance of structure Data
-		such that $S'$ is a size stored in $r_s$ (where should be stored an integer value). 
-	
-	\item {\tt FI\_node\_create} instructions creates a new node
-		(and hereby also a new TA) which is a root node of the new TA.
-		A reference to the new TA is stored to the destination register.
-		A type info of the new node and its size is obtained from source
-		register.
-		
-		$f(\stdsym) = \symstate{F'}{
-		\regssub{
-			r_{d}}
-			x}
-		{I_n}$
-		where $F'$ is a new FA created by adding newly created TA $t$ to $F$
-		and $x$ is a reference to $t$.
-		TA $t$ has selectors defined in $r_s$. 
-		Note that reference to $t$ is not added to a TA in $F$ in this step
-		but it is done by instruction assigning a register value to a
-		node of TA.
-	
-	\item {\tt FI\_node\_free} instruction deletes a node in FA and
-		invalidate all references to it.
-		
-		$f(\stdsym) = \symstate{F'}
-		{\regs}
-		{I_n}$
-		where $F'$ is obtained from $F$ by deleting a TA $t$ referenced
-		by a value of $r_s$ and removing all reference to $t$ from TA of $F$.
-
-	\item {\tt FI\_abs, FI\_fix} instructions computes fixpoint with (FI\_abs) or
-		without ({\tt FI\_fix}) abstraction.
-		
-		$f(\stdsym) = \symstate{F'}
-		{\regs}
-		{I_n}$
-		where $F'$ is a new FA obtained from $F$ by computing fixpoint with or without abstraction.
-
-\end{itemize}
-
-Since we already covered the most crucial instructions we describe
-the rest of the instructions now.
-The following instructions are used for manipulating registers.
-
-\begin{itemize}
-
-	\item {\tt FI\_load\_cst} instruction loads a constant to a register.
-		So it creates a new symbolic state which differs only in register content.
-		
-		$f(\stdsym) = \symstate{F}{\regssub{r_d}{c}}{I_n})$ where
-		$c$ is a constant which is parameter of this instruction.
-	
-	\item {\tt FI\_move\_reg} instructions creates a new symbolic state where
-		a value from $r_s$ is moved to register $r_d$.
-		
-		$f(\stdsym) = \symstate{F}{\regssub{r_d}{r_s}}{I_n}$.
-	
-	\item {\tt FI\_bnot, FI\_inot} instructions negate a value in a register and
-		creates a new symbolic state with the negated value in the register.
-		{\tt FI\_bnot} negates integer and {\tt FI\_inot} negates the boolean value.
-		
-		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\neg r_d}}{I_n}$.
-	
-	\item {\tt FI\_move\_reg\_offs} instruction accesses a tree automaton pointed
-		by a reference in the source register and increases its {\tt displacement} value by a given offset.
-		The new value is stored in the destination register.
-		
-		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl+o}}}{I_n}$
-		where $o$ is offset which is a parameter of this instruction
-		and $\rrefreg{r_s}$.
-	
-	\item {\tt FI\_move\_reg\_inc} instruction does same thing as the previous one but
-		it increases a displacement by a value in the second source register (which is
-		present for this instruction).
-		
-		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl + r_{s_2}}}}{I_n}$
-		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are source registers such that
-		$\rrefreg{r_{s_1}}$, $r_{s_2}$ has integer value.
-	
-	\item {\tt FI\_get\_greg} loads a value from a global register to
-		a local register.
-		
-		$f(\stdsym) = \symstate{F}{\regssub{r_{ld}}{r_{gs}}}{I_n}$.
-	
-	\item {\tt FI\_set\_greg} loads a value from a local register to
-		a global register.
-		
-		$f(\stdsym) = \symstate{F}{\regssub{r_{gd}}{r_{ls}}}{I_n}$.
-	
-	\item {\tt FI\_get\_ABP} loads a root reference to a FA representing
-		a memory pointed by the local variables and adds an offset to a displacement
-		in the root reference.
-		
-		$f(\stdsym) = \symstate{F}{\regssub{r_d}{
-			\rreftuple{\droot}{\ddispl + o}}}
-			{I_n}$ where $\rrefreg{r_{ABP}}$ is the register containing root
-		reference to FA representing local memory and $o$ is an offset
-		which is a parameter of this function.
-	
-	\item {\tt FI\_get\_GLOB} loads a root reference to a FA representing
-		a memory of local function to a local register
-		and adds an offset to a displacement in the root reference.
-		
-		$f(\stdsym) = \symstate{F}
-			{\regssub{r_{d}}{
-				\rreftuple{\droot}{\ddispl + o}
-			}}
-			{I_n}$ where $\rrefreg{r_{GLOB}}$ is the register containing root
-			reference to FA representing the global memory state and $o$ is an offset
-			which is a parameter of this instruction.
-	
-	\item {\tt FI\_load} loads a value from a FA pointed
-		by a root reference in the source register to the destination register.
-		The value is stored in the $n$-th successor of the root pointed
-		by source register value, where $n$ is a value of an offset.
-		
-		$f(\stdsym) = \symstate{F}
-			{\regssub{r_{d}}{
-				\rreftuple{\droot}{\ddispl + o}
-			}}
-			{I_n}$
-			where $\rrefreg{r_{s}}$,
-			$F[i]$ is a TA of F,
-			$o$ is offset which is a parameter of this instruction,
-			$i=\droot$,
-			$displ=\ddispl + o$.
-	
-	\item {\tt FI\_load\_ABP, FI\_load\_GLOB} same as the previous instruction
-		but loads a value from a FA pointed by $r_{ABP}$ or $r_{GLOB}$ register.
-		
-		Formally it could be defined as the previous instruction but
-		$r_{ABP}$ and $r_{GLOB}$ are used instead of $r_s$.
-	
-	\item {\tt FI\_store} instruction stores a value from the source register
-		to a TA pointed by the destination register.
-		The location is the $n$-th successor of a root of the FA where $n$ is an offset
-		obtained as a parameter of this instruction.
-		
-		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
-		where $F'$ is a FA obtained from $F$ by assignment
-		$S_{F[i]}^{displ} = r_{d}$,
-		$F[i]$ is a TA of $F$ referenced by a root reference $\rref$ stored in $r_s$ register,
-		$o$ is an offset which is a parameter of this instruction,
-		$i=\droot$ and $displ=\ddispl + o$.
-	
-	\item {\tt FI\_loads, FI\_stores} instructions do same as the previous
-		one but manipulates the structures.
-		
-		Formal definition is also same but the result in the register $r_d$ (in case of {\tt FI\_loads})
-		and or in the corresponding (in case of {\tt FI\_stores}) has a different typed
-		(concretely it is a structure).
-
-	\item {\tt FI\_push\_greg} instruction creates a new global register
-		and fills it with a value in the source register.
-		
-		$f(\stdsym) = \symstate{F}
-		{\regs\cup \{r_g\}}
-		{I_n}$
-		where $r_g$ is a new global register such that $r_g = r_s$.
-	
-	\item {\tt FI\_pop\_greg} instruction takes a value in the last created
-		global register and stores it to a local register.
-		The global register is then deleted.
-		
-		$f(\stdsym) = \symstate{F}
-		{\regssubmin{r_g}{r_d}{r_g}}
-		{I_n}$
-		where $r_g$ is the lastly created global register.
-
-	\end{itemize}
-
-	Finally, the remaining instructions are not a specific kind of the operations
-	but perform the various operations like conditions, arithmetic operations or
-	aborting the symbolic execution, etc.
-
-	\begin{itemize}
-
-	\item {\tt FI\_cond} instruction represents a condition in the original code.
-		It creates a new symbolic state with the same forest automaton and appends
-		it to the queue.
-		The new state contains an instruction which corresponds to a \textit{then}
-		or \textit{else} branch of the condition.
-		The instruction for the new state is chosen according to
-		the content of {\tt FI\_cond} instruction symbolic state register.
-		
-		$f(\stdsym) = \symstate{F}{\regs}{r_s ? I_t : I_f}$
-		where $I_t$ is instruction used when $r_s$ has true value and
-		$I_f$ is instruction used otherwise.
-
-
-	\item {\tt FI\_iadd, FI\_imull} instructions performs integer
-		addition and multiplication.
-		
-		$f(\stdsym) = \symstate{F}
-		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
-		{I_n}$
-		where $r_{s1} \in \regs, r_{s2} \in \regs$, $\otimes \in \{+,*\}$
-		are two source registers with values of integer type.
-
-	\item {\tt FI\_eq, FI\_neq, FI\_ge, FI\_gt, FI\_le, FI\_lt} instructions
-		makes a comparison corresponding to their names.
-		The result of the comparison stores to the destination register.
-		
-		$f(\stdsym) = \symstate{F}
-		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
-		{I_n}$
-		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are two source registers
-		and $\otimes \in \{=,\neq, <,>,\leq,\geq\}$.
-	
-	\item {\tt FI\_build\_struct} instruction creates a structure from a
-		content of registers and the result stores to a destination register.
-		The source registers are defined by an index of the first register and
-		a vector of offsets from this register to another registers
-		that are used for creating structure.
-		
-		$f(\stdsym) = \symstate{F}
-		{\regssub{r_d}{x}}
-		{I_n}$
-		where $x$ is a structure created from the values of the registers $r_s,r_{s+i_1},r_{s+i_2}, \ldots, r_{s+i_n}$.
-		The values $i_1, i_2, \ldots, i_n$ are offsets defined as the parameters of this instruction.
-
-	\item {\tt FI\_check} instruction checks whether there is not a garbage.
-		
-		$f(\stdsym) = \symstate{F'}
-		{\regs}
-		{I_n}$
-		where $F'$ is obtained from $F$ by removing all unreachable
-		TA.
-	
-	\item {\tt FI\_abort} instruction aborts program execution.
-	
-	\item {\tt FI\_assert} instruction checks whether a value
-		in a given register is the same one as a constant.
-		
-		$f(\stdsym) = \stdsym$ if $r_s = c$, otherwise
-		symbolic execution is aborted.
-		Constant $c$ is a parameter of this instruction.
-	
-	\item {\tt FI\_error} instruction throws an exception representing
-		a local error in program.
-	
-	\item {\tt FI\_noret} instruction quits program symbolic execution when
-		no return function end is reached.
-
-\end{itemize}
-
-	We illustrate how a program in C is represented by the described instructions.
-	Consider the following C program.
-	Some examples of a translation from the C statements to the Forester microcode instructions is
-	given now before a more detail description of the instructions.
-	Consider the follwing data structure that implements singly-linked list.
-
+Consider the following data structure that is an implementation of singly-linked list.
 	\begin{quote}
 	\begin{verbatim}
-	 struct T {
-	    struct T* next;
-		int data;
+	struct T {
+      struct T* next;
+      int data;
 	};
 
 	\end{verbatim}
 	\end{quote}
-	Consider also the two variables {\verb struct T *x, *y} used in the next examples.
+	
+	Consider also the two variables \code{struct T *x, *y} used in the next examples.
 	Note that all constants used in the examples are dependent to a concrete Forester
 	run and they are chosen randomly in this text.
+	The syntax of the instructions in the examples is following:
+	$$ op r0, r1, r2$$
+	$op$ is a name of a instruction,
+	$r0, r1, r2$ are operands such that $r0$ is a destination register,
+	$r1$ and $r2$ are the source registers.
+	It is also possible that there is a constant instead of a register
+	as an operand of the instruction.
+	When $[r0+c]$ is used as an operand that the instruction dereferences a root reference in register $0$.
+	It means that the instruction access directly a selector with displacement $c$ in a label in the transition where
+	the referenced root is the parent state.
+	Note that when it is not stated otherwise it is reffered to a selector in a label of a transition
+	where the root of the transition is the referenced TA by a specified register.
 
 \bexmp
 	The statement \codix{x = (struct T*) malloc(sizeof(struct T));} is translated
-	to this microinstructions:
+	to these microcode instructions:
 	\begin{quote}
 	\begin{verbatim}
 	1: mov r0, (int)4
@@ -1285,14 +996,16 @@ The following instructions are used for manipulating registers.
 	\end{verbatim}
 	\end{quote}
 
-	Firstly the size of a new allocated (in this case size is $4$) data is stored to the register $r_0$ at line $1$.
-	Then the new instance of structure {\tt Data} is created and stored to $r_0$ at line $2$.
+	Firstly the size of a new allocated data (in this case the size is $4$) is stored to the register $0$ at line $1$.
+	Then the new instance of structure {\tt Data} is created and stored to register $0$ at line $2$.
 	A new TA $t$ is created at line $3$.
-	The TA $t$ has one transition from the root with label that consists one pointer selector {\tt next} whose
-	displacement in label is $0$ and size is $4$.
-	A root reference to $t$ is stored to $r_0$.
-	Finally lines $5$ a $6$ performs adding root reference pointing to $t$ to a FA that represents
+	The TA $t$ has one transition from the root with a label that consists one pointer selector {\tt next} whose
+	displacement in the label is $0$ and the size is $4$.
+	The displacement defines the order of the selector in the label.
+	The instruction \codix{node} also stores a root reference to $t$ to register $0$.
+	Finally lines $4$ a $5$ performs adding root reference pointing to $t$ to a FA that represents
 	a memory state of the actually executed function (which is in this case function {\tt main}).
+	The instruction at line $6$ then checks whether no garbage was created by the previous instructions.
 \eexmp
 
 \bexmp
@@ -1308,15 +1021,13 @@ The following instructions are used for manipulating registers.
 	\end{verbatim}
 	\end{quote}
 
-	The first instruction stores a reference to the \codix{x} pointer selector to the register $0$.
-	The second instruction performs isolation of this selector.
-	That causes a creating of a new TA if \codix{x->next} points to an allocated memory (because a new
+	The first instruction stores a root reference to an TA representing heap pointed by the \codix{x} pointer to register $0$.
+	The root reference is chosen by the selector with displacement $12$ in a label in TA referenced by register $ABP$.
+	The second instruction performs an isolation of the selector with displacement $0$ in the TA referenced by register $0$.
+	This causes a creation of a new TA if \codix{x->next} points to an allocated memory (because a new
 	cut-point is created when pointer \codix{y} also points to this memory.
 	Otherwise the instruction does not do anything.
-	The instruction at line $3$ loads to register $0$ a root reference from a selector from a label
-	in the transition from the root of TA referenced by register $0$.
-	The selector is defined by a offset which is a parameter of the instruction and
-	its value is $0$ in this case.
+	The instruction at line $3$ loads to register $0$ a root reference from a selector of TA referenced by register $0$.
 	The instruction at line $4$ moves a reference to TA that represents a local memory state to register $1$.
 	Finally, the instruction at line $5$ copies the root reference from register $0$ to
 	a TA node pointed by pointer \codix{y} selector.
@@ -1346,13 +1057,13 @@ The following instructions are used for manipulating registers.
 	The statement \codix{x->data = y->data;} is performed by these instructions:
 	\begin{quote}
 	\begin{verbatim}
-    1: mov r3, [ABP + 16]
-    2: acc [r3 + 4]
-    3: mov r3, [r3 + 4]
-    4: mov r1, [ABP + 12]
-    5: acc [r1 + 4]
-    6: mov [r1 + 4], r3
-    7: check
+	1: mov r3, [ABP + 16]
+	2: acc [r3 + 4]
+	3: mov r3, [r3 + 4]
+	4: mov r1, [ABP + 12]
+	5: acc [r1 + 4]
+	6: mov [r1 + 4], r3
+	7: check
 	\end{verbatim}
 	\end{quote}
 
@@ -1367,11 +1078,322 @@ The following instructions are used for manipulating registers.
 	The last operation is again check of garbage.
 \eexmp
 
-\begin{comment}
-mov   	r0, [ABP + 12]   ; /home/martin/dp/tex/src/micro.c:20:5:  #1048577 = (#1964:x == #1965:y)
-                  mov   	r1, [ABP + 16]   
-                  eq    	r5, r0, r1  
-\end{comment}
+\bexmp
+	The statement \codix{x == y} translates Forester into this list of the instructions:
+	\begin{quote}
+	\begin{verbatim}
+	1: mov r0, [ABP + 12]
+	2: mov	r1, [ABP + 16]
+	3: eq r5, r0, r1
+	\end{verbatim}
+	\end{quote}
+
+	The instruction at line $1$ loads a root reference pointed by a selector related to a pointer $x$
+	to register $1$.
+	The second instruction does the same thing as the previous one but for a pointer $y$
+	and register $1$.
+	The third register then compares the content of the registers $1$ and $2$ and stores the result
+	to register $5$.
+\eexmp
+
+\vskip 1em
+
+The examples should bring some intuition and
+now we give a more detailed and formal description of the instructions.
+At first, the notion used further is described.
+We use $r_s \in \regs$ to denote the source register,
+$r_d \in \regs$ to denote the destination register,
+$r_l \in \regs$ to denote a local register and
+$r_g \in \regs$ to denote a global register.
+Note that the source register is also global or local and the same holds for the destination register.
+The source and destination registers are parameters of some instructions.
+We use $\regssub{r}{r'}$ to denote a set of the registers which has the same values as
+the registers in $\regs$ excluding $r$ that has a value $r'$.
+A symbol $I_n$ denotes next instruction following an instruction actually executed.
+We define semantics of each instruction formally using a function 
+$f: \instrset \times \symset \rightarrow \symset$
+where $\symset$ is a set of all symbolic states and $\instrset$ is a set of all instructions.
+When it is clear for which instruction is used we omit the first parameter of $f$.
+The function $f$ defines an effect of the instruction as transformation of
+the current symbolic state $s$ to a new symbolic state $s'$.
+
+A list of the microcode instructions used in Forester with description
+of their semantics follows.
+Each instruction is described informally first and then its effect is defined
+in the notion of function $f$.
+The instructions are divided to the two parts, the first part contains
+the instructions modifying forest automata,
+the second part the other instructions.
+
+\subsubsection{The Instructions Modifying Forest Automata}
+\begin{itemize}
+	\item {\tt acc\_sel} isolates the $i$-th selector of a label
+		in the transition from the root of a given TA.
+		The root of TA is defined by a destination register.
+		This instruction checks whether a selector pointed by the destination register
+		selects a node that represents allocated memory node or undefined pointer.
+		In the first case the node is isolated to a new TA and the original node in the
+		original TA is replaced by a root reference to the new TA.
+		In the second case nothing changes.
+		Note that this basically corresponds to identification of the cut-points
+		and their separation to a new TA.
+		
+		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
+		where $F'$ is a new FA obtained from $F$ by isolating
+		the $i$-th selector of a label of a transition of the root of TA $t$.
+		TA $t$ and the related selector are determined by a root reference $RR=(Root, Displ)$
+		in the register $r_d$ such that $Root$ points to $t$ and $i=Displ+o$
+		where $o$ is a offset which is a parameter of this instruction.
+
+	\item {\tt acc\_set,acc\_all} instruction does the same thing as the previous one
+		but for a set of selectors or for all selectors of a given root of TA.
+	
+	\item {\tt node\_create} instructions creates a new node
+		(and hereby also a new TA) which is a root node of the new TA.
+		A reference to the new TA is stored to the destination register.
+		A type info of the new node and its size is obtained from source
+		register.
+		
+		$f(\stdsym) = \symstate{F'}{
+		\regssub{
+			r_{d}}
+			x}
+		{I_n}$
+		where $F'$ is a new FA created by adding newly created TA $t$ to $F$
+		and $x$ is a reference to $t$.
+		TA $t$ has selectors defined in $r_s$. 
+		Note that reference to $t$ is not added to a TA in $F$ in this step
+		but it is done by instruction assigning a register value to a
+		node of TA.
+	
+	\item {\tt node\_free} instruction deletes a node in FA and
+		invalidate all references to it.
+		
+		$f(\stdsym) = \symstate{F'}
+		{\regs}
+		{I_n}$
+		where $F'$ is obtained from $F$ by deleting a TA $t$ referenced
+		by a value of $r_s$ and removing all reference to $t$ from TA of $F$.
+
+	\item {\tt store} instruction stores a value from the source register
+		to a TA pointed by the destination register.
+		The location is the $n$-th successor of a root of the FA where $n$ is an offset
+		obtained as a parameter of this instruction.
+		
+		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
+		where $F'$ is a FA obtained from $F$ by assignment
+		$S_{F[i]}^{displ} = r_{d}$,
+		$F[i]$ is a TA of $F$ referenced by a root reference $\rref$ stored in $r_s$ register,
+		$o$ is an offset which is a parameter of this instruction,
+		$i=\droot$ and $displ=\ddispl + o$.
+	
+	\item {\tt loads, stores} instructions do same as the previous
+		one but manipulates the structures.
+		
+		Formal definition is also same but the result in the register $r_d$ (in case of {\tt loads})
+		and or in the corresponding (in case of {\tt stores}) has a different typed
+		(concretely it is a structure).
+
+	\item {\tt abs, fix} instructions computes fixpoint with (abs) or
+		without ({\tt fix}) abstraction.
+		
+		$f(\stdsym) = \symstate{F'}
+		{\regs}
+		{I_n}$
+		where $F'$ is a new FA obtained from $F$ by computing fixpoint with or without abstraction.
+
+\end{itemize}
+
+\subsubsection{The Instructions Not Modifying Forest Automata}
+
+\begin{itemize}
+
+	\item {\tt alloc} instruction creates a new instance of structure {\tt Data} $\ddata$
+		that represents allocated memory.
+		The size $S$ of $D$ is determined by an integer value in the source register.
+		The created instance will be further used for creating of a new TA.
+		
+		$f(\stdsym) = \symstate{F}{
+		\regssub{
+			r_{d}}
+			{x}}
+		{I_n}$
+		where $x=({\tt void\_ptr},{\tt undef},S',\emptyset)$ is an instance of structure Data
+		such that $S'$ is a size stored in $r_s$ (where should be stored an integer value). 
+
+	\item {\tt load\_cst} instruction loads a constant to a register.
+		So it creates a new symbolic state which differs only in register content.
+		
+		$f(\stdsym) = \symstate{F}{\regssub{r_d}{c}}{I_n})$ where
+		$c$ is a constant which is parameter of this instruction.
+	
+	\item {\tt move\_reg} instructions creates a new symbolic state where
+		a value from $r_s$ is moved to register $r_d$.
+		
+		$f(\stdsym) = \symstate{F}{\regssub{r_d}{r_s}}{I_n}$.
+	
+	\item {\tt bnot, inot} instructions negate a value in a register and
+		creates a new symbolic state with the negated value in the register.
+		{\tt bnot} negates integer and {\tt inot} negates the boolean value.
+		
+		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\neg r_d}}{I_n}$.
+	
+	\item {\tt move\_reg\_offs} instruction accesses a tree automaton pointed
+		by a reference in the source register and increases its {\tt displacement} value by a given offset.
+		The new value is stored in the destination register.
+		
+		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl+o}}}{I_n}$
+		where $o$ is offset which is a parameter of this instruction
+		and $\rrefreg{r_s}$.
+	
+	\item {\tt move\_reg\_inc} instruction does same thing as the previous one but
+		it increases a displacement by a value in the second source register (which is
+		present for this instruction).
+		
+		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl + r_{s_2}}}}{I_n}$
+		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are source registers such that
+		$\rrefreg{r_{s_1}}$, $r_{s_2}$ has integer value.
+	
+	\item {\tt get\_greg} loads a value from a global register to
+		a local register.
+		
+		$f(\stdsym) = \symstate{F}{\regssub{r_{ld}}{r_{gs}}}{I_n}$.
+	
+	\item {\tt set\_greg} loads a value from a local register to
+		a global register.
+		
+		$f(\stdsym) = \symstate{F}{\regssub{r_{gd}}{r_{ls}}}{I_n}$.
+	
+	\item {\tt get\_ABP} loads a root reference to a FA representing
+		a memory pointed by the local variables and adds an offset to a displacement
+		in the root reference.
+		
+		$f(\stdsym) = \symstate{F}{\regssub{r_d}{
+			\rreftuple{\droot}{\ddispl + o}}}
+			{I_n}$ where $\rrefreg{r_{ABP}}$ is the register containing root
+		reference to FA representing local memory and $o$ is an offset
+		which is a parameter of this function.
+	
+	\item {\tt get\_GLOB} loads a root reference to a FA representing
+		a memory of local function to a local register
+		and adds an offset to a displacement in the root reference.
+		
+		$f(\stdsym) = \symstate{F}
+			{\regssub{r_{d}}{
+				\rreftuple{\droot}{\ddispl + o}
+			}}
+			{I_n}$ where $\rrefreg{r_{GLOB}}$ is the register containing root
+			reference to FA representing the global memory state and $o$ is an offset
+			which is a parameter of this instruction.
+	
+	\item {\tt load} loads a value from a FA pointed
+		by a root reference in the source register to the destination register.
+		The value is stored in the $n$-th successor of the root pointed
+		by source register value, where $n$ is a value of an offset.
+		
+		$f(\stdsym) = \symstate{F}
+			{\regssub{r_{d}}{
+				\rreftuple{\droot}{\ddispl + o}
+			}}
+			{I_n}$
+			where $\rrefreg{r_{s}}$,
+			$F[i]$ is a TA of F,
+			$o$ is offset which is a parameter of this instruction,
+			$i=\droot$,
+			$displ=\ddispl + o$.
+	
+	\item {\tt load\_ABP, load\_GLOB} same as the previous instruction
+		but loads a value from a FA pointed by $r_{ABP}$ or $r_{GLOB}$ register.
+		
+		Formally it could be defined as the previous instruction but
+		$r_{ABP}$ and $r_{GLOB}$ are used instead of $r_s$.
+
+	\item {\tt push\_greg} instruction creates a new global register
+		and fills it with a value in the source register.
+		
+		$f(\stdsym) = \symstate{F}
+		{\regs\cup \{r_g\}}
+		{I_n}$
+		where $r_g$ is a new global register such that $r_g = r_s$.
+	
+	\item {\tt pop\_greg} instruction takes a value in the last created
+		global register and stores it to a local register.
+		The global register is then deleted.
+		
+		$f(\stdsym) = \symstate{F}
+		{\regssubmin{r_g}{r_d}{r_g}}
+		{I_n}$
+		where $r_g$ is the lastly created global register.
+
+	\item {\tt cond} instruction represents a condition in the original code.
+		It creates a new symbolic state with the same forest automaton and appends
+		it to the queue.
+		The new state contains an instruction which corresponds to a \textit{then}
+		or \textit{else} branch of the condition.
+		The instruction for the new state is chosen according to
+		the content of {\tt cond} instruction symbolic state register.
+		
+		$f(\stdsym) = \symstate{F}{\regs}{r_s ? I_t : I_f}$
+		where $I_t$ is instruction used when $r_s$ has true value and
+		$I_f$ is instruction used otherwise.
+
+
+	\item {\tt iadd, imull} instructions performs integer
+		addition and multiplication.
+		
+		$f(\stdsym) = \symstate{F}
+		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
+		{I_n}$
+		where $r_{s1} \in \regs, r_{s2} \in \regs$, $\otimes \in \{+,*\}$
+		are two source registers with values of integer type.
+
+	\item {\tt eq, neq, ge, gt, le, lt} instructions
+		makes a comparison corresponding to their names.
+		The result of the comparison stores to the destination register.
+		
+		$f(\stdsym) = \symstate{F}
+		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
+		{I_n}$
+		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are two source registers
+		and $\otimes \in \{=,\neq, <,>,\leq,\geq\}$.
+	
+	\item {\tt build\_struct} instruction creates a structure from a
+		content of registers and the result stores to a destination register.
+		The source registers are defined by an index of the first register and
+		a vector of offsets from this register to another registers
+		that are used for creating structure.
+		
+		$f(\stdsym) = \symstate{F}
+		{\regssub{r_d}{x}}
+		{I_n}$
+		where $x$ is a structure created from the values of the registers $r_s,r_{s+i_1},r_{s+i_2}, \ldots, r_{s+i_n}$.
+		The values $i_1, i_2, \ldots, i_n$ are offsets defined as the parameters of this instruction.
+
+	\item {\tt check} instruction checks whether there is not a garbage.
+		
+		$f(\stdsym) = \symstate{F'}
+		{\regs}
+		{I_n}$
+		where $F'$ is obtained from $F$ by removing all unreachable
+		TA.
+	
+	\item {\tt abort} instruction aborts program execution.
+	
+	\item {\tt assert} instruction checks whether a value
+		in a given register is the same one as a constant.
+		
+		$f(\stdsym) = \stdsym$ if $r_s = c$, otherwise
+		symbolic execution is aborted.
+		Constant $c$ is a parameter of this instruction.
+	
+	\item {\tt error} instruction throws an exception representing
+		a local error in program.
+	
+	\item {\tt noret} instruction quits program symbolic execution when
+		no return function end is reached.
+
+\end{itemize}
+
 
 \chapter{Forester with VATA}
 \label{ch:fova}
