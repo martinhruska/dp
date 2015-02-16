@@ -897,7 +897,7 @@ The core of the forest automata module is class {\tt FA}.
 The implementation corresponds to the definitions given in Chapter \ref{ch:prel}.
 Class FA has a data member representing a vector of tree automata $(t_1 \cdots t_n)$.
 It also has a data member keeping a reference to an automaton representing the global variables
-and a reference to the automata representing the local variables of the current function. %TODO define ABP
+and a reference to the automata representing the local variables of the actually executed function. %TODO define ABP
 The labels of the TA transitions are represented by the structure {\tt NodeLabel}.
 This structure contains a data member determining the type of the root node of a transition
 (whether it is a general node, a data node or a node containing a vector of data).
@@ -913,17 +913,19 @@ representing the actual memory state.
 Another data member of class SymState is a set of registers $\regsset$.
 We denote set $\regsset$ by $\regs$. 
 The register are local or global ones.
-The global registers contain the references to the forest automata modelling
+There are two global registers.
+The first one contain a reference to the forest automata modelling
 the global state, e.g., the block of global variables in the symbolic state.
+The second one then represents the allocated memory of the actually executed function.
 The local registers serve as temporary memory used in
 the microcode instructions for data manipulation.
 Putting together the data members of class {\tt SymState}
 we can define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
 
-The values of the registers are instances of a structure {\tt Data}.
+The values of the registers are instances of structure {\tt Data}.
 We can formally define structure Data as $\ddata$ where
 $T$ is a data type,
-$S \in \natnum$ is size of data,
+$S \in \natnum$ is a size of data,
 $V$ is a value of type $T$,
 $MB=(D_1 \cdots D_n)$ represents nested data if they are present (this is the case when $D$ represents a data structure)
 and $D_i$ is another instance of data.
@@ -951,7 +953,7 @@ The microcode instructions executed during the symbolic execution are described 
 \label{subsec:microinstr}
 
 This sections provides a description of the Forester microcode instructions.
-Firstly, we introduce some examples how the C statements are trasnlated
+Firstly, we introduce some examples how C statements are trasnlated
 to the Forester microcode instructions, then we define the instructions
 more formally and we give a complete list of them.
 
@@ -969,42 +971,48 @@ Consider the following data structure that is an implementation of singly-linked
 	Consider also the two variables \code{struct T *x, *y} used in the next examples.
 	Note that all constants used in the examples are dependent to a concrete Forester
 	run and they are chosen randomly in this text.
-	The syntax of the instructions in the examples is following:
-	$$ op r0, r1, r2$$
+	The syntax of instructions in the examples is following:
+	$$ op r_0, r_1, r_2$$
 	$op$ is a name of a instruction,
-	$r0, r1, r2$ are operands such that $r0$ is a destination register,
-	$r1$ and $r2$ are the source registers.
+	$r_0, r_1, r_2$ are operands such that $r_0$ is a destination register,
+	$r_1$ and $r_2$ are the source registers.
+	Some instructions do not have three registers as parameters but most of them
+	have just two.
 	It is also possible that there is a constant instead of a register
 	as an operand of the instruction.
-	When $[r0+c]$ is used as an operand that the instruction dereferences a root reference in register $0$.
-	It means that the instruction access directly a selector with displacement $c$ in a label in the transition where
+	When $[r_0+c]$ is used as an operand then the instruction dereferences a root reference in register $0$.
+	It means that the instruction access directly a selector with the displacement $c$ in a label in the transition where
 	the referenced root is the parent state.
 	Note that when it is not stated otherwise it is reffered to a selector in a label of a transition
-	where the root of the transition is the referenced TA by a specified register.
+	where the root of the transition is the referenced TA by the specified register.
+	In the following text the registers $r_1,\ldots,r_n$ are local ones and
+	$GLOB$ and $ABP$ global registers such that $GLOB$ register contains reference to a FA representing
+	global variables and $ABP$ register contains reference to a FA representing local memory.
 
 \bexmp
 	The statement \codix{x = (struct T*) malloc(sizeof(struct T));} is translated
 	to these microcode instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov r0, (int)4
+	1: mov_reg r0, (int)4
 	2: alloc r0, r0
-	3: node r0, r0, next[0:4:+0]
-	4: mov r1, ABP + 0
-	5: mov [r1 + 12], r0    
+	3: node_create r0, r0, next[0:4:+0]
+	4: mov_reg r1, ABP + 0
+	5: mov_reg [r1 + 12], r0    
 	6: check
 	\end{verbatim}
 	\end{quote}
 
-	Firstly the size of a new allocated data (in this case the size is $4$) is stored to the register $0$ at line $1$.
+	Firstly the size of a new allocated data (in this case the size is $4$) is stored to the register $0$ at line~$1$.
 	Then the new instance of structure {\tt Data} is created and stored to register $0$ at line $2$.
 	A new TA $t$ is created at line $3$.
 	The TA $t$ has one transition from the root with a label that consists one pointer selector {\tt next} whose
 	displacement in the label is $0$ and the size is $4$.
 	The displacement defines the order of the selector in the label.
 	The instruction \codix{node} also stores a root reference to $t$ to register $0$.
-	Finally lines $4$ a $5$ performs adding root reference pointing to $t$ to a FA that represents
-	a memory state of the actually executed function (which is in this case function {\tt main}).
+	Finally lines $4$ a $5$ perform adding root reference pointing to $t$ to a FA that represents
+	a memory state of the actually executed function (which is in this case the function {\tt main}).
+	In this case a selector related to the pointer x has displacemnt $12$ in the label of TA referenced by the register $1$.
 	The instruction at line $6$ then checks whether no garbage was created by the previous instructions.
 \eexmp
 
@@ -1012,17 +1020,17 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{y = x->next;} is symbolically done by the following instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov r0, [ABP + 12]
-	2: acc [r0+0]
-	3: mov r0, [r0 + 0]
-	4: mov r1, ABP + 0
-	5: mov [r1 + 16], r0    
+	1: mov_reg r0, [ABP + 12]
+	2: acc_sel [r0+0]
+	3: mov_reg r0, [r0 + 0]
+	4: mov_reg r1, ABP + 0
+	5: mov_reg [r1 + 16], r0    
 	6: check
 	\end{verbatim}
 	\end{quote}
 
 	The first instruction stores a root reference to an TA representing heap pointed by the \codix{x} pointer to register $0$.
-	The root reference is chosen by the selector with displacement $12$ in a label in TA referenced by register $ABP$.
+	In this case, a node with a root reference is pointed by the selector with displacement displacement $12$ in a label in TA referenced by register $ABP$.
 	The second instruction performs an isolation of the selector with displacement $0$ in the TA referenced by register $0$.
 	This causes a creation of a new TA if \codix{x->next} points to an allocated memory (because a new
 	cut-point is created when pointer \codix{y} also points to this memory.
@@ -1038,18 +1046,20 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{free(x);} is performed by these instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov r0, [ABP + 12]
-	2: acca [r0]
+	1: mov_reg r0, [ABP + 12]
+	2: acca_sel [r0]
 	3: free r0
 	4: check
 	\end{verbatim}
 	\end{quote}
 
-	The first instruction loads to register $0$ a root reference pointed by a selector
-	of the pointer \codix{y}.
+	The first instruction loads to register $0$ a root reference to TA representing heap pointed by \codix{x}.
+	The reference to the TA is stored in a node pointed by a selector with displacement $12$
+	in a label of TA referenced by register \codix{ABP}.
 	The second one isolates all selectors of the TA referenced by register $0$
 	abd then the third instruction removes node pointed by register $0$
 	and finally invalidates all references to it.
+	The last instruction again checks whether there is not created garbage by performing this instruction.
 
 \eexmp
 
@@ -1057,39 +1067,40 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{x->data = y->data;} is performed by these instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov r3, [ABP + 16]
-	2: acc [r3 + 4]
-	3: mov r3, [r3 + 4]
-	4: mov r1, [ABP + 12]
-	5: acc [r1 + 4]
-	6: mov [r1 + 4], r3
+	1: mov_reg r3, [ABP + 16]
+	2: acc_sel [r3 + 4]
+	3: mov_reg r3, [r3 + 4]
+	4: mov_reg r1, [ABP + 12]
+	5: acc_sel [r1 + 4]
+	6: mov_reg [r1 + 4], r3
 	7: check
 	\end{verbatim}
 	\end{quote}
 
-	The first instruction loads to register $3$ a root reference pointed by a selector
-	of the pointer \codix{x} (which is in this $4$-th selector of a label under the referenced root).
-	Then the data selector \codix{x->data} is isolated and a data value from this selector
-	is loaded to register $r$ by the instructions at line $2$ and $3$.
+	The first instruction loads to register $3$ a root reference pointed by a selector (related to pointer \codix{x}).
+	with displacement $16$ in TA referenced by register \codix{ABP} (what is TA modeling actually executed function).
+	Then the data selector \codix{x->data} (which has displacement $4$ in label in TA reference by register $3$)
+	is isolated and a data value from this selector	is loaded to register $r$ by the instructions at line $2$ and $3$.
 	The instructions at line $4$ and $5$ prepares data selector \codix{y->data} in the same way
-	as the selector \codix{y->data} has been prepared.
-	Finally at line $6$ the data value in register $3$ is coppied to TA node referenced by
+	as the selector \codix{x->data} has been prepared.
+	Finally at line $6$ the data value in register $3$ is coppied to TA node pointed by
 	the selector \codix{y->data}.
-	The last operation is again check of garbage.
+	The last operation is again checking whether no garbage left.
 \eexmp
 
 \bexmp
 	The statement \codix{x == y} translates Forester into this list of the instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov r0, [ABP + 12]
-	2: mov	r1, [ABP + 16]
+	1: mov_reg r0, [ABP + 12]
+	2: mov_reg	r1, [ABP + 16]
 	3: eq r5, r0, r1
 	\end{verbatim}
 	\end{quote}
 
-	The instruction at line $1$ loads a root reference pointed by a selector related to a pointer $x$
-	to register $1$.
+	The instruction at line $1$ loads a root reference pointed by a selector
+	with displacement $12$ in TA referenced by register \codix{ABP}.
+	related to a pointer $x$ to register $0$.
 	The second instruction does the same thing as the previous one but for a pointer $y$
 	and register $1$.
 	The third register then compares the content of the registers $1$ and $2$ and stores the result
@@ -1098,7 +1109,7 @@ Consider the following data structure that is an implementation of singly-linked
 
 \vskip 1em
 
-The examples should bring some intuition and
+The examples should bring some intuition into the concept of the microcode instructions and
 now we give a more detailed and formal description of the instructions.
 At first, the notion used further is described.
 We use $r_s \in \regs$ to denote the source register,
