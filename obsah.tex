@@ -1212,6 +1212,15 @@ the second part the other instructions.
 		{I_n}$
 		where $F'$ is a new FA obtained from $F$ by computing fixpoint with or without abstraction.
 
+	\item {\tt check()} instruction checks whether there is not a garbage
+		and alternatively removes all unreachable TA.
+		
+		$f(\stdsym) = \symstate{F'}
+		{\regs}
+		{I_n}$
+		where $F'$ is obtained from $F$ by removing all unreachable
+		TA.
+
 \end{itemize}
 
 \subsubsection{The Instructions Not Modifying Forest Automata}
@@ -1285,9 +1294,8 @@ the second part the other instructions.
 		reference to FA representing local memory and $o$ is an offset
 		which is a parameter of this function.
 	
-	\item {\tt get\_GLOB} loads a root reference to a FA representing
-		a memory of local function to a local register
-		and adds an offset to a displacement in the root reference.
+	\item {\tt get\_GLOB($r_d$,$ABP$,$o$)} loads a root reference from the register $ABP$
+		to the destination register $r_d$ and adds the offset $o$ to a displacement in the root reference.
 		
 		$f(\stdsym) = \symstate{F}
 			{\regssub{r_{d}}{
@@ -1297,10 +1305,9 @@ the second part the other instructions.
 			reference to FA representing the global memory state and $o$ is an offset
 			which is a parameter of this instruction.
 	
-	\item {\tt load} loads a value from a FA pointed
-		by a root reference in the source register to the destination register.
-		The value is stored in the $n$-th successor of the root pointed
-		by source register value, where $n$ is a value of an offset.
+		\item {\tt load($r_d$,$r_s$,$o$)} loads a value from a TA $t$ pointed
+		by a root reference in the source register $r_s$ to the destination register $r_d$.
+		The value is stored in a selector with displacement $o$ in label of $t$.
 		
 		$f(\stdsym) = \symstate{F}
 			{\regssub{r_{d}}{
@@ -1313,22 +1320,22 @@ the second part the other instructions.
 			$i=\droot$,
 			$displ=\ddispl + o$.
 	
-	\item {\tt load\_ABP, load\_GLOB} same as the previous instruction
-		but loads a value from a FA pointed by $r_{ABP}$ or $r_{GLOB}$ register.
+	\item {\tt load\_ABP($r_d$,$r_s$,$o$), load\_GLOB($r_d$,$r_s$,$o$)} instructions do the same as
+		the previous instruction but loads a value from a TA pointed by $r_{ABP}$ or $r_{GLOB}$ register.
 		
 		Formally it could be defined as the previous instruction but
-		$r_{ABP}$ and $r_{GLOB}$ are used instead of $r_s$.
+		$ABP$ and $GLOB$ are used instead of $r_s$.
 
-	\item {\tt push\_greg} instruction creates a new global register
-		and fills it with a value in the source register.
+	\item {\tt push\_greg($r_s$)} instruction creates a new global register $r_g$
+		and fills it with a value in the source register $r_s$.
 		
 		$f(\stdsym) = \symstate{F}
 		{\regs\cup \{r_g\}}
 		{I_n}$
 		where $r_g$ is a new global register such that $r_g = r_s$.
 	
-	\item {\tt pop\_greg} instruction takes a value in the last created
-		global register and stores it to a local register.
+	\item {\tt pop\_greg($r_g$, $r_s$)} instruction takes a value in the last created
+		global register and stores it to the source register.
 		The global register is then deleted.
 		
 		$f(\stdsym) = \symstate{F}
@@ -1336,21 +1343,23 @@ the second part the other instructions.
 		{I_n}$
 		where $r_g$ is the lastly created global register.
 
-	\item {\tt cond} instruction represents a condition in the original code.
+	\item {\tt cond($r_s$,$I_t$,$I_e$)} instruction represents a condition in the original code.
 		It creates a new symbolic state with the same forest automaton and appends
 		it to the queue.
-		The new state contains an instruction which corresponds to a \textit{then}
-		or \textit{else} branch of the condition.
+		The new state contains an instruction which corresponds to a \textit{then} ($I_t$)
+		or \textit{else} ($I_e$) branch of the condition.
 		The instruction for the new state is chosen according to
-		the content of {\tt cond} instruction symbolic state register.
-		
+		the content of the source register $r_s$.
+
 		$f(\stdsym) = \symstate{F}{\regs}{r_s ? I_t : I_f}$
 		where $I_t$ is instruction used when $r_s$ has true value and
 		$I_f$ is instruction used otherwise.
 
 
-	\item {\tt iadd, imull} instructions performs integer
-		addition and multiplication.
+	\item {\tt iadd($r_d$,$r_{s_1}$,$r_{s_2}$), imull($r_d$,$r_{s_1}$,$r_{s_2}$)}
+		instructions performs integer addition and multiplication of the numbers
+		in the source registers $r_{s_1}$ and $r_{s_2}$ and stores the result to
+		the destination register $r_d$.
 		
 		$f(\stdsym) = \symstate{F}
 		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
@@ -1358,9 +1367,10 @@ the second part the other instructions.
 		where $r_{s1} \in \regs, r_{s2} \in \regs$, $\otimes \in \{+,*\}$
 		are two source registers with values of integer type.
 
-	\item {\tt eq, neq, ge, gt, le, lt} instructions
-		makes a comparison corresponding to their names.
-		The result of the comparison stores to the destination register.
+	\item {\tt eq, neq, ge, gt, le, lt}($r_d$,$r_{s_1}$,$r_{s_2}$) instructions
+		makes a corresponding comparison of the values in the source registers $r_{s_1}$
+		and $r_{s_2}$.
+		The result of the comparison stores to the destination register $r_d$.
 		
 		$f(\stdsym) = \symstate{F}
 		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
@@ -1368,8 +1378,9 @@ the second part the other instructions.
 		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are two source registers
 		and $\otimes \in \{=,\neq, <,>,\leq,\geq\}$.
 	
-	\item {\tt build\_struct} instruction creates a structure from a
-		content of registers and the result stores to a destination register.
+	\item {\tt build\_struct($r_d$,$r_{s}$ $i_1 \cdots i_n$)} instruction creates a structure from a
+		content of the source registers $r_s,r_{s+i_1},r_{s+i_2}, \ldots, r_{s+i_n}$
+		and the result stores to the destination register $r_d$.
 		The source registers are defined by an index of the first register and
 		a vector of offsets from this register to another registers
 		that are used for creating structure.
@@ -1379,28 +1390,20 @@ the second part the other instructions.
 		{I_n}$
 		where $x$ is a structure created from the values of the registers $r_s,r_{s+i_1},r_{s+i_2}, \ldots, r_{s+i_n}$.
 		The values $i_1, i_2, \ldots, i_n$ are offsets defined as the parameters of this instruction.
-
-	\item {\tt check} instruction checks whether there is not a garbage.
-		
-		$f(\stdsym) = \symstate{F'}
-		{\regs}
-		{I_n}$
-		where $F'$ is obtained from $F$ by removing all unreachable
-		TA.
 	
-	\item {\tt abort} instruction aborts program execution.
+	\item {\tt abort()} instruction aborts program execution.
 	
-	\item {\tt assert} instruction checks whether a value
-		in a given register is the same one as a constant.
+	\item {\tt assert($r_s$,$c$)} instruction checks whether the value
+		in the source register is the same one as the constant $c$.
 		
 		$f(\stdsym) = \stdsym$ if $r_s = c$, otherwise
 		symbolic execution is aborted.
 		Constant $c$ is a parameter of this instruction.
 	
-	\item {\tt error} instruction throws an exception representing
+	\item {\tt error()} instruction throws an exception representing
 		a local error in program.
 	
-	\item {\tt noret} instruction quits program symbolic execution when
+	\item {\tt noret()} instruction quits program symbolic execution when
 		no return function end is reached.
 
 \end{itemize}
