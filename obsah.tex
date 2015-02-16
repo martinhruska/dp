@@ -1116,10 +1116,10 @@ We use $r_s \in \regs$ to denote the source register,
 $r_d \in \regs$ to denote the destination register,
 $r_l \in \regs$ to denote a local register and
 $r_g \in \regs$ to denote a global register.
-Note that the source register is also global or local and the same holds for the destination register.
+Note that the source register is also a global or a local one and the same holds for the destination register.
 The source and destination registers are parameters of some instructions.
-We use $\regssub{r}{r'}$ to denote a set of the registers which has the same values as
-the registers in $\regs$ excluding $r$ that has a value $r'$.
+We use $\regssub{r}{r'}$ to denote a set of the registers which is same as
+the set $\regs$ but register $r$ is substitued by register $r'$.
 A symbol $I_n$ denotes next instruction following an instruction actually executed.
 We define semantics of each instruction formally using a function 
 $f: \instrset \times \symset \rightarrow \symset$
@@ -1131,16 +1131,16 @@ the current symbolic state $s$ to a new symbolic state $s'$.
 A list of the microcode instructions used in Forester with description
 of their semantics follows.
 Each instruction is described informally first and then its effect is defined
-in the notion of function $f$.
+in the notion of the function $f$.
 The instructions are divided to the two parts, the first part contains
 the instructions modifying forest automata,
 the second part the other instructions.
 
 \subsubsection{The Instructions Modifying Forest Automata}
 \begin{itemize}
-	\item {\tt acc\_sel} isolates the $i$-th selector of a label
+	\item {\tt acc\_sel($r_d$)} isolates the $i$-th selector of a label
 		in the transition from the root of a given TA.
-		The root of TA is defined by a destination register.
+		The root of TA is defined by the destination register $r_d$.
 		This instruction checks whether a selector pointed by the destination register
 		selects a node that represents allocated memory node or undefined pointer.
 		In the first case the node is isolated to a new TA and the original node in the
@@ -1156,14 +1156,14 @@ the second part the other instructions.
 		in the register $r_d$ such that $Root$ points to $t$ and $i=Displ+o$
 		where $o$ is a offset which is a parameter of this instruction.
 
-	\item {\tt acc\_set,acc\_all} instruction does the same thing as the previous one
+	\item {\tt acc\_set($r_d$),acc\_all($r_d$)} instruction does the same thing as the previous one
 		but for a set of selectors or for all selectors of a given root of TA.
 	
-	\item {\tt node\_create} instructions creates a new node
-		(and hereby also a new TA) which is a root node of the new TA.
-		A reference to the new TA is stored to the destination register.
+	\item {\tt node\_create($r_d$,$r_s$)} instructions creates a new node
+		(and hereby also a new TA) which is the root node of the new TA.
+		A reference to the new TA is stored to the destination register $r_d$.
 		A type info of the new node and its size is obtained from source
-		register.
+		register $r_s$.
 		
 		$f(\stdsym) = \symstate{F'}{
 		\regssub{
@@ -1172,13 +1172,13 @@ the second part the other instructions.
 		{I_n}$
 		where $F'$ is a new FA created by adding newly created TA $t$ to $F$
 		and $x$ is a reference to $t$.
-		TA $t$ has selectors defined in $r_s$. 
+		The selectors in the label of $t$ are specified in $r_s$. 
 		Note that reference to $t$ is not added to a TA in $F$ in this step
 		but it is done by instruction assigning a register value to a
 		node of TA.
 	
-	\item {\tt node\_free} instruction deletes a node in FA and
-		invalidate all references to it.
+	\item {\tt node\_free($r_s$)} instruction deletes a node in FA (referenced by register $r_s$) and
+		invalidates all references to it.
 		
 		$f(\stdsym) = \symstate{F'}
 		{\regs}
@@ -1186,10 +1186,9 @@ the second part the other instructions.
 		where $F'$ is obtained from $F$ by deleting a TA $t$ referenced
 		by a value of $r_s$ and removing all reference to $t$ from TA of $F$.
 
-	\item {\tt store} instruction stores a value from the source register
-		to a TA pointed by the destination register.
-		The location is the $n$-th successor of a root of the FA where $n$ is an offset
-		obtained as a parameter of this instruction.
+	\item {\tt store($r_d,r_s,o$)} instruction stores a value from the source register $r_s$
+		to a TA $t$ pointed by the destination register $r_d$.
+		The location is selected by a selector with displacement $o$ in a label of $t$.
 		
 		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
 		where $F'$ is a FA obtained from $F$ by assignment
@@ -1198,14 +1197,14 @@ the second part the other instructions.
 		$o$ is an offset which is a parameter of this instruction,
 		$i=\droot$ and $displ=\ddispl + o$.
 	
-	\item {\tt loads, stores} instructions do same as the previous
+	\item {\tt loads($r_d,r_s,o$), stores($r_d,r_s,o$)} instructions do the same as the previous
 		one but manipulates the structures.
 		
 		Formal definition is also same but the result in the register $r_d$ (in case of {\tt loads})
 		and or in the corresponding (in case of {\tt stores}) has a different typed
 		(concretely it is a structure).
 
-	\item {\tt abs, fix} instructions computes fixpoint with (abs) or
+	\item {\tt abs, fix()} instructions computes fixpoint with (abs) or
 		without ({\tt fix}) abstraction.
 		
 		$f(\stdsym) = \symstate{F'}
