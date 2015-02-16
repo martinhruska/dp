@@ -1218,10 +1218,11 @@ the second part the other instructions.
 
 \begin{itemize}
 
-	\item {\tt alloc} instruction creates a new instance of structure {\tt Data} $\ddata$
+	\item {\tt alloc($r_d$,$r_s$)} instruction creates a new instance of structure {\tt Data} $\ddata$
 		that represents allocated memory.
-		The size $S$ of $D$ is determined by an integer value in the source register.
-		The created instance will be further used for creating of a new TA.
+		The size $S$ of $D$ is determined by an integer value in the source register $r_s$.
+		The created instance will be further used for creating of a new TA
+		and it is yet stored to the destination register.
 		
 		$f(\stdsym) = \symstate{F}{
 		\regssub{
@@ -1231,53 +1232,53 @@ the second part the other instructions.
 		where $x=({\tt void\_ptr},{\tt undef},S',\emptyset)$ is an instance of structure Data
 		such that $S'$ is a size stored in $r_s$ (where should be stored an integer value). 
 
-	\item {\tt load\_cst} instruction loads a constant to a register.
+	\item {\tt load\_cst($r_d$,$c$)} instruction loads a constant $c$ to the destination register $r_d$.
 		So it creates a new symbolic state which differs only in register content.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{c}}{I_n})$ where
 		$c$ is a constant which is parameter of this instruction.
 	
-	\item {\tt move\_reg} instructions creates a new symbolic state where
-		a value from $r_s$ is moved to register $r_d$.
+	\item {\tt move\_reg($r_d$,$r_s$)} instructions creates a new symbolic state where
+		a value from the source register $r_s$ is moved to the destination register $r_d$.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{r_s}}{I_n}$.
 	
-	\item {\tt bnot, inot} instructions negate a value in a register and
-		creates a new symbolic state with the negated value in the register.
+	\item {\tt bnot($r_d$), inot($r_d$)} instructions negates a value in the destination register and
+		creates a new symbolic state with the negated value in the destination register.
 		{\tt bnot} negates integer and {\tt inot} negates the boolean value.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\neg r_d}}{I_n}$.
 	
-	\item {\tt move\_reg\_offs} instruction accesses a tree automaton pointed
-		by a reference in the source register and increases its {\tt displacement} value by a given offset.
-		The new value is stored in the destination register.
+	\item {\tt move\_reg\_offs($r_d$,$r_s$,$o$)} instruction accesses a tree automaton pointed
+		by a reference in the source register $r_s$ and increases its displacement value by the given offset $o$.
+		The new value is then stored in the destination register $r_d$.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl+o}}}{I_n}$
 		where $o$ is offset which is a parameter of this instruction
 		and $\rrefreg{r_s}$.
 	
-	\item {\tt move\_reg\_inc} instruction does same thing as the previous one but
-		it increases a displacement by a value in the second source register (which is
+	\item {\tt move\_reg\_inc($r_d$,$r_{s_1}$,$r_{s_2}$,)} instruction does same thing as the previous one but moreover
+		it increases a displacement by a value in the second source register $r_{s_2}$ (which is
 		present for this instruction).
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl + r_{s_2}}}}{I_n}$
 		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are source registers such that
-		$\rrefreg{r_{s_1}}$, $r_{s_2}$ has integer value.
+		$\rrefreg{r_{s_1}}$, $r_{s_2}$ is integer value.
 	
-	\item {\tt get\_greg} loads a value from a global register to
-		a local register.
+	\item {\tt get\_greg($r_{ld}$,$r_{gs}$)} loads a value from the global, source register $r_{gs}$ to
+		the local, destination register $r_{ld}$.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_{ld}}{r_{gs}}}{I_n}$.
 	
-	\item {\tt set\_greg} loads a value from a local register to
-		a global register.
+	\item {\tt set\_greg($r_{gd}$,$r_{ls}$)} loads a value from the local, source register $r_{ls}$ to
+		the global, destination register $r_{gd}$.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_{gd}}{r_{ls}}}{I_n}$.
 	
-	\item {\tt get\_ABP} loads a root reference to a FA representing
-		a memory pointed by the local variables and adds an offset to a displacement
+	\item {\tt get\_ABP($r_d$,$GLOB$, $o$)} loads a root reference from the register $ABP$ to
+		the destination register $r_d$. The instruction also adds the offest $o$ to a displacement
 		in the root reference.
-		
+
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{
 			\rreftuple{\droot}{\ddispl + o}}}
 			{I_n}$ where $\rrefreg{r_{ABP}}$ is the register containing root
