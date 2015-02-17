@@ -1197,14 +1197,12 @@ the second part the other instructions.
 		$o$ is an offset which is a parameter of this instruction,
 		$i=\droot$ and $displ=\ddispl + o$.
 	
-	\item {\tt loads($r_d,r_s,o$), stores($r_d,r_s,o$)} instructions do the same as the previous
+	\item {\tt stores($r_d,r_s,o$)} instruction does the same as the previous
 		one but manipulates the structures.
 		
-		Formal definition is also same but the result in the register $r_d$ (in case of {\tt loads})
-		and or in the corresponding (in case of {\tt stores}) has a different typed
-		(concretely it is a structure).
+		Formal definition is also same but the result is a structure.
 
-	\item {\tt abs, fix()} instructions computes fixpoint with (abs) or
+	\item {\tt abs(), fix()} instructions computes fixpoint with (abs) or
 		without ({\tt fix}) abstraction.
 		
 		$f(\stdsym) = \symstate{F'}
@@ -1305,7 +1303,7 @@ the second part the other instructions.
 			reference to FA representing the global memory state and $o$ is an offset
 			which is a parameter of this instruction.
 	
-		\item {\tt load($r_d$,$r_s$,$o$)} loads a value from a TA $t$ pointed
+	\item {\tt load($r_d$,$r_s$,$o$)} loads a value from a TA $t$ pointed
 		by a root reference in the source register $r_s$ to the destination register $r_d$.
 		The value is stored in a selector with displacement $o$ in label of $t$.
 		
@@ -1319,7 +1317,11 @@ the second part the other instructions.
 			$o$ is offset which is a parameter of this instruction,
 			$i=\droot$,
 			$displ=\ddispl + o$.
-	
+
+	\item {\tt loads($r_d,r_s,o$)} instruction does the same as the previous	one but manipulates the structures.
+		
+		Formal definition is the same but the result store in the selector is a structure.
+
 	\item {\tt load\_ABP($r_d$,$r_s$,$o$), load\_GLOB($r_d$,$r_s$,$o$)} instructions do the same as
 		the previous instruction but loads a value from a TA pointed by $r_{ABP}$ or $r_{GLOB}$ register.
 		
@@ -1509,9 +1511,8 @@ However it has proved that this would bring high overhead in some situations.
 A conversion of some data types is needed compared to situation when there are used directly data types compatible with VATA in the Forester code.
 Hence we decided to remove the original tree automata module and further support only version of Forester with \vata.
 
-\chapter{Backward Run in Forest Automata Based Verification(Text text)}
+\chapter{Backward Run in Forest Automata Based Verification}
 \label{ch:backward}
-text
 
 \section{Backward Run over Symbolic Context}
 
@@ -1521,28 +1522,60 @@ We describe each instruction informally first and then the instruction is define
 of a function $\grev: \grevinter$ which should has reverse semantics to the function $f$ from Section \ref{subsec:microinstr}.
 So $\grev$ takes as parameter a symbolic state and an instruction and returns a new symbolic state representing
 a symbolic state in the forward symbolic execution right before execution of the instruction.
-Note that not all instructions need to be reversed but only those
-modifying forest automata or those affecting further modification of forest automata.
-All the notion used in the following text is the same as the one defined in Section \ref{subsec:microinstr,subsec:faimpl}.
-We present the crucial instructions first then the rest is given.
+All the notion used in the following text is the same as the one defined in Section \ref{subsec:microinstr}.
+Further we use $\ftrace = \ftraceseq$ to denote a forward trace of the symbolic states explored during
+the forward run (note that the trace starts with the leaf state).
+The backward trace $\btrace = \btraceseq$ is then created during the backward run.
+The symbolic state $\sfwd$ is used for denoting the symbolic state in $\ftrace$ actually visited during the backward run.
+The symbolic state $\sbwd$ is the last state created (and appended to $\btrace$) during the backward run.
+We denote the instruction related to the state $\sfwd$ by $\isfwd$.
+
+The symbolic execution is done by iterating over the $\ftrace$ and for each
+instruction related to the selected symbolic states is performed its
+reverse operation.
+The result of the reverse operation is a new symbol state that is
+added to the backward trace $\btrace$.
+
+\subsection{The Instructions With Special Reverse Semantics}
+
 \begin{itemize}
 	\item {\tt FI\_acc\_sel}
 		
 	\item {\tt FI\_acc\_set,FI\_acc\_all}
 
-	\item {\tt FI\_alloc}
-
 	\item {\tt FI\_node\_create}
 	
 	\item {\tt FI\_node\_free}
+	
+	\item {\tt FI\_store}
+	
+	\item {\tt FI\_stores}
 
 	\item {\tt FI\_abs, FI\_fix}
 
+	\item {\tt FI\_push\_greg}
+	
+	\item {\tt FI\_pop\_greg}
+
+	\item {\tt FI\_get\_greg}
+	
+	\item {\tt FI\_set\_greg}
+
+	\item {\tt FI\_abort}
+
 \end{itemize}
 
-Since we already covered the most crucial instructions we describe
-the rest of the instructions now.
-The following instructions are used for manipulating registers.
+\subsubsection{Register Assignment Instructions}
+The following instructions do simply an assignment to the register.
+So reversing them consist creating a symbolic state $S'$ with
+the same registers as the symbolic state $\sbwd$ has
+and a substition of the original destination register $r_d$ of $\isfwd$ in $S'$
+by the value of the same register in the state $\sfwd$ (denoted by $r'_d$).
+Formally, $\grev(\stdsym) = \symstate{F}
+			{\regssub{r_{d}}{r'_{d}}
+			}
+			{I}$
+			where $\stdsym = \sbwd$.
 
 \begin{itemize}
 
@@ -1556,10 +1589,6 @@ The following instructions are used for manipulating registers.
 
 	\item {\tt FI\_move\_reg\_inc}
 
-	\item {\tt FI\_get\_greg}
-
-	\item {\tt FI\_set\_greg}
-
 	\item {\tt FI\_get\_ABP}
 
 	\item {\tt FI\_get\_GLOB}
@@ -1568,23 +1597,9 @@ The following instructions are used for manipulating registers.
 	
 	\item {\tt FI\_load\_ABP, FI\_load\_GLOB}
 	
-	\item {\tt FI\_store}
-
-	\item {\tt FI\_loads, FI\_stores}
-
-	\item {\tt FI\_push\_greg}
+	\item {\tt FI\_loads}
 	
-	\item {\tt FI\_pop\_greg}
-
-	\end{itemize}
-
-	Finally, the remaining instructions do not perform a specific operations
-	but perform the various operations like conditions, arithmetic operations or
-	aborting the symbolic execution, etc.
-
-	\begin{itemize}
-
-	\item {\tt FI\_cond}
+	\item {\tt FI\_alloc}
 
 	\item {\tt FI\_iadd, FI\_imull}
 
@@ -1592,14 +1607,25 @@ The following instructions are used for manipulating registers.
 	
 	\item {\tt FI\_build\_struct}
 
-	\item {\tt FI\_check}
+\end{itemize}
 
-	\item {\tt FI\_abort}
+\subsubsection{Void Instructions}
+The following instructions have no reverse semantics
+(because they do not change the symbolic state in forward run)
+so the symbolic state obtained by the reverse instruction
+is the same as the symbolic state $\sfwd$.
+Formally written, $\grev(\stdsym) = \stdsym$ where $\sbwd = \stdsym$.
+
+\begin{itemize}
+	
+	\item {\tt FI\_cond}
+	
+	\item {\tt FI\_check}
 	
 	\item {\tt FI\_assert}
-
+	
 	\item {\tt FI\_error}
-
+	
 	\item {\tt FI\_noret}
 
 \end{itemize}
