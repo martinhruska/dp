@@ -1516,7 +1516,7 @@ Hence we decided to remove the original tree automata module and further support
 
 \section{Backward Run over Symbolic Context}
 
-This sections provides a description of the reverse operations for
+This section provides a description of the reverse operations for
 each instruction of Forester microcode which were introduced in Section \ref{subsec:microinstr}.
 We describe each instruction informally first and then the instruction is defined in notion
 of a function $\grev: \grevinter$ which should has reverse semantics to the function $f$ from Section \ref{subsec:microinstr}.
@@ -1540,11 +1540,31 @@ added to the backward trace $\btrace$.
 
 \begin{itemize}
 	\item {\tt FI\_acc\_sel}
-		
-	\item {\tt FI\_acc\_set,FI\_acc\_all}
+		NOT YET DONE
 
-	\item {\tt FI\_node\_create}
-	
+	\item {\tt FI\_acc\_set,FI\_acc\_all}
+		NOT YET DONE
+
+	\item {\tt FI\_node\_create($r_s$, $r_d$)}
+		Instruction performs dealocation of a memory which is done by the function \code{free}.
+		Instruction gets value from the source register $r_s$ in $\sfwd$.
+		If the value is a reference or a null pointer then the new
+		state is just copy of the $\sbwd$.
+		Otherwise if the value type is void pointer then the new symbolic
+		state has the same values in the registers as the state $\sbwd$ has but
+		the value of the register $r_d$ is subtitued by its value $r'_{d}$ in $\sfwd$
+		because the register $r_d$ in $\sbwd$ contains reference to a TA $t$
+		representing heap pointed by the dealocated pointer.
+		TA $t$ is then removed from FA and all refrences to it are set invalidated.
+
+		Formally, $\grev(\stdsym) = \symstate{F'}
+			{\regssub{r_{d}}{r'_{d}}
+			}
+			{I}$
+			where $\stdsym = \sbwd$,
+			$r_{d} \in \sbwd$, $r'_{d} \in \sfwd$
+			and $F'$ is obtained from $T$ by removing TA $t$ referenced by the register $r_d$.
+
 	\item {\tt FI\_node\_free}
 	
 	\item {\tt FI\_store}
@@ -1562,6 +1582,7 @@ added to the backward trace $\btrace$.
 	\item {\tt FI\_set\_greg}
 
 	\item {\tt FI\_abort}
+		This instruction is not reversible.
 
 \end{itemize}
 
