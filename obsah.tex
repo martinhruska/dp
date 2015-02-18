@@ -1557,7 +1557,7 @@ added to the backward trace $\btrace$.
 		representing heap pointed by the dealocated pointer.
 		TA $t$ is then removed from FA and all refrences to it are set invalidated.
 
-		Formally, $\grev(\stdsym) = \symstate{F'}
+		$\grev(\stdsym) = \symstate{F'}
 			{\regssub{r_{d}}{r'_{d}}
 			}
 			{I}$
@@ -1566,20 +1566,60 @@ added to the backward trace $\btrace$.
 			and $F'$ is obtained from $T$ by removing TA $t$ referenced by the register $r_d$.
 
 	\item {\tt FI\_node\_free}
-	
-	\item {\tt FI\_store}
+		TODO
+
+	\item {\tt FI\_store($r_d$)}
+		Instruction creates a new symbolic state identical to the $\sbwd$.
+		Then the root reference $RR$ is loaded from the register $r_d$ in $\sbwd$.
+		The value $V$ from a node pointed by the selector in FA of $\sfwd$ referenced by
+		the root reference in register $r_d$ is loaded (which is actually value replaced
+		by this instruction in the forward run).
+		Finally, the value $V$ is stored to FA of the new symbolic state to the node
+		pointed by the selector referenced by $RR$.
+
+		$\grev(\stdsym) = \symstate{F'}
+			{\regs}
+			{I}$
+			where $\stdsym = \sbwd$ and $F'$ is obtained
+			by the described operation.
+
 	
 	\item {\tt FI\_stores}
+		This instruction has same reverse operation like the previous one but
+		it reverses storing a structure to a FA.
 
 	\item {\tt FI\_abs, FI\_fix}
+		TODO
 
-	\item {\tt FI\_push\_greg}
-	
-	\item {\tt FI\_pop\_greg}
+	\item {\tt FI\_push\_greg($r_g$)}
+		Instruction creates a new symbolic state identical to the state $\sbwd$ but
+		the last global register from the new state is removed (what inverts push operation).
 
-	\item {\tt FI\_get\_greg}
+		$\grev(\stdsym) = \symstate{F}
+		{\regs \setminus \{r_g\}}
+		{I}$ where $\sbwd = \stdsym$ and $r_g$
+		is the last global register added to the state.
+
+	\item {\tt FI\_pop\_greg($r_g$)}
+		Instruction creates a new state identical to the $\sbwd$,
+		then the register $r_g$ from $\sbwd$ is moved to the
+		forest automaton of the new state (what actually reverts pop)
+		and finally the orignal value of $r_g$ in $\sfwd$ is stored
+		to the corresponding register int the new state.
 	
-	\item {\tt FI\_set\_greg}
+		$\grev(\stdsym) = \symstate{F}
+		{\regs \cup \{r_g\}}
+		{I}$ where $\sbwd = \stdsym$ and $r_g$
+		is the last global register added to the state.
+	
+	\item {\tt FI\_set\_greg($r_g$)}
+		Instruction creates a new symbolic state indentical to the $\sbwd$,
+		loads an old value of the global register $r_g$ from $\sfwd$
+		and sets the value of $r_g$ in the new state to it.
+
+		$\grev(\stdsym) = \symstate{F}
+		{\regs \cup \{r_g\}}
+		{I}$ where $\sbwd = \stdsym$.
 
 	\item {\tt FI\_abort}
 		This instruction is not reversible.
@@ -1617,6 +1657,8 @@ Formally, $\grev(\stdsym) = \symstate{F}
 	\item {\tt FI\_load}
 	
 	\item {\tt FI\_load\_ABP, FI\_load\_GLOB}
+	
+	\item {\tt FI\_get\_greg}
 	
 	\item {\tt FI\_loads}
 	
