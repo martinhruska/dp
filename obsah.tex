@@ -1588,8 +1588,16 @@ added to the backward trace $\btrace$.
 		This instruction has same reverse operation like the previous one but
 		it reverses storing a structure to a FA.
 
-	\item {\tt FI\_abs, FI\_fix}
-		TODO
+	\item {\tt FI\_abs(), FI\_fix()}
+		Reversion is done by creating a new symbolic state identical to the state $\sbwd$.
+		Then a new FA create by intersection of FA of $\sbwd$ and FA of $\sfwd$ is assigned
+		to the new symbolic state.
+
+		$\grev(\stdsym) = \symstate{F'}
+			{\regs}
+			{I}$
+			where $\stdsym = \sbwd$, $F' = F \cap F_{FWD}$ and $F_{FWD}$ is
+			FA of $\sfwd$.
 
 	\item {\tt FI\_push\_greg($r_g$)}
 		Instruction creates a new symbolic state identical to the state $\sbwd$ but
