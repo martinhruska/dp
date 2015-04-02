@@ -1428,7 +1428,7 @@ So the first thing needed to be done is reducing number of dependencies between 
 Then it would be possible to apply design pattern \emph{adapter} \cite{gamma95} (described in Section \ref{sec:adapter}) to create
 an interface between Forester and \vata\ (implementation itself is described in \ref{sec:fova_impl}).
 Applying of adapter design pattern makes possible to include VATA without need of rewriting
-Forester to the names of methods and data used in VATA.
+Forester to the names of methods and data members used in VATA.
 It creates also only one place (particularly adapter class) connecting Forester and VATA instead of
 including VATA into many of the Forester classes and so it prevents from creating too strong relation between them.
 
@@ -1453,10 +1453,9 @@ have same state as parent.
 These kinds of iterations are quite common in Forester.
 Another part of refactoring consists of simple replacing access of the class data members by the corresponding getters and setters method.
 Reducing of structural dependencies is also done by emphasis application of \emph{Law of Demeter} \cite{lod89} what practically
-means that classes using TA explicitly should implement methods providing information about TA instead of providing object representing TA itself.
+means that classes using TA explicitly should implement methods providing information about TA instead of providing instance of TA object itself.
 E.g., when one class wants to know whether a given state is final in an tree automaton of an forest automaton then FA implementation should
 implement a method providing this information instead of providing access to its TA.
-Applying the Law of Demeter reduces knowledge needed about implementation of TA module across the whole project.
 That helps us to make a smaller interface for TA module.
 However, also after this refactoring Forester source code is still far from accomplishing the mentioned good practices (and also those not mentioned)
 in the whole source code.
@@ -1495,7 +1494,7 @@ The main part of the adapter patter is in our case newly implemented class \emph
 We decided to used the implementation approach to Adaptor, preferring composition over inheritance,
 because it is more suitable for our purposes since we often needs to rename methods 
 (name of a method in Forester differs from name of a method in VATA performing same operation)
-or conversion of parameters data type (e.g. from vector to set). 
+or convert a data type of parameter of tree automata operation (e.g. from vector to set). 
 
 The class \emph{VATAAdapter} instantiates class \emph{ExplicitTreeAut} from VATA as its private data member
 and redirects to this instance method calls from Forester (the names of methods of VATAAdapter are the same as they were
@@ -1503,12 +1502,14 @@ in the original TA library).
 \emph{VATAAdapter} also sometimes performs mentioned conversion of the data types.
 There are methods implemented by adapter not presented in VATA like method \emph{unfoldAtRoot}
 performing some kind of an unfolding.
-The methods of this kind are very Forester specific so it is not sensible to add them to general purpose library like VATA is.
+The methods of this kind are very Forester specific so it is not sensible to add them to general purpose library like VATA is
+and it is better to implement them in interface like class VATAAdapter is.
 
 We originally supposed that it would be possible to keep the original TA module along VATA adapter
 to be able to easily switch between them.
 However it has proved that this would bring high overhead in some situations.
-A conversion of some data types is needed compared to situation when there are used directly data types compatible with VATA in the Forester code.
+E.g., a~conversion of some data types would be needed in this case
+what is overhead compared to implementation where data types compatible with VATA are used directly in the Forester code.
 Hence we decided to remove the original tree automata module and further support only version of Forester with \vata.
 
 \chapter{Backward Run in Forest Automata Based Verification}
@@ -1519,18 +1520,18 @@ Hence we decided to remove the original tree automata module and further support
 This section provides a description of the reverse operations for
 each instruction of Forester microcode which were introduced in Section \ref{subsec:microinstr}.
 We describe each instruction informally first and then the instruction is defined in notion
-of a function $\grev: \grevinter$ which should has reverse semantics to the function $f$ from Section \ref{subsec:microinstr}.
-So $\grev$ takes as parameter a symbolic state and an instruction and returns a new symbolic state representing
-a symbolic state in the forward symbolic execution right before execution of the instruction.
+of the function $\grev: \grevinter$ which should have the reverse semantics to the function $f$ from Section \ref{subsec:microinstr}.
+So the function $\grev$ takes as parameter a symbolic state and an instruction and returns a new symbolic state.
 All the notion used in the following text is the same as the one defined in Section \ref{subsec:microinstr}.
-Further we use $\ftrace = \ftraceseq$ to denote a forward trace of the symbolic states explored during
+Moreover we use $\ftrace = \ftraceseq$ to denote a forward trace of the symbolic states explored during
 the forward run (note that the trace starts with the leaf state).
 The backward trace $\btrace = \btraceseq$ is then created during the backward run.
 The symbolic state $\sfwd$ is used for denoting the symbolic state in $\ftrace$ actually visited during the backward run.
 The symbolic state $\sbwd$ is the last state created (and appended to $\btrace$) during the backward run.
-We denote the instruction related to the state $\sfwd$ by $\isfwd$.
+We denote the instruction related to the state $\sfwd$ by $\isfwd$
+and the instruction related to the state $\sbwd$ by $\isbwd$.
 
-The symbolic execution is done by iterating over the $\ftrace$ and for each
+The backward run is done by iterating over the $\ftrace$ and for each
 instruction related to the selected symbolic states is performed its
 reverse operation.
 The result of the reverse operation is a new symbol state that is
@@ -1546,10 +1547,10 @@ added to the backward trace $\btrace$.
 		NOT YET DONE
 
 	\item {\tt FI\_node\_create($r_s$, $r_d$)}
-		Instruction performs dealocation of a memory which is done by the function \code{free}.
+		Instruction performs reverse operation to the C function \code{malloc}.
 		Instruction gets value from the source register $r_s$ in $\sfwd$.
 		If the value is a reference or a null pointer then the new
-		state is just copy of the $\sbwd$.
+		state is just copy of $\sbwd$.
 		Otherwise if the value type is void pointer then the new symbolic
 		state has the same values in the registers as the state $\sbwd$ has but
 		the value of the register $r_d$ is subtitued by its value $r'_{d}$ in $\sfwd$
@@ -1557,10 +1558,10 @@ added to the backward trace $\btrace$.
 		representing heap pointed by the dealocated pointer.
 		TA $t$ is then removed from FA and all refrences to it are set invalidated.
 
-		$\grev(\stdsym) = \symstate{F'}
+		$\grev(\bstdsym) = \symstate{F'}
 			{\regssub{r_{d}}{r'_{d}}
 			}
-			{I}$
+			{\isfwd}$
 			where $\stdsym = \sbwd$,
 			$r_{d} \in \sbwd$, $r'_{d} \in \sfwd$
 			and $F'$ is obtained from $T$ by removing TA $t$ referenced by the register $r_d$.
@@ -1577,9 +1578,9 @@ added to the backward trace $\btrace$.
 		Finally, the value $V$ is stored to FA of the new symbolic state to the node
 		pointed by the selector referenced by $RR$.
 
-		$\grev(\stdsym) = \symstate{F'}
+		$\grev(\bstdsym) = \symstate{F'}
 			{\regs}
-			{I}$
+			{\isfwd}$
 			where $\stdsym = \sbwd$ and $F'$ is obtained
 			by the described operation.
 
@@ -1590,12 +1591,12 @@ added to the backward trace $\btrace$.
 
 	\item {\tt FI\_abs(), FI\_fix()}
 		Reversion is done by creating a new symbolic state identical to the state $\sbwd$.
-		Then a new FA create by intersection of FA of $\sbwd$ and FA of $\sfwd$ is assigned
+		Then a new FA created by the intersection of FA of $\sbwd$ and FA of $\sfwd$ is assigned
 		to the new symbolic state.
 
-		$\grev(\stdsym) = \symstate{F'}
+		$\grev(\bstdsym) = \symstate{F'}
 			{\regs}
-			{I}$
+			{\isfwd}$
 			where $\stdsym = \sbwd$, $F' = F \cap F_{FWD}$ and $F_{FWD}$ is
 			FA of $\sfwd$.
 
@@ -1603,9 +1604,9 @@ added to the backward trace $\btrace$.
 		Instruction creates a new symbolic state identical to the state $\sbwd$ but
 		the last global register from the new state is removed (what inverts push operation).
 
-		$\grev(\stdsym) = \symstate{F}
+		$\grev(\bstdsym) = \symstate{F}
 		{\regs \setminus \{r_g\}}
-		{I}$ where $\sbwd = \stdsym$ and $r_g$
+		{\isfwd}$ where $\sbwd = \stdsym$ and $r_g$
 		is the last global register added to the state.
 
 	\item {\tt FI\_pop\_greg($r_g$)}
@@ -1615,9 +1616,9 @@ added to the backward trace $\btrace$.
 		and finally the orignal value of $r_g$ in $\sfwd$ is stored
 		to the corresponding register int the new state.
 	
-		$\grev(\stdsym) = \symstate{F}
+		$\grev(\bstdsym) = \symstate{F}
 		{\regs \cup \{r_g\}}
-		{I}$ where $\sbwd = \stdsym$ and $r_g$
+		{\isfwd}$ where $\sbwd = \stdsym$ and $r_g$
 		is the last global register added to the state.
 	
 	\item {\tt FI\_set\_greg($r_g$)}
@@ -1625,9 +1626,9 @@ added to the backward trace $\btrace$.
 		loads an old value of the global register $r_g$ from $\sfwd$
 		and sets the value of $r_g$ in the new state to it.
 
-		$\grev(\stdsym) = \symstate{F}
+		$\grev(\bstdsym) = \symstate{F}
 		{\regs \cup \{r_g\}}
-		{I}$ where $\sbwd = \stdsym$.
+		{\isfwd}$ where $\sbwd = \stdsym$.
 
 	\item {\tt FI\_abort}
 		This instruction is not reversible.
@@ -1703,6 +1704,94 @@ Formally written, $\grev(\stdsym) = \stdsym$ where $\sbwd = \stdsym$.
 
 
 \section{Intersection of Forest Automata}
+
+\section{Backward run}
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=1\linewidth]{fig/artmc.png}
+	\caption{
+		Figure is taken from \cite{artmc}.
+		Figure shows a forest automata language before (green area)
+		and after (yellow area) abstraction.
+		One oval consisting green and yellow part represents
+		language of a forest automaton in a symbolic state of symbolic execution.
+		Figure also shows how a forest automaton (and it language) is gradually changed
+		by abstract transformers what is illustrated by lines connecting ovals.
+		A~found error is shown as a red area in the last oval.
+		The backward run starts from this error and it finds
+		that an error is spurious because an intersection (the orange areas) of forest automata language from backward (the blue ovals)
+		and forward (the green and yellow area) run is empty at level of the symbolic state with language $L(M^{\alpha}_{k-1})$.}
+	\label{fig:bwrun}
+\end{figure}
+
+We have already covered how to represent dynamic data structures by forest automata in the previous section.
+The forest automata make us able to handle also infinite state spaces
+rising from a possible unboudness of the mentioned dynamic data structures.
+However, there is still a problem of state explosion that often makes
+nearly impossible to finish verification procedure of a system in real time.
+Therefore the abstraction over the forest automata is introduced.
+The abstraction accelerates the computation by merging more states
+of forest automata to one abstract state.
+The negative effect of the abstraction is the overapproximation of the reachable
+states of an analyzed system.
+In case of computer programs this leads to finding reachable error states in
+an abstracted state space which are not present in the real system.
+This could be prevented by a refinement of the abstraction
+which avoids repeating of the abstraction of the states
+that lead to the spurious error.
+
+Forester now implements a height abstraction.
+This abstraction merges states whose languages (note that a language of state is a set of trees) are the same
+when the trees of the languages are compared only to the given depth.
+The main problem of this abstraction technique is its scalability because
+the only way how to scale it is by the parameter defining the depth of tree comparison.
+The more precise abstraction is so called \emph{predicate abstraction} \cite{artmc} that introduces
+a set of predicates and merges the states in which the same predicates hold.
+When a spurious counterexample is found, then the set of predicates is extended by
+a predicate that prevents reaching the spurious counterexample again
+and the~verification procedure is rerun with the new predicate.
+
+Finding the new predicate and checking spuriousness of an error is done by performing of \emph{backward run}.
+A~backward run starts from forest automata modelling a heap with a spurious error and
+reverting gradually each abstract operation over the forest automata
+in backward order of the operations.
+When an automata with an empty language is get by the reverse abstract transformation then the error is spurious.
+The last automaton of backward run with a non empty language is then used as a new predicate.
+Backward run is illustrated by Figure \ref{fig:bwrun} and the illustration
+is further described in the caption of the figure.
+
+It could be necessary to perform a forest automata intersection during
+the backward run.
+But it is not needed always because Forester implements many abstract transformers
+that do not modify forest automata directly but changes only symbolic state of the symbolic execution
+without accessing forest automata.
+The abstract transformers of this kind could be reversed without intersection of forest automata
+from the backward and the forward run what brings better performance of the backward run.
+An example where the intersection is necessary to be done is for example an operation for freeing a memory node.
+The intersection is done between a forest automaton from the backward run and a forest automaton from the forward
+run before the abstract transformer has been applied.
+The result automata is then further used in the backward run.
+
+The goal of this work is to implement backward run and predicate abstraction
+for non-hierarchical forest automata.
+It includes design of the reverse operations for abstract transformers over
+the abstract domain and the application of predicate abstraction on forest automate.
+Moreover, as it was already mentioned the intersection of foster automata is needed in some reverse
+operations of backward run so it is also part of this work to implement it.
+Forester has some basic implementation of both, the reverse microcode instructions and
+intersection of forest automata.
+However, the implementation was not mature enough so it was necessary to
+complete it and evaluate it on the SV-COMP benchmark.
+
+We mentioned that this work implements either backward run and predicate abstraction only for
+non-hierarchical forest automata.
+The extension of them for hierarchical forest automata is not part
+of this work because of it demanding character.
+But it is definitely a challenging issue for future work
+that will be done next after finishing the implementation of basic predicate abstraction.
+
+
 
 \chapter{template$<$class Text$>$ Implementation(Text text)}
 \label{ch:impl}
