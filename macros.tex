@@ -4,7 +4,7 @@
 \newcommand{\funcdecl}[3]{#1: #2 \rightarrow #3}
 \newcommand{\subst}[2]{[#1/#2]} %co, za co
 \newcommand{\bexmp}[0]{\noindent\rule{\textwidth}{0.4pt} \begin{example}}
-\newcommand{\eexmp}[0]{\end{example} \noindent\rule{\textwidth}{0.4pt}}
+\newcommand{\eexmp}[0]{\end{example} \noindent\rule{\textwidth}{0.6pt}}
 \newcommand{\symset}[0]{\mathbb{S}}
 \newcommand{\instrset}[0]{\mathbb{I}}
 \newcommand{\regs}[0]{\mathbb{G}}
@@ -14,6 +14,12 @@
 \newcommand{\symstate}[3]{(#1, #2, #3)}
 \newcommand{\stdsym}[0]{\symstate{F}{\regs}{I}}
 \newcommand{\natnum}[0]{\mathbb{N}}
+\newcommand{\eqrel}[1]{\sim_#1}
+\newcommand{\eqclass}[2]{[#1]_{\eqrel{#2}}}
+\newcommand{\heqrel}[1]{\sim^n_#1}
+\newcommand{\langlen}[2]{L^{\leq n}(#1,#2)}
+\newcommand{\lang}[2]{L(#1,#2)}
+\newcommand{\heqclass}[2]{[#1]_{\heqrel{#2}}}
 
 \newcommand{\lfunc}[2]{\lambda #1 \,:\, #2}
 \newcommand{\lfuncp}[3]{(\lambda #1 \,:\, #2)(#3)}

@@ -64,6 +64,7 @@ which enables checking spuriousness of an error found in a program.
 The error could be spurious because of too high level of abstraction over FA is used.
 The information gained by backward run could be used for the refinement of \emph{predicate abstraction} (one kind of abstraction over FA)
 to prevent verification procedure from getting the same spurious error again.
+This way of gradual refinement is based on \emph{counterexample-guided abstract refinement} (CEGAR) \cite{cegar}.
 However, Forester does not use predicate abstraction but \emph{height abstraction} now
 because predicate abstraction needs the backward run.
 Height abstraction is less precise and less flexible compared to predicate abstraction so implementing predicate abstraction
@@ -421,7 +422,7 @@ A graph $g$ is \emph{unambiguously determined} by $SE(g)$ if $g$ has no isolated
 \subsection{Tree Automata over Structured Labels}
 
 Since we already extended the labels to structures ones we also define tree automata over these labels.
-A (finite, non-deterministic, top-down) \emph{tree automata} (over structured labels) is quadruple $A=(Q,2^\Gamma, \delta, R)$ where
+A (finite, non-deterministic, top-down) \emph{tree automata} (over structured labels) is quadruple $A=(Q,2^\Gamma, \Delta, R)$ where
 \begin{itemize}
 	\item $Q$ is a finite set of states.
 	\item $\Gamma$ is a ranked alphabet.
@@ -501,11 +502,16 @@ proofed in \cite{forester:techrep}.
 \chapter{Forest Automata based Verification}
 \label{ch:fav}
 
-The different heap configurations could be reached during execution of a program.
-The aim of the shape analysis is to prove that it is not possible to reach such a heap configuration in which
-an error like double free or invalid pointer can occur.
-The heap configurations could be represented by FA and hence it is possible
-to use FA in shape analysis.
+Consider programs manipulating dynamic data structures.
+These programs change shape of a heap (and so reache another heap configuration)
+by performing operations like an allocation of the new memory nodes on the heap
+or removing the old ones.
+Since the dynamic data structures are unbouded the number of
+the reachable heap configurations is infinite.
+However, it is possible to represent the infinite state space by forest automata in finite way.
+Then we can perform shape analysis over the forest automata representation of the reachable
+heap configurations to discover whether no undesirable behavior like a dereference of uninitialized
+pointer happen.
 
 This chapter provides an overview of the shape analysis based forest automata introduced in \cite{forester12}.
 First, a heap representation using FA is described and then
@@ -516,11 +522,12 @@ we provide overview of symbolic execution that employs framework of abstract int
 
 It is possible to view a \emph{heap} (more precisely, a single heap configuration)
 as a (directed) graph where each allocated heap cells corresponds to a node in the graph \cite{forester13}.
-The heap cells consists of \emph{pointer selectors} and \emph{data selectors} that picks a data from some finite data domain.
+The heap cells consists of \emph{pointer selectors} and \emph{data selectors}.
 A pointer selectors could point to another graph node or to the value \emph{null} or it could be undefined.
-A data selector then references its node to the data from data domain.
+A data selector picks a data from some finite data domain.
 %When we consider the pointer variables of a program it also holds that they can have pointer and data selectors.
-A heap graph could be split to the trees in the following manner.
+We need to split a heap graph to the trees to be able to represent in by forest automat.
+The splitting is done in the following manner.
 We identify the heap cut-points (corresponding to the already defined term \emph{cut-points})
 which are the heap cells pointed by a pointer variable or by more then one other heap cells by their pointer selectors.
 The heap is then split to the trees whose roots nodes are cut-points identified in the previous step.
@@ -536,8 +543,8 @@ A single heap configuration is a io-graph $g_{st}$ over the ranked alphabet of t
 with sub-labels from the ranked alphabet $\Gamma = PSel \cup (DSel \times \mathbb{D})$ having the
 ranking function that assigns $1$ to the pointer selectors and $0$ to the data selectors.
 The values of data selectors are stored in the structured labels as sub-labels from $DSel \times \mathbb{D}$.
-A node $v$ of a graph representing a heap reflects by its label internal structure the structure of
-related allocated memory cell in the heap so it holds that $l_g(v) \in 2^\Gamma$.
+A node $v$ of a graph representing a heap reflects by its label the internal structure of
+the related allocated memory cell in the heap so it holds that $l_g(v) \in 2^\Gamma$.
 A null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) = \emptyset$
 and undefined selectors of a node $v$ have not corresponding  sub-labels in $l_g(\texttt{v})$.
 
@@ -556,24 +563,32 @@ a next item and also integer data variable, written in C:
 \end{minipage}
 \end{center}
 Then a allocated cell of this singly-linked list on the heap with value $13$ in \texttt{data} variable and pointer to a cell named $s_{next}$
-in \texttt{next} variable could be represented
+in the \texttt{next} variable could be represented
 by a node $s$ with following label $l_g(s) = \{next_g(s_{next}),(data_g,13),()\}$.
-As you can see, the pointer selector $next_g \in PSel$ representing the pointer variable \texttt{next} from \texttt{SLL} structure
+As you can see, the pointer selector $next_g \in PSel$ represents the pointer variable \texttt{next} from \texttt{SLL} structure
 has really rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing \texttt{data} variable from \texttt{SLL} structure
 has rank $0$.
 \eexmp
 
-We need to represent the sets of the heap configurations reachable by the analysed program, not only single heap configuration.
-That would be possible by employing the forest automata of higher level respecting canonicity that represents io-forests
-which model the set of heap configurations.
+The mentioned method describes how to decompose a heap graph to forest, concretely we use the io-forests.
+An io-forest can be accepted by a forest automaton as a member of its language.
+Moreover, a language of forest automaton is a set of such forests.
+So is is possible to represent a set of the reachable heap configurations at a point of the analysed program.
+Precisely, the forest automata of higher level respecting canonicity are used in the verification method
+because they have richer expressive power then the non-hierarchical forest automata.
+The forest automata of higher level also makes possible to represent data structure with unboudned number
+of the cut-points by their folding into the boxes what is further described later.
 
-The another thing needed to be represented by FA is a \emph{stack frame} of a function in the analyzed program.
-When we recall definition of io-forests and forest automata so they contains exactly one (index of) input port.
-The input port node $sf$ serves in case of shape analysis based on FA for storing of a stack frame of the analyzed function.
+Not only the allocated memory on the heap is modelled by forest automata during the verification procedure but also
+a \emph{stack frame} of the acutally analyzed function of the original program is represented by forest automata.
+Particularly, the io-forests and forest automata have from their definitions exactly one (index of) input port and
+just the input port $sf$ keeps a information about the stack frame.
 
 \section{Symbolic Execution}
 \label{sec:se}
 
+So far we described representation of heap configurations using forest automata.
+Now we cover how the forest automata representation is computed for each point of the analysed program.
 FA-based verification procedure is a standard \emph{abstract interpretation} \cite{cousot:77}.
 The concrete domain assigns to each program location a set of pairs
 $(\sigma,H)$ where a mapping $\sigma$ maps each variable
@@ -663,7 +678,7 @@ Normalization consist of the following steps:
 It was already explained how the heap is decomposed to the forests.
 One part of the decomposition process is identifying the cut-points.
 But it could happen that there is infinitely many cut-points in the graphs representing the heaps.
-It is the case of e.g. doubly linked list where each node is cut-point itself.
+It is the case of e.g. doubly linked list where each node is a cut-point itself.
 This could be resolved by employing boxes (box is a symbol of alphabet of forest automata of higher level which is also forest automata as it was mentioned in Chapter \ref{ch:prel}).
 Since it is possible for FA to use other FA as symbols we can fold recurring sub-graphs to the boxes that are further used as the labels
 and so reduce the number of cut-points (to a bounded count).
@@ -672,6 +687,49 @@ The steps of verification procedure where folding and unfolding is needed has be
 and its formal definition is given in Chapter \ref{ch:prel}.
 The boxes can be learn during analysing of a program automatically by the method proposed in \cite{forester13} or
 it can be given to the analyzer manually by a user.
+
+\subsection{Abstraction over Forest Automata}
+\label{subsec:abstraction}
+
+We mentioned that forest automata are able to handle also infinite state spaces
+rising from a possible unboudness of the mentioned dynamic data structures.
+However, there is still the problem of state explosion that often makes
+nearly impossible to finish verification procedure of a system in real time
+and moreover, not even termination of the verification procedure is guaranteed at all.
+Therefore the abstraction over the forest automata is introduced to increase probability of termination
+and to accelerate the method.
+The abstraction over forest automata is based on the framework of \emph{abstract regular tree model checking} \cite{artmc}.
+
+The abstraction accelerates the computation by merging states of forest automaton that are equivalet
+to an equivalet relation over states of forest automaton.
+Formally, the abstraction $\alpha$ over a tree automaton $M=(Q, \Sigma, \Delta, R)/$ is
+a function $\alpha: Q \rightarrow Q/\eqrel{M}$ such that $\alpha(q) = \eqclass{q}{M}$
+where $\eqrel{M} \subseteq Q \times Q$ is an equivalence relation.
+We denote $\alpha(M)$ the tree automaton obtained by applying $\alpha$ to $Q$.
+It holds that $Q/\eqrel{M} \subseteq Q$ and also that $L(M) \subseteq L(\alpha(M))$.
+Since the abstraction is defined for a single tree automaton
+it is performed component-wise over a forest automaton.
+
+The forest automata based verification currently employs \emph{height abstraction}.
+This abstraction merges states with the equivalent languages upon to a given string length.
+So the range of abstraction function is set of equivalence classes of relation $\heqrel{M}$
+such that $\forall q_1,q_2 \in Q: q_1 \eqrel{M} q_2 \Leftrightarrow \langlen{M}{q_1} = \langlen{M}{q_2}$
+where $\langlen{M}{q}$ $=$ $\{ w \in \Sigma^n \,|\, |w| \leq n \wedge wv \in \lang{M}{q} \wedge |v| \geq 0\}$
+and $n\in \mathbb{N}$ is height of the abstraction.
+
+The abstraction over forest automata overapproximate set of reachable
+configurations of a program (what is formally expressed by $L(M) \subseteq L(\alpha(M))$).
+This brings mentioned acceleration of verification procedure but on the other hand
+could led to a detection of a spurious counterexample which is not present
+in the original program but it occurs in a heap configuration created by abstraction.
+The program verification is restarted after the detection of spurious counterexample
+but it uses a refined abstraction $\alpha'$ what is abstraction such that $L(\alpha'(M)) \subseteq L(\alpha(M))$.
+The refined abstraction can prevent reaching the detected spurious counterexample again.
+In the case of height abstraction the refinement is done by increasing the height $n$.
+However the refinement does not guarantee that the detected spurious counterexample will not
+be detected agin the next run.
+This would be resolved by using predicate abstraction which is described later in Chapter \ref{ch:backward}
+and it application to forest automata is one of the merits of this master thesis.
 
 \chapter{The VATA Library and Forester}
 \label{ch:tools}
