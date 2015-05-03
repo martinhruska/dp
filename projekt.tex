@@ -103,16 +103,16 @@
 	  První cíl byl již splněn a varianta nástroje Forester používající knihovnu VATA se účastnila soutěže SV-COMP 2015.
   }, % abstrakt v ceskem jazyce
   abstract.en={
-	  Forest automata are formalism used for analysis and verification of programs manipulating dynamic data structures.
-	  Forest automata are based on tree automata and shape analysis related to forest automata has been implemented in Forester tool.
-	  Forester has its own implementation of tree automata.
-	  However, there is the VATA library which implements the efficient algorithms for the tree automata manipulation,
-	  especially the efficient algorithms for the checking language inclusion of tree automata what is operation
-	  crucial also for verification procedure based on forest automata.
-	  The first goal of this thesis is to implement version of Forester tool that uses VATA library for tree automata manipulation.
-	  The second goal of this thesis is to extend forest automata based verification with backward run that checks whether
-	  a found error is a spurious or real one what could be used for refinement of predicate abstraction.
-	  The first goal has been already fulfill and the variant of Forester using the VATA library participated in the competition SV-COMP 2015.}, % abstrakt v anglickem jazyce
+	  In this work, we develop an existing method for shape analysis based on so called forest automata,
+	  and we also improve its implementation, the tool Forester.
+	  Forest automata are based on tree automata and Forester includes a simple implementation of tree automata.
+	  Our first contribution is replacing this implementation by a general purpose tree automata library VATA,
+	  which contains highly optimized implementations of the used automata operations.
+      The version of Forester using the VATA library participated in the competition SV-COMP 2015.
+      Secondly, we have extended the forest automata based verification method with a counterexample analysis.
+      The results of the counterexample analysis can be then used to check whether
+      a found error is a~spurious or a real one what could be used for refinement of predicate abstraction.
+      We are currently working on its application in counterexample based abstraction refinement.}, % abstrakt v anglickem jazyce
   %Prohlaseni
   declaration={Prohlašuji, že jsem tuto diplomovou práci vypracoval samostatně pod vedením\\ pana Mgr. Lukáše Holíka, Ph.D.},
   %Podekovani (nepovinne)
