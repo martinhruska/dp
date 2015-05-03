@@ -504,10 +504,10 @@ proofed in \cite{forester:techrep}.
 \label{ch:fav}
 
 Consider programs manipulating dynamic data structures.
-These programs change shape of a heap (and so reache another heap configuration)
+These programs change shape of a heap (and so reach another heap configuration)
 by performing operations like an allocation of the new memory nodes on the heap
 or removing the old ones.
-Since the dynamic data structures are unbouded the number of
+Since the dynamic data structures are unbounded the number of
 the reachable heap configurations is infinite.
 However, it is possible to represent the infinite state space by forest automata in finite way.
 Then we can perform shape analysis over the forest automata representation of the reachable
@@ -527,7 +527,7 @@ The heap cells consists of \emph{pointer selectors} and \emph{data selectors}.
 A pointer selectors could point to another graph node or to the value \emph{null} or it could be undefined.
 A data selector picks a data from some finite data domain.
 %When we consider the pointer variables of a program it also holds that they can have pointer and data selectors.
-We need to split a heap graph to the trees to be able to represent in by forest automat.
+We need to split a heap graph to the trees to be able to represent in by forest automata.
 The splitting is done in the following manner.
 We identify the heap cut-points (corresponding to the already defined term \emph{cut-points})
 which are the heap cells pointed by a pointer variable or by more then one other heap cells by their pointer selectors.
@@ -577,11 +577,11 @@ Moreover, a language of forest automaton is a set of such forests.
 So is is possible to represent a set of the reachable heap configurations at a point of the analysed program.
 Precisely, the forest automata of higher level respecting canonicity are used in the verification method
 because they have richer expressive power then the non-hierarchical forest automata.
-The forest automata of higher level also makes possible to represent data structure with unboudned number
+The forest automata of higher level also makes possible to represent data structure with unbounded number
 of the cut-points by their folding into the boxes what is further described later.
 
-Not only the allocated memory on the heap is modelled by forest automata during the verification procedure but also
-a \emph{stack frame} of the acutally analyzed function of the original program is represented by forest automata.
+Not only the allocated memory on the heap is modeled by forest automata during the verification procedure but also
+a \emph{stack frame} of the actually analyzed function of the original program is represented by forest automata.
 Particularly, the io-forests and forest automata have from their definitions exactly one (index of) input port and
 just the input port $sf$ keeps a information about the stack frame.
 
@@ -701,8 +701,8 @@ Therefore the abstraction over the forest automata is introduced to increase pro
 and to accelerate the method.
 The abstraction over forest automata is based on the framework of \emph{abstract regular tree model checking} \cite{artmc}.
 
-The abstraction accelerates the computation by merging states of forest automaton that are equivalet
-to an equivalet relation over states of forest automaton.
+The abstraction accelerates the computation by merging states of forest automaton that are equivalent
+to an equivalent relation over states of forest automaton.
 Formally, the abstraction $\alpha$ over a tree automaton $M=(Q, \Sigma, \Delta, R)/$ is
 a function $\alpha: Q \rightarrow Q/_{\eqrel{M}}$ such that $\alpha(q) = \eqclass{q}{M}$
 where $\eqrel{M} \subseteq Q \times Q$ is an equivalence relation.
@@ -728,7 +728,7 @@ but it uses a refined abstraction $\alpha'$ what is abstraction such that $L(\al
 The refined abstraction can prevent reaching the detected spurious counterexample again.
 In the case of height abstraction the refinement is done by increasing the height $n$.
 However the refinement does not guarantee that the detected spurious counterexample will not
-be detected agin the next run.
+be detected again the next run.
 This would be resolved by using predicate abstraction which is described later in Chapter \ref{ch:backward}
 and it application to forest automata is one of the merits of this master thesis.
 
@@ -1013,7 +1013,7 @@ The microcode instructions executed during the symbolic execution are described 
 
 This sections provides a description of the Forester microcode instructions
 which correspond to the abstract transformers in context of abstraction interpretation.
-Firstly, we introduce some examples how the C statements are trasnlated
+Firstly, we introduce some examples how the C statements are translated
 to the Forester microcode instructions, then we define the instructions
 more formally and we give a complete list of them.
 
@@ -1043,7 +1043,7 @@ Consider the following data structure that is an implementation of singly-linked
 	When $[r+c]$ is used as an operand then the instruction dereferences a root reference in register $r$.
 	Exactly, the instruction access directly a selector with the displacement $c$ in a label of the transition with
 	the referenced root as the parent state.
-	Note that when it is not stated otherwise it is reffered to a selector in a label of a transition
+	Note that when it is not stated otherwise it is referred to a selector in a label of a transition
 	where the root of the transition is the referenced TA by the specified register.
 	In the following text the registers $r_1,\ldots,r_n$ are local ones and
 	$GLOB$ and $ABP$ are global registers such that $GLOB$ register contains reference to a FA representing
@@ -1143,7 +1143,7 @@ Consider the following data structure that is an implementation of singly-linked
 	is isolated and a data value from this selector	is loaded to register $r$ by the instructions at line $2$ and $3$.
 	The instructions at line $4$ and $5$ prepare data selector \codix{y->data} in the same way
 	as the selector \codix{x->data} has been prepared.
-	Finally at line $6$ the data value in register $3$ is coppied to TA node pointed by
+	Finally at line $6$ the data value in register $3$ is copied to TA node pointed by
 	the selector \codix{y->data}.
 	The last operation is again checking whether no garbage left.
 \eexmp
@@ -1179,7 +1179,7 @@ $r_g \in \regs$ to denote a global register.
 Note that the source register is also a global or a local one and the same holds for the destination register.
 The source and destination registers are parameters of some instructions.
 We use $\regssub{r}{r'}$ to denote a set of the registers which is same as
-the set $\regs$ but register $r$ is substitued by register $r'$.
+the set $\regs$ but register $r$ is substituted by register $r'$.
 A symbol $I_n$ denotes next instruction following an instruction actually executed.
 We define semantics of each instruction formally using a function 
 $f: \instrset \times \symset \rightarrow \symset$
@@ -1343,7 +1343,7 @@ the second part the other instructions.
 		$f(\stdsym) = \symstate{F}{\regssub{r_{gd}}{r_{ls}}}{I_n}$.
 	
 	\item {\tt get\_ABP($r_d$,$GLOB$, $o$)} loads a root reference from the register $ABP$ to
-		the destination register $r_d$. The instruction also adds the offest $o$ to a displacement
+		the destination register $r_d$. The instruction also adds the offset $o$ to a displacement
 		in the root reference.
 
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{
@@ -1612,14 +1612,14 @@ Finally, an implementation of both concepts is described at Section \ref{sec:imp
 	\label{fig:bwrun}
 \end{figure}
 
-As we descibed in Section \ref{ch:fav}, the abstract transformers $\abstr$
+As we described in Section \ref{ch:fav}, the abstract transformers $\abstr$
 related to the concrete program operations are gradually applied to forest automata
 starting from a forest automaton modelling an empty heap.
 This gradual application of abstract transformers in the same order
 with the concrete program operations is called \emph{forward run}.
 Formally, a forest automaton at a program point $n$ is obtained by
 $\abstr^n(\abstr^{n-1}(\ldots \abstr^{1}(F^{empt}) \ldots))$ in forward run
-where $\abstr^i$ is an abstract transformer related to the conrete
+where $\abstr^i$ is an abstract transformer related to the concrete
 program operation at $i-th$ point of program and $F^{empt}$ is
 a forest automata modelling an empty (initial) heap.
 Moreover, normalization, box folding and abstraction is performed
@@ -1628,14 +1628,14 @@ it was described in \ref{ch:fav}.
 
 Consider that a program error is detected at the $n$-th program location
 during the forward run.
-The verification of non-spuriouty of the error is done by gradual applying
+The verification of non-spuriousness of the error is done by gradual applying
 \emph{reverse abstract transformers} $\rabstr$ over forest automata
 starting from the point where the error was found
 and checking whether intersection of languages of forest automata from forward run
 and backward run is non-empty at each program point.
 This process is called backward run.
 Formally, we compute forest automaton $\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F^{n}) \ldots))$
-for each program location from the $n$-th point back to the beggining.
+for each program location from the $n$-th point back to the beginning.
 We check whether $\forall 0 \leq i \leq n: L(\rabstr^1(\ldots \rabstr^{i}(F^{i}) \ldots)) \cap
 L(\abstr^n(\ldots \abstr^{1}(F^{empt}) \ldots)) \neq \emptyset$
 and when the intersection is empty the the found error is declared
@@ -1715,7 +1715,7 @@ It gradually creates the part of the resulting intersection forest automata that
 from the input states.
 The result of this function is index of TA created by the function in the resulting FA.
 It process so-called product states during it computation.
-A product state is basicaly a pair $(r,s)$ where $r$ is a state of $\F_{\A}$
+A product state is basically a pair $(r,s)$ where $r$ is a state of $\F_{\A}$
 and $s$ is a state of $\F_{\B}$.
 
 The function creates a product state from the input states $lhs$ and $rhs$ and
@@ -1723,7 +1723,7 @@ adds it to the set of already processed product states if it is not already proc
 otherwise it returns index of such product state in the result automaton.
 This is done at line $1-3$.
 Then the counter of processed product states is increased and
-stack \emph{workset} is initialized to serve like a auxilliary data
+stack \emph{workset} is initialized to serve like a auxiliary data
 structure where the product states are stored to be processed later at line $4-8$.
 
 The function creates a new TA with the product state $lhs$ and $rhs$ as the root
@@ -1739,8 +1739,8 @@ root states and creates a new TA with index $cp$.
 Finally the product state $(r,s)$ is added to the resulting FA
 as a root reference to a TA indexed $cp$.
 This case is at lines $13-14$.
-Another similiar cases are when $r$ or $s$ is a root reference and the second one is not.
-The function intersect is called with the referenced root state as one paramenter
+Another similar cases are when $r$ or $s$ is a root reference and the second one is not.
+The function intersect is called with the referenced root state as one parameter
 and the second parameter is the state of product state that is not a root reference.
 The result of this function call is a index $cp$ of newly created TA.
 Then the product state $(r,s)$ is added to the resulting FA as the root reference
@@ -1755,15 +1755,15 @@ $(r_1 \cdots r_n) \in \post{a}{r}$, $(s_1 \cdots s_n) \in \post{a}{s}$ and
 $\post{a}{q} = \{(q_1 \cdots q_n) \in Q^n\,|\, q \xrightarrow{a} (q_1 \cdots q_n) \in \Delta\}$.
 Finally, when the product state $(r_i,s_i)$ where $1 \leq i \leq n$ is a new one
 then it is added to the state set $Q$ and appended to the workset to be further processed.
-This last case corresponds to lines $24-30$ in the algoritm.
+This last case corresponds to lines $24-30$ in the algorithm.
 
 \input{alg_isect.tex}
 
 \section{Designing Backward Run over Symbolic States}
 \label{sec:brdesign}
 
-We described backward run generaly in the beginning of this chapter.
-Now, a more technical and algorithmical description takes a place.
+We described backward run generally in the beginning of this chapter.
+Now, a more technical and algorithmically description takes a place.
 We recall the definitions given in Section \ref{subsec:microinstr}.
 
 It was mentioned that the tool Forester implements the abstract
@@ -1781,7 +1781,7 @@ We denote the trace by $\ftrace$ and we call it \emph{forward trace}.
 The state $\sfwdp{i}$ is the input of the instruction $\isfwdp{i+1}$
 where $i \geq 0$ and the $\sfwdp{i+1}$ is the resulting symbolic state. 
 
-The extension by backward run is quite straightward.
+The extension by backward run is quite straightforward.
 When an error is detected in a symbolic state $\sfwd{i}$
 then the backward run starts from this symbolic state.
 The backward run is done by going through $T$ in the reverse order
@@ -1797,11 +1797,11 @@ by the algorithm for the intersection of forest automata to get the successor
 symbolic state in backward run (and also to detect spurious counterexample
 by checking whether $L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B) = \emptyset$)
 after the execution of each instruction in the backward run.
-Indeed, it is sufficent to compute intersect FA only for
+Indeed, it is sufficient to compute intersect FA only for
 the microcode instructions {\tt FI\_abs(), FI\_fix()}
 because only these instructions performs an abstraction.
 The other instruction are precise and elementary enough
-that they could reversed withou needing to make intersection.
+that they could reversed without needing to make intersection.
 
 The method of execution of the backward is already described so
 the next sections provides the description of the inverse microcode instructions.
@@ -1841,10 +1841,10 @@ added to the backward trace $\btrace$.
 		state is just copy of $\sbwd$.
 		Otherwise if the value type is void pointer then the new symbolic
 		state has the same values in the registers as the state $\sbwd$ has but
-		the value of the register $r_d$ is subtitued by the value $r'_{d}$ in $\sfwd$
+		the value of the register $r_d$ is substituted by the value $r'_{d}$ in $\sfwd$
 		because the register $r_d$ in $\sbwd$ contains reference to a TA $t$
-		representing heap pointed by the alocated pointer by this instruction.
-		TA $t$ is then removed from FA and all refrences to it are set invalidated.
+		representing heap pointed by the allocated pointer by this instruction.
+		TA $t$ is then removed from FA and all references to it are set invalidated.
 
 		$\grev(\bstdsym) = \symstate{F'}
 			{\regssub{r_{d}}{r'_{d}}
@@ -1860,7 +1860,7 @@ added to the backward trace $\btrace$.
 		is referenced by the root reference $RR$ in the register $r_d$.
 		This TA is copied from FA in $\sfwd$ to FA in $\sbwd$ into the
 		corresponding position.
-		It is also neccesery to relabel the selectors of FA in $\sbwd$
+		It is also necessary to relabel the selectors of FA in $\sbwd$
 		according to FA in $\sfwd$ to replace undefined values created
 		after free by the root reference to the renewed FA.
 
@@ -1917,7 +1917,7 @@ added to the backward trace $\btrace$.
 		Instruction creates a new state identical to the $\sbwd$,
 		then the register $r_g$ from $\sbwd$ is moved to the
 		forest automaton of the new state (what actually reverts pop)
-		and finally the orignal value of $r_g$ in $\sfwd$ is stored
+		and finally the original value of $r_g$ in $\sfwd$ is stored
 		to the corresponding register int the new state.
 	
 		$\grev(\bstdsym) = \symstate{F}
@@ -1926,7 +1926,7 @@ added to the backward trace $\btrace$.
 		is the last global register added to the state.
 	
 	\item {\tt FI\_set\_greg($r_g$)}
-		Instruction creates a new symbolic state indentical to the $\sbwd$,
+		Instruction creates a new symbolic state identical to the $\sbwd$,
 		loads an old value of the global register $r_g$ from $\sfwd$
 		and sets the value of $r_g$ in the new state to it.
 
@@ -1949,7 +1949,7 @@ added to the backward trace $\btrace$.
 
 	\item {\tt FI\_acc\_set,FI\_acc\_all}
 		This the same as the previous instruction and so
-		the semantic of these instrctions is empty.
+		the semantic of these instructions is empty.
 		
 		$\grev(\stdsym) = \stdsym$
 
@@ -1959,7 +1959,7 @@ added to the backward trace $\btrace$.
 The following instructions do simply an assignment to the register.
 So reversing them consist creating a symbolic state $S'$ with
 the same registers as the symbolic state $\sbwd$ has
-and a substition of the original destination register $r_d$ of $\isfwd$ in $S'$
+and a substitution of the original destination register $r_d$ of $\isfwd$ in $S'$
 by the value of the same register in the state $\sfwd$ (denoted by $r'_d$).
 Formally, $\grev(\stdsym) = \symstate{F}
 			{\regssub{r_{d}}{r'_{d}}
