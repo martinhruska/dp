@@ -14,12 +14,24 @@
 \newcommand{\symstate}[3]{(#1, #2, #3)}
 \newcommand{\stdsym}[0]{\symstate{F}{\regs}{I}}
 \newcommand{\natnum}[0]{\mathbb{N}}
+\newcommand{\lang}{\mathcal{L}}
+
+\newcommand{\defarrow}[0]{\Leftrightarrow}
+
 \newcommand{\eqrel}[1]{\sim_#1}
 \newcommand{\eqclass}[2]{[#1]_{\eqrel{#2}}}
 \newcommand{\heqrel}[1]{\sim^n_#1}
 \newcommand{\langlen}[2]{L^{\leq n}(#1,#2)}
-\newcommand{\lang}[2]{L(#1,#2)}
+\newcommand{\langstate}[2]{L(#1,#2)}
 \newcommand{\heqclass}[2]{[#1]_{\heqrel{#2}}}
+
+\newcommand{\abstr}[0]{\tau_{op}}
+\newcommand{\rabstr}[0]{\tau_{op^1}}
+\newcommand{\abs}[0]{\alpha}
+
+\newcommand{\pred}[0]{P}
+\newcommand{\predset}[0]{\mathcal{P}}
+\newcommand{\peqrel}[0]{\sim_\predset}
 
 \newcommand{\lfunc}[2]{\lambda #1 \,:\, #2}
 \newcommand{\lfuncp}[3]{(\lambda #1 \,:\, #2)(#3)}
@@ -47,3 +59,16 @@
 \newcommand{\btrace}[0]{BT}
 \newcommand{\isbwd}[0]{I^{B}}
 \newcommand{\bstdsym}[0]{\symstate{F}{\regs}{\isbwd}}
+
+%isect
+\newcommand{\A}[0]{\mathcal{A}}
+\newcommand{\B}[0]{\mathcal{B}}
+\newcommand{\CC}[0]{\mathcal{C}}
+\newcommand{\F}[0]{\mathcal{F}}
+\newcommand{\X}[0]{\mathcal{X}}
+\newcommand{\nat}[0]{\mathbb{N}}
+\newcommand{\st}[0]{\;|\;}
+\newcommand{\ltr}[1]{\xrightarrow{#1}} % labelled->
+\newcommand{\rank}[0]{\#}
+\newcommand{\post}[2]{\mathit{post}_{#1}(#2)}
+\newcommand{\powerset}[1]{2^{#1}}

@@ -1,0 +1,99 @@
+\begin{algorithm}[ht]
+  \caption{Intersection for non-hierarchical forest automata}
+\label{alg:isect}
+  \KwIn{ $\F_{\A} = (\A_1, \dots, \A_n, R_{\A})$, $\F_{\B} = (\B_1, \dots, \B_m, R_{\B})$}
+  \KwOut{$\F_{\CC} = (\CC_1, \dots, \CC_p, R_{\CC})$ such that $\lang(\F_{\CC}) = \lang(\F_{\A}) \cap \lang(\F_{\B})$}
+
+  \tcp{NB: as the automata are non-hierarchical, they have no output ports}
+
+  \If{$R_{\A} \neq R_{\B}$}
+  {
+    \Return{$()$}\;
+  }
+
+  $\mathit{processed} := \emptyset$\;
+  $\mathit{cnt} := 0$\;
+  $\mathit{FA} := ()$\;
+  
+  \For{$i := 1$ \KwTo $k$}
+  {
+    $\mathit{intersect}((\F_{\A}[x_i], \F_{\B}[x_i]))$\;
+  }
+
+  \Return{$\mathit{FA}$}\;
+\end{algorithm}
+
+\begin{function}[ht]
+
+  \caption{intersect(lhs, rhs)}
+  \KwIn{$\mathit{lhs} = (\mathit{lhs.state}, \mathit{lhs.root})$ and $\mathit{rhs} = (\mathit{rhs.state}, \mathit{rhs.root})$ are pairs of an automaton and a state from the automaton}
+  \SetKwInput{KwData}{Globals}
+  \KwData{$\mathit{FA}$: a tuple of tree automata; $\mathit{processed}$: set of processed root points; $\mathit{cnt}$: counter of components of $\mathit{FA}$}
+  \KwOut{Index of the resulting component in $\mathit{FA}$}
+
+  \If{$(lhs, rhs) \in \mathit{processed}$}
+  {
+    \Return{index of the component for $(lhs, rhs)$}
+  }
+
+  $\mathit{processed} := \mathit{processed} \cup \{(lhs, rhs)\}$\;
+
+  $\mathit{index} := \mathit{cnt}$\;
+  $\mathit{cnt} := \mathit{cnt} + 1$\;
+
+  $\mathit{workset} := \mathtt{createStack}()$\;
+  $\mathit{workset}.\mathtt{push}((\mathit{lhs.state},\mathit{rhs.state}))$\;
+
+  \tcp{start creating the new TA}
+  $Q := \{(\mathit{lhs.state},\mathit{rhs.state})\}$; $\Delta := \emptyset$\;
+
+  \While{$\neg\mathit{workset}.\mathtt{empty}()$}
+  {
+    $(r, s) := \mathit{workset}.\mathtt{pop}()$\;
+
+    \uIf(\tcp*[h]{$r$ is a root reference}){$r \ltr{\mathtt{ref}(i)}$}
+    {
+      \uIf(\tcp*[h]{both $r$ and $s$ are root references}){$s \ltr{\mathtt{ref}(j)}$}
+      {
+        add $((i, \mathtt{root}(i)), (j, \mathtt{root}(j)))$ into the bijection\;
+        \tcp{for CFA with matching RIGs, it should not happen that $i$ or $j$ would already be mapped somewhere else}
+        $\mathit{cp} := \intersect((i, \mathtt{root}(i)), (j, \mathtt{root}(j)))$\;
+      }
+      \Else(\tcp*[h]{only $r$ is a root reference})
+      {
+        add $((i, \mathtt{root}(i)), (\mathit{rhs.aut}, s))$ into the bijection\;
+        $\mathit{cp} := \intersect((i, \mathtt{root}(i)), (\mathit{rhs.aut}, s))$\;
+      }
+      $\Delta := \Delta \cup \{(r,s) \ltr{\mathtt{ref}(\mathit{cp})}\}$\;
+    }
+    \uElseIf(\tcp*[h]{only $s$ is a root reference}){$s \ltr{\mathtt{ref}(j)}$}
+    {
+      add $((\mathit{lhs.aut}, r), (j, \mathtt{root}(j)))$ into the bijection\;
+      $\mathit{cp} := \intersect((\mathit{lhs.aut}, r), (j, \mathtt{root}(j)))$\;
+      $\Delta := \Delta \cup \{(r,s) \ltr{\mathtt{ref}(\mathit{cp})}\}$\;
+    }
+    \Else(\tcp*[h]{for normal transitions})
+    {
+      \ForEach{$a \in \Sigma$ (in the reverse order than given by $\preceq_{\Sigma}$)}
+      {
+        \ForEach{$(r_1, \dots, r_{\rank{a}}) \in \post{a}{r}, (s_1, \dots, s_{\rank{a}}) \in \post{a}{s}$}
+        {
+          \tcp{the ordering should not be important here}
+          $\Delta := \Delta \cup \{(r,s) \ltr{a} ((r_1, s_1), \dots, (r_{\rank{a}}, s_{\rank{a}}))\}$\;
+          \For(\tcp*[h]{push in the reverse order to keep DFT}){$i := \rank{a}$ \KwTo $1$}
+          {
+            \If{$(r_i, s_i) \not\in Q$}
+            {
+              $Q := Q \cup \{(r_i, s_i)\}$\;
+              $\mathit{workset}.\texttt{push}((r_i, s_i))$\;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  $\mathit{FA}.\mathtt{append}((Q, \Sigma \cup \nat, \Delta, \{(\mathit{lhs.state},\mathit{rhs.state})\}))$\;
+  \Return{$\mathit{index}$}\;
+\end{function}
+

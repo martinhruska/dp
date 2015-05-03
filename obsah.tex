@@ -703,7 +703,7 @@ The abstraction over forest automata is based on the framework of \emph{abstract
 The abstraction accelerates the computation by merging states of forest automaton that are equivalet
 to an equivalet relation over states of forest automaton.
 Formally, the abstraction $\alpha$ over a tree automaton $M=(Q, \Sigma, \Delta, R)/$ is
-a function $\alpha: Q \rightarrow Q/\eqrel{M}$ such that $\alpha(q) = \eqclass{q}{M}$
+a function $\alpha: Q \rightarrow Q/_{\eqrel{M}}$ such that $\alpha(q) = \eqclass{q}{M}$
 where $\eqrel{M} \subseteq Q \times Q$ is an equivalence relation.
 We denote $\alpha(M)$ the tree automaton obtained by applying $\alpha$ to $Q$.
 It holds that $Q/\eqrel{M} \subseteq Q$ and also that $L(M) \subseteq L(\alpha(M))$.
@@ -713,8 +713,8 @@ it is performed component-wise over a forest automaton.
 The forest automata based verification currently employs \emph{height abstraction}.
 This abstraction merges states with the equivalent languages upon to a given string length.
 So the range of abstraction function is set of equivalence classes of relation $\heqrel{M}$
-such that $\forall q_1,q_2 \in Q: q_1 \eqrel{M} q_2 \Leftrightarrow \langlen{M}{q_1} = \langlen{M}{q_2}$
-where $\langlen{M}{q}$ $=$ $\{ w \in \Sigma^n \,|\, |w| \leq n \wedge wv \in \lang{M}{q} \wedge |v| \geq 0\}$
+such that $\forall q_1,q_2 \in Q: q_1 \eqrel{M} q_2 \defarrow \langlen{M}{q_1} = \langlen{M}{q_2}$ where
+$\langlen{M}{q}$ $=$ $\{ w \in \Sigma^n \,|\, |w| \leq n \wedge wv \in \langstate{M}{q} \wedge |v| \geq 0\}$
 and $n\in \mathbb{N}$ is height of the abstraction.
 
 The abstraction over forest automata overapproximate set of reachable
@@ -1010,8 +1010,9 @@ The microcode instructions executed during the symbolic execution are described 
 \subsection{The Microcode Instructions}
 \label{subsec:microinstr}
 
-This sections provides a description of the Forester microcode instructions.
-Firstly, we introduce some examples how C statements are trasnlated
+This sections provides a description of the Forester microcode instructions
+which correspond to the abstract transformers in context of abstraction interpretation.
+Firstly, we introduce some examples how the C statements are trasnlated
 to the Forester microcode instructions, then we define the instructions
 more formally and we give a complete list of them.
 
@@ -1030,7 +1031,7 @@ Consider the following data structure that is an implementation of singly-linked
 	Note that all constants used in the examples are dependent to a concrete Forester
 	run and they are chosen randomly in this text.
 	The syntax of instructions in the examples is following:
-	$$ op r_0, r_1, r_2$$
+	$$ op\ r_0,\ r_1,\ r_2$$
 	$op$ is a name of a instruction,
 	$r_0, r_1, r_2$ are operands such that $r_0$ is a destination register,
 	$r_1$ and $r_2$ are the source registers.
@@ -1038,13 +1039,13 @@ Consider the following data structure that is an implementation of singly-linked
 	have just two.
 	It is also possible that there is a constant instead of a register
 	as an operand of the instruction.
-	When $[r_0+c]$ is used as an operand then the instruction dereferences a root reference in register $0$.
-	It means that the instruction access directly a selector with the displacement $c$ in a label in the transition where
-	the referenced root is the parent state.
+	When $[r+c]$ is used as an operand then the instruction dereferences a root reference in register $r$.
+	Exactly, the instruction access directly a selector with the displacement $c$ in a label of the transition with
+	the referenced root as the parent state.
 	Note that when it is not stated otherwise it is reffered to a selector in a label of a transition
 	where the root of the transition is the referenced TA by the specified register.
 	In the following text the registers $r_1,\ldots,r_n$ are local ones and
-	$GLOB$ and $ABP$ global registers such that $GLOB$ register contains reference to a FA representing
+	$GLOB$ and $ABP$ are global registers such that $GLOB$ register contains reference to a FA representing
 	global variables and $ABP$ register contains reference to a FA representing local memory.
 
 \bexmp
@@ -1091,7 +1092,7 @@ Consider the following data structure that is an implementation of singly-linked
 	In this case, a node with a root reference is pointed by the selector with displacement displacement $12$ in a label in TA referenced by register $ABP$.
 	The second instruction performs an isolation of the selector with displacement $0$ in the TA referenced by register $0$.
 	This causes a creation of a new TA if \codix{x->next} points to an allocated memory (because a new
-	cut-point is created when pointer \codix{y} also points to this memory.
+	cut-point is created when pointer \codix{y} also points to this memory).
 	Otherwise the instruction does not do anything.
 	The instruction at line $3$ loads to register $0$ a root reference from a selector of TA referenced by register $0$.
 	The instruction at line $4$ moves a reference to TA that represents a local memory state to register $1$.
@@ -1115,7 +1116,7 @@ Consider the following data structure that is an implementation of singly-linked
 	The reference to the TA is stored in a node pointed by a selector with displacement $12$
 	in a label of TA referenced by register \codix{ABP}.
 	The second one isolates all selectors of the TA referenced by register $0$
-	abd then the third instruction removes node pointed by register $0$
+	Then the third instruction removes node pointed by register $0$
 	and finally invalidates all references to it.
 	The last instruction again checks whether there is not created garbage by performing this instruction.
 
@@ -1139,7 +1140,7 @@ Consider the following data structure that is an implementation of singly-linked
 	with displacement $16$ in TA referenced by register \codix{ABP} (what is TA modeling actually executed function).
 	Then the data selector \codix{x->data} (which has displacement $4$ in label in TA reference by register $3$)
 	is isolated and a data value from this selector	is loaded to register $r$ by the instructions at line $2$ and $3$.
-	The instructions at line $4$ and $5$ prepares data selector \codix{y->data} in the same way
+	The instructions at line $4$ and $5$ prepare data selector \codix{y->data} in the same way
 	as the selector \codix{x->data} has been prepared.
 	Finally at line $6$ the data value in register $3$ is coppied to TA node pointed by
 	the selector \codix{y->data}.
@@ -1570,15 +1571,198 @@ E.g., a~conversion of some data types would be needed in this case
 what is overhead compared to implementation where data types compatible with VATA are used directly in the Forester code.
 Hence we decided to remove the original tree automata module and further support only version of Forester with \vata.
 
-\chapter{Backward Run in Forest Automata Based Verification}
+\chapter{Developing Backward Run and Predicate Abstraction for Forest Automata Based Verification}
 \label{ch:backward}
 
-\section{Backward Run over Symbolic Context}
+As we already mentioned when an error in analysed program is detected
+it is necessary to check whether the error is real one or spurious
+so it is created by an overapproximating abstraction over automata.
+The analysis of spuriousness is done by \emph{backward run} which has not
+yet been designed and implemented in forest automata based verification yet.
+When it is proved that the error is spurious we have to refine abstraction to avoid
+reaching the error again and restart analysis with the refined abstraction.
+This principle of gradually refinement of abstraction is based on CEGAR framework \cite{cegar}.
+
+In this work, we propose using predicate abstraction \cite{artmc} in forest automata based verification
+which has more fining tuning then currently used height abstraction.
+Predicate abstraction can be refined by obtaining \emph{predicates} from backward run
+what guarantees that the spurious error will not be reached again.
+However, we restrict ourselves only on basic forest automata, not the hierarchical ones.
+
+The structure of this chapter is following.
+The first Section \ref{sec:mybw} describes backward and predicate abstraction run generally
+then the second Section contains design of backward run for forest automata.
+Section \ref{sec:predicates} provides description of design of
+predicate abstraction for forest automata.
+Section \ref{sec:isect} describes algorithm for intersection of non-hierarchical forest automata
+that is needed for backward run.
+Finally, an implementation of both concepts is described at Section \ref{sec:impl}.
+
+\section{Backward run and predicate abstraction}
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=1\linewidth]{fig/artmc.png}
+	\caption{
+		Figure is taken from \cite{artmc}.
+		Figures illustrates principle of forward and backward run and
+		a detection of an spurious counterexample.}
+	\label{fig:bwrun}
+\end{figure}
+
+As we descibed in Section \ref{ch:fav}, the abstract transformers $\abstr$
+related to the concrete program operations are gradually applied to forest automata
+starting from a forest automaton modelling an empty heap.
+This gradual application of abstract transformers in the same order
+with the concrete program operations is called \emph{forward run}.
+Formally, a forest automaton at a program point $n$ is obtained by
+$\abstr^n(\abstr^{n-1}(\ldots \abstr^{1}(F^{empt}) \ldots))$ in forward run
+where $\abstr^i$ is an abstract transformer related to the conrete
+program operation at $i-th$ point of program and $F^{empt}$ is
+a forest automata modelling an empty (initial) heap.
+Moreover, normalization, box folding and abstraction is performed
+as a part of abstract transformers at some program locations as
+it was described in \ref{ch:fav}.
+
+Consider that a program error is detected at the $n$-th program location
+during the forward run.
+The verification of non-spuriouty of the error is done by gradual applying
+\emph{reverse abstract transformers} $\rabstr$ over forest automata
+starting from the point where the error was found
+and checking whether intersection of languages of forest automata from forward run
+and backward run is non-empty at each program point.
+This process is called backward run.
+Formally, we compute forest automaton $\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F^{n}) \ldots))$
+for each program location from the $n$-th point back to the beggining.
+We check whether $\forall 0 \leq i \leq n: L(\rabstr^1(\ldots \rabstr^{i}(F^{i}) \ldots)) \cap
+L(\abstr^n(\ldots \abstr^{1}(F^{empt}) \ldots)) \neq \emptyset$
+and when the intersection is empty the the found error is declared
+to be spurious.
+
+This principle is illustrated by Figure \ref{fig:bwrun}.
+Figure shows a forest automata language before (green area)
+and after (yellow area) abstraction at a program location where abstraction is performed.
+One oval consisting green and yellow part represents language of a forest automaton
+in a symbolic state of symbolic execution.
+Figure also shows how a forest automaton (and it language) is gradually changed
+by abstract transformers what is illustrated by lines connecting ovals.
+A~found error is shown as a red area in the last oval.
+The backward run starts from this error and it finds
+that an error is spurious because an intersection (the orange areas) of
+forest automata language from backward (the blue ovals) and forward
+(the green and yellow area) run is empty at level of the symbolic state
+with language $L(M^{\alpha}_{k-1})$.
+
+So far we describe principle of backward run so we cover
+also predicate abstraction that is based on the one introduced
+in \cite{artmc}.
+Predicate abstraction is not yet used in forest automata based verification
+because it looses it advantages over height abstraction without
+a backward run which detects the predicates to refine predicate abstraction
+in case of a spurious counterexample detection.
+
+Let $\predset=\{\pred_1, \ldots, \pred_n\}$ be a set of predicates.
+A predicate $\pred \in \predset$ is a language represented by
+a tree automaton.
+As we described in Section \ref{subsec:abstraction}, the abstraction function $\abs$
+over a set of states $Q$ of TA $A=(Q,\Sigma,\delta, R)$ basically
+merges states in the same equivalence class of a equivalence relation.
+The predicate abstraction introduces a equivalence relation $\peqrel$
+where the states of tree automaton are equivalent when
+they have empty intersection with the same predicates.
+Formally, $\forall q_1,q_2 \in Q: q_1 \peqrel q_2 \defarrow
+(\forall \pred \in \predset: \langstate(A,q_1) \cap \pred \neq \emptyset
+\Leftrightarrow \langstate(A, q_2) \cap \pred \neq \emptyset)$.
+Note, that predicate abstraction is defined over a TA, not FA,
+and it is applied component-wise to FA.
+
+The refinement of predicate abstraction is done by adding
+tree automata from a FA in backward run that has empty language
+intersection with the related FA from the forward run.
+Then the new forward run can be started using the extended predicate
+set for the abstraction.
+Note that the abstraction merges at most the same states as
+in the previous run.
+TODO: dukaz, proc je takto dobre.
+Mozna neco o terminaci.
+
+\section{Intersection of Forest Automata Languages}
+
+It is needed to perform the forest automata languages intersection
+during the backward run as it was described in the previous section.
+We design and implement the algorithm for intersection
+of languages of non-hierarchical forest automata because it has not been develop yet.
+The algorithm is given at Algorithm \ref{alg:isect}.
+
+The input of the algorithm are two non-hierarchical forest automata $\F_{\A}$
+and $\F_{\B}$ and the output is a forest automaton $\F_{\CC}$ such that
+$\lang(\F_{\A}) \cap \lang(\F_{\B}) = \lang(\F_{\CC})$.
+
+The algorithm starts with initialized helping data structures and
+resulting automaton at lines $3-5$.
+Then it iterates over all pointer variables (in symbolic state) of the analysed program
+that are visible at the point of program where intersection is performed
+and it call the function \emph{intersect} over states of FA pointed
+by the variables.
+
+The function intersect takes as the input these states and
+it also needs information defining to which TA of FA the state belongs.
+The function also manipulates the structures created in the beginning of the
+whole algorithm.
+It gradually creates the part of the resulting intersection forest automata that starts
+from the input states.
+The result of this function is index of TA created by the function in the resulting FA.
+It process so-called product states during it computation.
+A product state is basicaly a pair $(r,s)$ where $r$ is a state of $\F_{\A}$
+and $s$ is a state of $\F_{\B}$.
+
+The function creates a product state from the input states $lhs$ and $rhs$ and
+adds it to the set of already processed product states if it is not already processed,
+otherwise it returns index of such product state in the result automaton.
+This is done at line $1-3$.
+Then the counter of processed product states is increased and
+stack \emph{workset} is initialized to serve like a auxilliary data
+structure where the product states are stored to be processed later at line $4-8$.
+
+The function creates a new TA with the product state $lhs$ and $rhs$ as the root
+and with an empty transition relation at line $8$.
+Then the product states from the workset are gradually processed at the cycle beginning
+at line $9$.
+We denote $(r,s)$ the actually processed product state.
+There are several cases how the product state is managed.
+The first case is when both $r$ and $s$ are the references to other
+tree automata.
+Then the function intersect is called recursively on the referenced
+root states and creates a new TA with index $cp$.
+Finally the product state $(r,s)$ is added to the resulting FA
+as a root reference to a TA indexed $cp$.
+This case is at lines $13-14$.
+Another similiar cases are when $r$ or $s$ is a root reference and the second one is not.
+The function intersect is called with the referenced root state as one paramenter
+and the second parameter is the state of product state that is not a root reference.
+The result of this function call is a index $cp$ of newly created TA.
+Then the product state $(r,s)$ is added to the resulting FA as the root reference
+to a component indexed by $cp$.
+These cases are in algorithm processed at line $16-18$ and $20-22$.
+The last one case is when both $r$ and $s$ are not root references
+but the standard states of FA.
+Then it is iterated over all $a \in \Sigma$ with $\#(a) = n$
+and a new transition $t$ is added to the transition relation $\Delta$.
+where $t = (r,s) \xrightarrow ((r_1,s_1) \cdots (r_n, s_n))$ such that
+$(r_1 \cdots r_n) \in \post{a}{r}$, $(s_1 \cdots s_n) \in \post{a}{s}$ and
+$\post{a}{q} = \{(q_1 \cdots q_n) \in Q^n\,|\, q \xrightarrow{a} (q_1 \cdots q_n) \in \Delta\}$.
+Finally, when the product state $(r_i,s_i)$ where $1 \leq i \leq n$ is a new one
+then it is added to the state set $Q$ and appended to the workset to be further processed.
+This last case corresponds to lines $24-30$ in the algoritm.
+
+\input{alg_isect.tex}
+
+\section{Designing Backward Run over Symbolic Context}
 
 This section provides a description of the reverse operations for
 each instruction of Forester microcode which were introduced in Section \ref{subsec:microinstr}.
 We describe each instruction informally first and then the instruction is defined in notion
-of the function $\grev: \grevinter$ which should have the reverse semantics to the function $f$ from Section \ref{subsec:microinstr}.
+of the function $\grev: \grevinter$ which should has the reverse semantics to the function $f$ from Section \ref{subsec:microinstr}.
 So the function $\grev$ takes as parameter a symbolic state and an instruction and returns a new symbolic state.
 All the notion used in the following text is the same as the one defined in Section \ref{subsec:microinstr}.
 Moreover we use $\ftrace = \ftraceseq$ to denote a forward trace of the symbolic states explored during
@@ -1611,9 +1795,9 @@ added to the backward trace $\btrace$.
 		state is just copy of $\sbwd$.
 		Otherwise if the value type is void pointer then the new symbolic
 		state has the same values in the registers as the state $\sbwd$ has but
-		the value of the register $r_d$ is subtitued by its value $r'_{d}$ in $\sfwd$
+		the value of the register $r_d$ is subtitued by the value $r'_{d}$ in $\sfwd$
 		because the register $r_d$ in $\sbwd$ contains reference to a TA $t$
-		representing heap pointed by the dealocated pointer.
+		representing heap pointed by the alocated pointer by this instruction.
 		TA $t$ is then removed from FA and all refrences to it are set invalidated.
 
 		$\grev(\bstdsym) = \symstate{F'}
@@ -1760,103 +1944,12 @@ Formally written, $\grev(\stdsym) = \stdsym$ where $\sbwd = \stdsym$.
 
 \end{itemize}
 
-
-\section{Intersection of Forest Automata}
-
-\section{Backward run}
-
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=1\linewidth]{fig/artmc.png}
-	\caption{
-		Figure is taken from \cite{artmc}.
-		Figure shows a forest automata language before (green area)
-		and after (yellow area) abstraction.
-		One oval consisting green and yellow part represents
-		language of a forest automaton in a symbolic state of symbolic execution.
-		Figure also shows how a forest automaton (and it language) is gradually changed
-		by abstract transformers what is illustrated by lines connecting ovals.
-		A~found error is shown as a red area in the last oval.
-		The backward run starts from this error and it finds
-		that an error is spurious because an intersection (the orange areas) of forest automata language from backward (the blue ovals)
-		and forward (the green and yellow area) run is empty at level of the symbolic state with language $L(M^{\alpha}_{k-1})$.}
-	\label{fig:bwrun}
-\end{figure}
-
-We have already covered how to represent dynamic data structures by forest automata in the previous section.
-The forest automata make us able to handle also infinite state spaces
-rising from a possible unboudness of the mentioned dynamic data structures.
-However, there is still a problem of state explosion that often makes
-nearly impossible to finish verification procedure of a system in real time.
-Therefore the abstraction over the forest automata is introduced.
-The abstraction accelerates the computation by merging more states
-of forest automata to one abstract state.
-The negative effect of the abstraction is the overapproximation of the reachable
-states of an analyzed system.
-In case of computer programs this leads to finding reachable error states in
-an abstracted state space which are not present in the real system.
-This could be prevented by a refinement of the abstraction
-which avoids repeating of the abstraction of the states
-that lead to the spurious error.
-
-Forester now implements a height abstraction.
-This abstraction merges states whose languages (note that a language of state is a set of trees) are the same
-when the trees of the languages are compared only to the given depth.
-The main problem of this abstraction technique is its scalability because
-the only way how to scale it is by the parameter defining the depth of tree comparison.
-The more precise abstraction is so called \emph{predicate abstraction} \cite{artmc} that introduces
-a set of predicates and merges the states in which the same predicates hold.
-When a spurious counterexample is found, then the set of predicates is extended by
-a predicate that prevents reaching the spurious counterexample again
-and the~verification procedure is rerun with the new predicate.
-
-Finding the new predicate and checking spuriousness of an error is done by performing of \emph{backward run}.
-A~backward run starts from forest automata modelling a heap with a spurious error and
-reverting gradually each abstract operation over the forest automata
-in backward order of the operations.
-When an automata with an empty language is get by the reverse abstract transformation then the error is spurious.
-The last automaton of backward run with a non empty language is then used as a new predicate.
-Backward run is illustrated by Figure \ref{fig:bwrun} and the illustration
-is further described in the caption of the figure.
-
-It could be necessary to perform a forest automata intersection during
-the backward run.
-But it is not needed always because Forester implements many abstract transformers
-that do not modify forest automata directly but changes only symbolic state of the symbolic execution
-without accessing forest automata.
-The abstract transformers of this kind could be reversed without intersection of forest automata
-from the backward and the forward run what brings better performance of the backward run.
-An example where the intersection is necessary to be done is for example an operation for freeing a memory node.
-The intersection is done between a forest automaton from the backward run and a forest automaton from the forward
-run before the abstract transformer has been applied.
-The result automata is then further used in the backward run.
-
-The goal of this work is to implement backward run and predicate abstraction
-for non-hierarchical forest automata.
-It includes design of the reverse operations for abstract transformers over
-the abstract domain and the application of predicate abstraction on forest automate.
-Moreover, as it was already mentioned the intersection of foster automata is needed in some reverse
-operations of backward run so it is also part of this work to implement it.
-Forester has some basic implementation of both, the reverse microcode instructions and
-intersection of forest automata.
-However, the implementation was not mature enough so it was necessary to
-complete it and evaluate it on the SV-COMP benchmark.
-
-We mentioned that this work implements either backward run and predicate abstraction only for
-non-hierarchical forest automata.
-The extension of them for hierarchical forest automata is not part
-of this work because of it demanding character.
-But it is definitely a challenging issue for future work
-that will be done next after finishing the implementation of basic predicate abstraction.
-
-
-
-\chapter{template$<$class Text$>$ Implementation(Text text)}
-\label{ch:impl}
+\section{template$<$class Text$>$ Implementation(Text text)}
+\label{sec:impl}
 text
 
-\section{Execution Trace}
-\section{Module For Intersection}
+\subsection{Execution Trace}
+\subsection{Module For Intersection}
 
 \chapter{template$<$class Text$>$ Evaluation(Text text)}
 \label{ch:eval}
