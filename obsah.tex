@@ -1598,7 +1598,8 @@ Section \ref{sec:isect} describes algorithm for intersection of non-hierarchical
 that is needed for backward run.
 Finally, an implementation of both concepts is described at Section \ref{sec:impl}.
 
-\section{Backward run and predicate abstraction}
+\section{Backward Run and Predicate Abstraction}
+\label{sec:br}
 
 \begin{figure}[t]
 	\centering
@@ -1757,8 +1758,57 @@ This last case corresponds to lines $24-30$ in the algoritm.
 
 \input{alg_isect.tex}
 
-\section{Designing Backward Run over Symbolic Context}
+\section{Designing Backward Run over Symbolic States}
+\label{sec:brdesign}
 
+We described backward run generaly in the beginning of this chapter.
+Now, a more technical and algorithmical description takes a place.
+We recall the definitions given in Section \ref{subsec:microinstr}.
+
+It was mentioned that the tool Forester implements the abstract
+transformers as the instructions of its microcode.
+The input C program is translated to the list $T=\isfwdp{1}, \isfwdp{2},\ldots, \isfwdp{n}$
+of the microcode instructions.
+These instruction are executed over a symbolic state of a program
+and generates a new symbolic state.
+The part of symbolic state are also forest automata representing
+the reachable heap configurations in a given symbolic state.
+
+The forward run is done by going through $T$ in the forward order.
+The trace of symbolic states $\ftraceseq$ is get by the forward run.
+We denote the trace by $\ftrace$ and we call it \emph{forward trace}.
+The state $\sfwdp{i}$ is the input of the instruction $\isfwdp{i+1}$
+where $i \geq 0$ and the $\sfwdp{i+1}$ is the resulting symbolic state. 
+
+The extension by backward run is quite straightward.
+When an error is detected in a symbolic state $\sfwd{i}$
+then the backward run starts from this symbolic state.
+The backward run is done by going through $T$ in the reverse order
+and an execution of the reverse instruction $\isbwdp{i}$ to each $\isfwdp{i}$
+over $\sbwdp{i+1}$ obtaining $\sbwdp{i}$.
+We obtain the \emph{backward trace} $\btraceseq$ by the backward run.
+We denote the trace by $\btrace$.
+
+In contrast to the conceptual view of the backward run given in Section \ref{sec:br}
+it is not necessary to compute FA with the language
+$L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B)$ directly
+by the algorithm for the intersection of forest automata to get the successor
+symbolic state in backward run (and also to detect spurious counterexample
+by checking whether $L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B) = \emptyset$)
+after the execution of each instruction in the backward run.
+Indeed, it is sufficent to compute intersect FA only for
+the microcode instructions {\tt FI\_abs(), FI\_fix()}
+because only these instructions performs an abstraction.
+The other instruction are precise and elementary enough
+that they could reversed withou needing to make intersection.
+
+The method of execution of the backward is already described so
+the next sections provides the description of the inverse microcode instructions.
+We describe each instruction informally first and then the instruction is defined in the notion
+of the function $\grev: \grevinter$ which should has the reverse semantics
+to the function $f$ from Section \ref{subsec:microinstr}.
+
+\begin{comment}
 This section provides a description of the reverse operations for
 each instruction of Forester microcode which were introduced in Section \ref{subsec:microinstr}.
 We describe each instruction informally first and then the instruction is defined in notion
@@ -1778,16 +1828,11 @@ instruction related to the selected symbolic states is performed its
 reverse operation.
 The result of the reverse operation is a new symbol state that is
 added to the backward trace $\btrace$.
+\end{comment}
 
 \subsection{The Instructions With Special Reverse Semantics}
 
 \begin{itemize}
-	\item {\tt FI\_acc\_sel}
-		NOT YET DONE
-
-	\item {\tt FI\_acc\_set,FI\_acc\_all}
-		NOT YET DONE
-
 	\item {\tt FI\_node\_create($r_s$, $r_d$)}
 		Instruction performs reverse operation to the C function \code{malloc}.
 		Instruction gets value from the source register $r_s$ in $\sfwd$.
@@ -1809,7 +1854,23 @@ added to the backward trace $\btrace$.
 			and $F'$ is obtained from $T$ by removing TA $t$ referenced by the register $r_d$.
 
 	\item {\tt FI\_node\_free}
-		TODO
+		Instruction reverses the effect of freeing memory.
+		The removed TA representing a heap pointed by a freed pointer
+		is referenced by the root reference $RR$ in the register $r_d$.
+		This TA is copied from FA in $\sfwd$ to FA in $\sbwd$ into the
+		corresponding position.
+		It is also neccesery to relabel the selectors of FA in $\sbwd$
+		according to FA in $\sfwd$ to replace undefined values created
+		after free by the root reference to the renewed FA.
+
+		$\grev(\bstdsym) = \symstate{F'}
+			{\regs}
+			{\isfwd}$
+			where $\stdsym = \sbwd$ and $F'= r(F \cup \{T\})$ where
+			$T$ is TA referenced by $RR$ in the register $r_d$ in $\sfwd$
+			and $r$ performs relabeling such that $r \xrightarrow{undef} () \in F
+			\wedge r \xrightarrow{RR} () \in F''$ then $r \xrightarrow{undef} ()$ is
+			replaced by $r \xrightarrow{RR} ()$ and $F''$ is FA of $\sfwd$.
 
 	\item {\tt FI\_store($r_d$)}
 		Instruction creates a new symbolic state identical to the $\sbwd$.
@@ -1874,6 +1935,22 @@ added to the backward trace $\btrace$.
 
 	\item {\tt FI\_abort}
 		This instruction is not reversible.
+
+	\item {\tt FI\_acc\_sel}
+		Instruction has empty semantics.
+		The original instruction isolates a selector
+		and so it can create a new TA.
+		It is not necessary to reverse this operation
+		since it does not change the language of FA of the
+		symbolic state or anything else in the symbolic state.
+		
+		$\grev(\stdsym) = \stdsym$
+
+	\item {\tt FI\_acc\_set,FI\_acc\_all}
+		This the same as the previous instruction and so
+		the semantic of these instrctions is empty.
+		
+		$\grev(\stdsym) = \stdsym$
 
 \end{itemize}
 
@@ -1944,16 +2021,19 @@ Formally written, $\grev(\stdsym) = \stdsym$ where $\sbwd = \stdsym$.
 
 \end{itemize}
 
-\section{template$<$class Text$>$ Implementation(Text text)}
-\label{sec:impl}
-text
 
-\subsection{Execution Trace}
+\section{Designing Predicate Abstraction over Forest Automata}
+\label{sec:padesign}
+
+
+
+\section{Implementation}
+\label{sec:impl}
+
 \subsection{Module For Intersection}
 
-\chapter{template$<$class Text$>$ Evaluation(Text text)}
+\chapter{Evaluation}
 \label{ch:eval}
-text
 
 \chapter{Conclusion}
 \label{ch:concl}
