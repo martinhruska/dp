@@ -2148,9 +2148,56 @@ but moreover contains information about variables in the current
 symbolic states what is needed by the algorithm for forest automata intersection
 from Section \ref{sec:isect}.
 
+The main method for symbolic state intersection is called \emph{Intersect}
+which makes an intersection between a symbolic state that calls the method and
+another symbolic state which is given as a paramter.
+The result of the intersection replaces the content of the calling object.
+
+Another operation implemented for purposes of the backward run is
+method \emph{SubstituteRefs} which performs the root references
+substitution as it is needed for reversing the instruction {\tt FI\_free}.
+The root represent to be substituted and reference for substitution are
+given in the parameters of this method.
+The method is again member of class \emph{SymState}.
 
 \subsection{Predicate Abstraction}
 \label{subsec:paimpl}
+
+The predicate abstraction is implemented by a method \emph{predicateAbstraction}
+which is a member of class \emph{Abstraction}.
+This method takes a set of tree automata representing the set of predicates
+as its parameter.
+The abstraction is performed over a forest automaton which is a member of
+class \emph{Abstraction}.
+
+The choice of abstraction is done by setting value of macro
+{\tt FA\_USE\_PREDICATE\_ABSTRACTION} to value $1$.
+When the predicate abstraction is chosen the method \emph{predicateAbstraction}
+is called on {\tt FA\_ABS} instruction execution.
+
+The new predicates use by predicate abstraction are created during
+the verification whether a found error is spurious or real.
+Particularly, the method \emph{isSpuriousCE} creates the predicates
+when the spurious error is detected using the method described
+in Section \ref{sec:padesign}.
+It is necessary to perform the intersection between TA representing
+predicates and TA of FA from symbolic state of backward run.
+The bottom-up intersection algorithm of tree automata was implemented
+to the VATA library for this purpose because VATA contained only the
+intersection in top-down way which is less suitable for our purposes since
+it generates more product states that are not further needed.
+
+The first run of predicate abstraction should be done
+with empty set of predicates what could lead to very
+strong abstraction where the most states would be merge.
+The result of this would be a lot of spurious counterexamples found
+in the first run.
+Therefore we use height abstraction with height $1$ (what is
+also the original configuration of abstraction used in Forester)
+for the first run of symbolic execution.
+When a spurious error is detected in this run then the new
+predicates are created and the next runs of symbolic execution uses predicate abstraction.
+
 
 \chapter{Evaluation}
 \label{ch:eval}
