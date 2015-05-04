@@ -1675,8 +1675,8 @@ they have empty intersection with the same predicates.
 Formally, $\forall q_1,q_2 \in Q: q_1 \peqrel q_2 \defarrow
 (\forall \pred \in \predset: \langstate(A,q_1) \cap \pred \neq \emptyset
 \Leftrightarrow \langstate(A, q_2) \cap \pred \neq \emptyset)$.
-Note, that predicate abstraction is defined over a TA, not FA,
-and it is applied component-wise to FA.
+Note, that predicate abstraction is defined over a TA
+and its extension to FA will be described later.
 
 The refinement of predicate abstraction is done by adding
 tree automata from a FA in backward run that has empty language
@@ -1689,7 +1689,7 @@ TODO: dukaz, proc je takto dobre.
 Mozna neco o terminaci.
 
 \section{Intersection of Forest Automata Languages}
-
+\label{sec:isect}
 It is needed to perform the forest automata languages intersection
 during the backward run as it was described in the previous section.
 We design and implement the algorithm for intersection
@@ -2026,12 +2026,131 @@ Formally written, $\grev(\stdsym) = \stdsym$ where $\sbwd = \stdsym$.
 \section{Designing Predicate Abstraction over Forest Automata}
 \label{sec:padesign}
 
+It was already mentioned that predicate abstraction taken from \cite{artmc}
+is defined over tree automata.
+We decide not to extend the concept completly to forest automata but
+to do abstraction over forest automata component wise.
+It means that when the abstraction is performed by the microcode instruction
+{\tt FI\_abs} it is done for each tree automaton of forest automaton in curreny symbolic
+state separetly.
+Formally, let $\fpabs: \fclass \rightarrow \fclass$ be an abstract function where
+$\fclass$ is a domain of forest automata.
+The function $\pabs$ is defined as follows.
+Let $F_1=(A_1 \cdots A_n, \pi_A)$ and $F_2=(B_1 \cdots B_n, \pi_B)$ be two forest automata
+and let $\pabs$ be an abstraction function merging states of a tree automaton according
+to the equivalence relation $\peqrel$,
+then $\fpabs(F_1) = F_2 \defarrow \forall i \in \{1,\ldots,n\}: B_i = \pabs(A_i)$.
 
+This also implies that the states are merged only in on tree automata not across the different
+tree automata of forest automata.
+However, merging states of different tree automata can be more efficient (since
+a forest automaton with smaller number of states is created) but this
+work porposes the first version of predicate abstraction and more
+fine tuning including theoretical correctness of the new method could
+be done as the future work.
+
+The predicates are also represented by tree automata.
+Furthemore, we use compressive representation of predicates
+proposed in \cite{artmc} where the predicates are the langages $\lang(A,q)$
+of the states $q \in Q$ of a tree automaton $A=(Q,\Sigma,\Delta, R)$
+Checking whether a state of a tree automaton has non-empty intersection
+with the same sets of predicates as another state of the automaton is done by the following method.
+Consider again TA $A$ and the set of predicates $\predset = \{\pred_1, \ldots, \pred_n\}$
+that are represented by set of TA $\{\predaut_1, \ldots, \predaut_m\}$.
+Note that one TA can preresent more predicates.
+Then we create the product automata $A \times \predaut_1, \ldots, A \times \predaut_m$.
+We use the algorithm for the bottom-up tree automata intersection from \cite{mt:lengal}.
+Each of product automata $A \times \predaut_i$, where $1 \leq i \leq$, has the state set
+containing the product states of the form $(p,q) \in Q_A \times Q_{\predaut_i}$.
+Then it is possible to define function $m: Q_A \rightarrow 2^{Q_{\predaut_1} \cup \ldots
+\cup Q_{\predaut_m}}$ as follows: $m(p) = \{q \in Q_{\predaut_1} \cup \ldots \cup Q_{\predaut_m}\,|\,
+\exists A \times \predaut_i: (p,q) \in Q_{A \times \predaut_i}\}$.
+Then we define the equivalence relation $\peqrel \subseteq Q \times Q$
+such that $(p_1,p_2) \in \peqrel \defarrow m(p_1) = m(p_2)$.
+Then it is possible to merge the states from $A$ according to this equivalence relation
+using the predicate function $\fpabs$.
+
+Another thing that is needed to design for the predicate abstraction is collecting a predicates.
+When a found error is considered to be a spurious one, then the abstraction needs to refined
+by creating the new predicates and adding them to the current set of the predicates $\predset$.
+The new predicates are created by the following technique.
+Consider a point of an analysed program where the spurious error is detected
+because $\lang(F_F) \cap \lang(F_B) = \emptyset$ where FA $F_F$ is obtained
+from a symbolic state of the forward run and FA $F_B$ is obtained from a symbolic state of
+the backward run.
+Then we create a normalized FA $F_F^N = (A_1 \cdots A_n, \pi_A)$ by normalization of $F_F$
+and a normalized $F_B^N = (B_1 \cdots B_m, \pi_B)$ by normalization of $F_B$.
+It can be supposed that $n = m$ because normalization transforms the both FA in an uniform form.
+TODO: MOZNA VIC POPSAT PROC TOTO LZE PREDPOKLADAT
+Then the set of the new predicates $\predset_{new} = \{B_i \in F^N_B \,|\, \lang(A_i) \cap \lang(B_i) =
+\emptyset\}$ is obtained.
+Finally, the symbolic execution is restarted again with the $\predset = \predset \cup \predset_{new}$.
 
 \section{Implementation}
 \label{sec:impl}
 
-\subsection{Module For Intersection}
+This section provides description how the described methods have been implemented
+to the Forester tool.
+We describe the implementation of backward run in Section \ref{subsec:bwimpl}
+and the implementation of intersection of symbolic states in Section \ref{subsec:isectimpl}.
+As the last one is covered implementation of predicate abstraction in Section \ref{subsec:paimpl}.
+
+\subsection{Backward Run}
+\label{subsec:bwimpl}
+
+The backward is possible to turn on by setting the macro {\tt FA\_BACKWARD\_RUN}
+in file \emph{config.h} to value $1$.
+If this macro is set to value $1$ then on a detected error
+the backward run is executed by class \emph{SymExec} that
+contains the methods for symbolic execution.
+
+The main method of backward run is called \emph{isSpuriousCE} that
+checks whether for a given forward trace is an error at a program point
+spurious or not and returns true or false according to it.
+This method is implemented in class \emph{BackwardRun} what is wrapping
+class of backward run.
+
+As it was desribed backward run is performed by going through the given
+forward trace in the backward orded and executing reverse operation to each
+microcode instruction.
+The method \emph{reverseAndIsect} has been added to class \emph{AbstractInstruction}
+for this purpose.
+The class \emph{AbstractInstruction} is the parent class of the inheritance hiearchy of
+microcode instructions.
+So each microcode instruction has to implement this method if it its parent class does not
+allready implement it.
+The method should changes the symbolic state in way that it reverse the semantic of
+the method \emph{execute} that is run in forward run.
+Despite the name of the method, the instructions do not need to perform
+intersection of forest automata (which is done only the cases described in
+previous section).
+The method \emph{reverseAndIsect} returns a new symbolic state that
+is used as the next symbolic state in the backward run.
+
+The method \emph{isSpuriousCE} returns {\tt false} whenever
+a symbolic state return by the method \emph{reverseAndIsect}
+contains a forest automaton with empty language.
+In such case, it also  creates the new predicates.
+When the method reaches the beginning of the forward
+trace, then the found error is real and the {\tt true}
+is returned.
+
+\subsection{Intersection of Forest Automata}
+\label{subsec:isectimpl}
+
+The method \emph{reverseAndIsect} of class \emph{FixpointBase}
+performs intersection of forest automata.
+This class is inherited by the classes implementing microcode
+instructions {\tt FI\_abs, FI\_fix} which both computes fixpoint.
+The intersection of forest automata is provided by class \emph{SymState}
+representing a symbolic state that contains forest automata
+but moreover contains information about variables in the current
+symbolic states what is needed by the algorithm for forest automata intersection
+from Section \ref{sec:isect}.
+
+
+\subsection{Predicate Abstraction}
+\label{subsec:paimpl}
 
 \chapter{Evaluation}
 \label{ch:eval}
