@@ -2199,8 +2199,49 @@ When a spurious error is detected in this run then the new
 predicates are created and the next runs of symbolic execution uses predicate abstraction.
 
 
-\chapter{Evaluation}
+\chapter{Experimental Evaluation}
 \label{ch:eval}
+
+This chapter provides exeprimental evaluation of the results of this work.
+First, we compare the versions of Forester without and with \vata.
+Then we evaluate the backward run on the SV-COMP benchmark
+and finally the version of Forester using predicate abstraction is compared to the
+original one with height abstraction and also discuss the newly analysis programs.
+
+\section{Backward Run Evaluation}
+\label{sec:bweval}
+
+\begin{table}[buH!]
+	\vskip6pt
+	\caption{SV-COMP Benchmark Evaluation of Backward Run.%Table shows the number of errors confirmed
+	}
+	\centering
+	\begin{tabular}{llr}
+		\toprule
+		Category & Real & Spurious \\
+		\midrule
+		HeapManipulation & $8$ & $3$ \\
+		MemorySafety & $6$ & $0$ \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:bwres}
+\end{table}
+
+The implementation of the backward run has been already finished and evaluated on the SV-COMP benchmark.
+The implementation of backward run helps in confirmation of the new $6$ real errors in the programs in the memory safety category and
+of the new $8$ real errors in the heap manipulation category.
+Moreover, the~$3$ spurious counterexamples were detected in heap manipulation category.
+The test cases with the~spurious counterexamples will be further resolved by implementing predicate
+abstraction.
+The results are summarized in Table \ref{tab:bwres}.
+The analyzed programs in SV-COMP benchmark includes 
+e.g., programs from LDV (Linux Drivers Verification) project
+containing implementation of alternating singly-linked list or manipulation with mutex locks, or the programs
+implementing bubble sort over a list implementation from the Linux kernel.
+Note that Forester does not successfully process all the programs in the test set
+because it does not currently support all the C language constructions.
+It causes that the number of the found errors, spurious or real, is not as high as it would be when
+Forester could analyze all the programs in the benchmark.
 
 \chapter{Conclusion}
 \label{ch:concl}
