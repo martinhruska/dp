@@ -2210,6 +2210,8 @@ original one with height abstraction and also discuss the newly analysis program
 
 All of the test cases have been evaluated on the computer with CPU Intel Core $2$ Duo ($2.13$ GHz)
 and $4$ GiB memory, using Debian Linux, testing version.
+We used g++, version, 4.9 for compiling Forester and gcc, version 4.8,
+as a compiler for the analyzed programs by Forester.
 The measured time is the CPU time.
 The results of the experiments are the averages of the five measurings.
 
@@ -2230,12 +2232,12 @@ modifications done as a part of this thesis.
 	\centering
 	\begin{tabular}{|l | c | c |}
 		\hline
-		Compiler optimization & without VATA & with VATA \\
+		Compiler optimization & without VATA [s] & with VATA [s] \\
 		\hline
 		\hline
-		Default    & $40.00$ & $3$ \\
+		-O3        & $9.00$ & $17.00$ \\
 		\hline
-		-O3        & $8$ & $3$ \\
+		Default    & $65.00$ & $43.00$ \\
 		\hline
 	\end{tabular}
 	\caption{Comparison of Forester with and without VATA on the Forester regress test suite.
@@ -2243,54 +2245,112 @@ modifications done as a part of this thesis.
 	\label{tab:vataregre}
 \end{table}
 
-\begin{table}[buh]
-	\vskip6pt
-	\centering
-	\begin{tabular}{|l | c | c |}
-		\hline
-		Version & without VATA & with VATA \\
-		\hline
-		\hline
-		SLL with CSLL            & x & $5.44$ \\
-		\hline
-		DLL with CDLL            & x & $10.70$ \\
-		\hline
-		Skiplist, the 3rd level  & x & $185.70$ \\
-		\hline
-		Skiplist, the 2nd level  & x & $1.9$ \\
-		\hline
-		Linux driver snippet     & x & $5.08$  \\ 
-		\hline
-	\end{tabular}
-	\caption{Comparison of Forester with and without VATA on the hard cases.
-		Not using compiler optimization.
-	}
-	\label{tab:vatahc}
-\end{table}
+The first performence tests were performed over the test set
+which servers also like a regress test suite for Forester.
+The results of these tests are summarized in Table \ref{tab:vataregre}.
+There are two cases that were measured.
+The first one is case when Forester is compiled with the third level of optimization of the compiler.
+The original implementation outperformed by the factor of two.
+Since we expected that VATA as an optimized library should be more efficient
+then Foterster implementation of tree automata, we tried to verify these results
+by compiling Forester and VATA without optimizations and runnig the tests again.
+We found that with the turned off optimizations of the compiler
+the Forester version using VATA is more efficent.
+The are two main points that can cause a worse performance of Forester with VATA
+when the optimizations are used.
+The first one is fact that the original implementation of tree automata
+in Foreter uses simulation to reduce a size of tree automata.
+The reduction based on simulation in VATA is not fully correct yet
+so we decided to not use it.
+But this does not explain why the original implementation is more efficient
+only when the advanced optimizations are used.
+The second point that can cause the slow down is
+that VATA is linked to Forester as a static library so the compiler cannot
+perform the advanced optimization between Forester and VATA as it does
+when Forester uses it own tree automata module.
+
 
 \begin{table}[buh]
 	\vskip6pt
 	\centering
 	\begin{tabular}{|l | c | c |}
 		\hline
-		Version & without VATA & with VATA \\
+		Version & without VATA [s] & with VATA [s] \\
 		\hline
 		\hline
-		SLL with CSLL            & x & $5.44$ \\
+		SLL with CSLL            & $7.77$ & $5.44$ \\
 		\hline
-		DLL with CDLL            & x & $10.70$ \\
+		DLL with CDLL            & $13.23$ & $10.70$ \\
 		\hline
-		Skiplist, the 3rd level  & x & $185.70$ \\
+		Skiplist, the 3rd level  & $173.07$ & $185.70$ \\
 		\hline
-		Skiplist, the 2nd level  & x & $1.9$ \\
+		Skiplist, the 2nd level  & $3.86$ & $1.90$ \\
 		\hline
-		Linux driver snippet     & x & $5.08$  \\ 
+		Linux driver snippet     & $9.931$ & $5.08$  \\ 
 		\hline
 	\end{tabular}
 	\caption{Comparison of Forester with and without VATA on the hard cases.
-		Using compiler optimization.
+		Compiled with g++ default optimization.
 	}
-	\label{tab:vatahc1}
+	\label{tab:vatadef}
+\end{table}
+
+We further decide to explore this problem by comparing
+both versions on programs which analysis is more time demanding.
+These programs contains manipulation of singly-linked lists with
+circular singly-linked list as their data, doubly-linked lists with
+circular doubly-linked list as their data, the skip-lists of the 2nd and
+the 3rd level and also a snippet from Linux drivers.
+Not all of these programs are included in the Forester regress test set.
+
+The results comparing Forester with and without VATA library compiled
+without compiler optimizations are in Table \ref{tab:vatadef}.
+The version of Forester with VATA is again faster in this case, also
+on these complicated data structures.
+The only one exception is a verification of the skip-list of the third
+level.
+We suppose that the original implementation takes the advantage of
+reduction of tree automata because the program manipulating the skip-list
+of the third level is the probably the most difficult case from the whole
+Forester testing benchmark and the tree automata with big number of states
+are created during it verification.
+
+The comparison of the Forester versions compiled with the compiler optimizations
+on the same programs are in Table \ref{tab:vataopt}.
+Here, the original implementation of Forester is again faster.
+The biggest difference is in time needed for verification of the skip-list of the third level
+what have probably the same causes as in the version without optimization.
+Putting the results together, we assume that the main performance
+loss for Forester using VATA comes from the unability of compiler
+to perform the advanced optimization.
+The fact that VATA does not do reduction of tree automata based on simulation relation
+has impact probably mainly in the demanding cases like a verification of skip-list is.
+However, completing algorithm for redution of tree automata in VATA would be one of the goals
+in the future work and without it we cannot fully confirm this assumption.
+
+\begin{table}[buh]
+	\vskip6pt
+	\centering
+	\begin{tabular}{|l | c | c |}
+		\hline
+		Version & without VATA [s] & with VATA [s] \\
+		\hline
+		\hline
+		SLL with CSLL            & $2.07$ & $0.85$ \\
+		\hline
+		DLL with CDLL            & $4.03$ & $1.43$ \\
+		\hline
+		Skiplist, the 3rd level  & $46.00$ & $15.00$ \\
+		\hline
+		Skiplist, the 2nd level  & $0.60$ & $0.40$ \\
+		\hline
+		Linux driver snippet     & $1.92$ & $1.07$ \\ 
+		\hline
+	\end{tabular}
+	\caption{Comparison of Forester with and without VATA on the hard cases.
+		Compiled with g++ with level -O3 of optimization.
+	}
+	\label{tab:vatahopt}
 \end{table}
 
 \section{Backward Run Evaluation}
