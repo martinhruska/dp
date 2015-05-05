@@ -3,3 +3,4 @@ Define intuitivelly what is backward run in general
 unify notion of abstraction - is it special abstract tranformer or what?
 introduce symbolic state or symbolic state
 rict nekde explicitne, ze implementuju ve foresterovi
+VATA linkovana jako staticka knihovna
