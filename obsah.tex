@@ -2325,8 +2325,10 @@ loss for Forester using VATA comes from the unability of compiler
 to perform the advanced optimization.
 The fact that VATA does not do reduction of tree automata based on simulation relation
 has impact probably mainly in the demanding cases like a verification of skip-list is.
-However, completing algorithm for redution of tree automata in VATA would be one of the goals
-in the future work and without it we cannot fully confirm this assumption.
+However, the completion of the algorithm for redution of tree automata in VATA would be
+needed to be done in the future work.
+Otherwise the analysis programs with heap represented by forest automata with lot of states
+would be inneficient.
 
 \begin{table}[buh]
 	\vskip6pt
@@ -2336,29 +2338,39 @@ in the future work and without it we cannot fully confirm this assumption.
 		Version & without VATA [s] & with VATA [s] \\
 		\hline
 		\hline
-		SLL with CSLL            & $2.07$ & $0.85$ \\
+		SLL with CSLL            & $0.85$ & $2.07$  \\
 		\hline
-		DLL with CDLL            & $4.03$ & $1.43$ \\
+		DLL with CDLL            & $1.43$ & $4.03$ \\
 		\hline
-		Skiplist, the 3rd level  & $46.00$ & $15.00$ \\
+		Skiplist, the 3rd level  & $15.00$ & $46.00$ \\
 		\hline
-		Skiplist, the 2nd level  & $0.60$ & $0.40$ \\
+		Skiplist, the 2nd level  & $0.40$ & $0.60$  \\
 		\hline
-		Linux driver snippet     & $1.92$ & $1.07$ \\ 
+		Linux driver snippet     & $1.07$ & $1.92$  \\ 
 		\hline
 	\end{tabular}
 	\caption{Comparison of Forester with and without VATA on the hard cases.
 		Compiled with g++ with level -O3 of optimization.
 	}
-	\label{tab:vatahopt}
+	\label{tab:vataopt}
 \end{table}
+
+Although Forester using VATA is slower in some cases
+the advantages coming from better
+modularity and maintability coming from seperate library
+for tree automata manipulation are still so important
+the the development will be further done with this version.
+On the other side, one of the goals of the future work should be
+the deeper investigation of the causes of the slow down.
+This could fully clarify the reasons why the slow down even happen.
+
 
 \section{Backward Run Evaluation}
 \label{sec:bweval}
 
 \begin{table}[buh!]
 	\vskip6pt
-	\caption{sv-comp benchmark evaluation of backward run.%table shows the number of errors confirmed
+	\caption{SV-COMP benchmark evaluation of backward run.%table shows the number of errors confirmed
 	}
 	\centering
 	\begin{tabular}{llr}
@@ -2372,21 +2384,40 @@ in the future work and without it we cannot fully confirm this assumption.
 	\label{tab:bwres}
 \end{table}
 
-The implementation of the backward run has been already finished and evaluated on the SV-COMP benchmark.
-The implementation of backward run helps in confirmation of the new $6$ real errors in the programs in the memory safety category and
+Backward run implementation was evaluated at SV-COMP benchmark.
+The evaluation was done by analysing the programs that was correct
+but Forester found an (spurious) error in them.
+We also checked whether the real errors are
+really marked as real.
+Note that before the implmentation of backward run
+Forester was not able to confirm that a found error is real.
+
+The implementation of backward run confirms the $6$ real errors in the programs
+in the memory safety category of SV-COMP benchmark and
 of the new $8$ real errors in the heap manipulation category.
 Moreover, the~$3$ spurious counterexamples were detected in heap manipulation category.
-The test cases with the~spurious counterexamples will be further resolved by implementing predicate
+The test cases with the~spurious counterexamples are further resolved by implementing predicate
 abstraction.
 The results are summarized in Table \ref{tab:bwres}.
 The analyzed programs in SV-COMP benchmark includes 
 e.g., programs from LDV (Linux Drivers Verification) project
-containing implementation of alternating singly-linked list or manipulation with mutex locks, or the programs
+containing implementation of alternating singly-linked list
+or manipulation with mutex locks, or the programs
 implementing bubble sort over a list implementation from the Linux kernel.
 Note that Forester does not successfully process all the programs in the test set
 because it does not currently support all the C language constructions.
 It causes that the number of the found errors, spurious or real, is not as high as it would be when
 Forester could analyze all the programs in the benchmark.
+
+The important contribution of backward run is guarantee of correctness when
+an error in a program is reported to the user.
+Unfortunately, we have to restrict the correctness the backward run
+only to the programs that use the supported C language constructions.
+E.g., Consider that a spurious error is detected because Forester lacks a support for
+evaluation of the arithmetic expressions or does not fully support
+a void pointers manipulation.
+Then the error will not be proved to be spurious by backward run due to the
+same reasons that caused the error detection.
 
 \chapter{Conclusion}
 \label{ch:concl}
