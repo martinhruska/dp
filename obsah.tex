@@ -2208,20 +2208,105 @@ Then we evaluate the backward run on the SV-COMP benchmark
 and finally the version of Forester using predicate abstraction is compared to the
 original one with height abstraction and also discuss the newly analysis programs.
 
+All of the test cases have been evaluated on the computer with CPU Intel Core $2$ Duo ($2.13$ GHz)
+and $4$ GiB memory, using Debian Linux, testing version.
+The measured time is the CPU time.
+The results of the experiments are the averages of the five measurings.
+
+\section{Forester with VATA Evaluation}
+
+This section provides comparison of the version of Forester tool
+that uses its own tree automata library and the version using \vata.
+Since the version without VATA is no longer compatible with the
+new version of Forester, we can evaluate the performance only
+on the programs that are able to analyze also with the older
+version of the tool without backward run and predicate abstraction.
+Therefore we use height abstraction with the height $1$
+what was the original configuration of Forester before the
+modifications done as a part of this thesis.
+
+\begin{table}[buh]
+	\vskip6pt
+	\centering
+	\begin{tabular}{|l | c | c |}
+		\hline
+		Compiler optimization & without VATA & with VATA \\
+		\hline
+		\hline
+		Default    & $40.00$ & $3$ \\
+		\hline
+		-O3        & $8$ & $3$ \\
+		\hline
+	\end{tabular}
+	\caption{Comparison of Forester with and without VATA on the Forester regress test suite.
+	}
+	\label{tab:vataregre}
+\end{table}
+
+\begin{table}[buh]
+	\vskip6pt
+	\centering
+	\begin{tabular}{|l | c | c |}
+		\hline
+		Version & without VATA & with VATA \\
+		\hline
+		\hline
+		SLL with CSLL            & x & $5.44$ \\
+		\hline
+		DLL with CDLL            & x & $10.70$ \\
+		\hline
+		Skiplist, the 3rd level  & x & $185.70$ \\
+		\hline
+		Skiplist, the 2nd level  & x & $1.9$ \\
+		\hline
+		Linux driver snippet     & x & $5.08$  \\ 
+		\hline
+	\end{tabular}
+	\caption{Comparison of Forester with and without VATA on the hard cases.
+		Not using compiler optimization.
+	}
+	\label{tab:vatahc}
+\end{table}
+
+\begin{table}[buh]
+	\vskip6pt
+	\centering
+	\begin{tabular}{|l | c | c |}
+		\hline
+		Version & without VATA & with VATA \\
+		\hline
+		\hline
+		SLL with CSLL            & x & $5.44$ \\
+		\hline
+		DLL with CDLL            & x & $10.70$ \\
+		\hline
+		Skiplist, the 3rd level  & x & $185.70$ \\
+		\hline
+		Skiplist, the 2nd level  & x & $1.9$ \\
+		\hline
+		Linux driver snippet     & x & $5.08$  \\ 
+		\hline
+	\end{tabular}
+	\caption{Comparison of Forester with and without VATA on the hard cases.
+		Using compiler optimization.
+	}
+	\label{tab:vatahc1}
+\end{table}
+
 \section{Backward Run Evaluation}
 \label{sec:bweval}
 
-\begin{table}[buH!]
+\begin{table}[buh!]
 	\vskip6pt
-	\caption{SV-COMP Benchmark Evaluation of Backward Run.%Table shows the number of errors confirmed
+	\caption{sv-comp benchmark evaluation of backward run.%table shows the number of errors confirmed
 	}
 	\centering
 	\begin{tabular}{llr}
 		\toprule
-		Category & Real & Spurious \\
+		category & real & spurious \\
 		\midrule
-		HeapManipulation & $8$ & $3$ \\
-		MemorySafety & $6$ & $0$ \\
+		heapmanipulation & $8$ & $3$ \\
+		memorysafety & $6$ & $0$ \\
 		\bottomrule
 	\end{tabular}
 	\label{tab:bwres}
