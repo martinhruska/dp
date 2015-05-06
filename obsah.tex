@@ -2445,6 +2445,20 @@ a void pointers manipulation.
 Then the error will not be proved to be spurious by backward run due to the
 same reasons that caused the error detection.
 
+\section{Predicate Abstraction}
+\label{sec:paeval}
+
+This section provides evaluation of the Forester using predicate abstraction.
+The predicate abstraction is used in the way described in Section \ref{sec:impl}.
+So the first run is done using height abstraction with height $1$ and when a spurious
+counterexample is found, the analysis creates the predicates and follows with
+the predicate abstraction.
+First, the number of the new cases that Forester can analyse due to
+the predicate abstraction.
+Then the newly analysed cases are studied more deeply and
+the Forester performance is compared to Predator, winner in MemorySafety
+category of SV-COMP'15.
+
 \chapter{Conclusion}
 \label{ch:concl}
 
