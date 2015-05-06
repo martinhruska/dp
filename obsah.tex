@@ -2213,7 +2213,7 @@ and $4$ GiB memory, using Debian Linux, testing version.
 We used g++, version, 4.9 for compiling Forester and gcc, version 4.8,
 as a compiler for the analyzed programs by Forester.
 The measured time is the CPU time.
-The results of the experiments are the averages of the five measurings.
+The result times of the experiments are the averages of the five measurings.
 The evaluations over SV-COMP benchmark are done following the rules of
 SV-COMP competition \cite{www:svcomp}.
 
@@ -2376,7 +2376,7 @@ This could fully clarify the reasons why the slow down even happen.
 		and the Forester test test.
 	}
 	\centering
-	\begin{tabular}{llr}
+	\begin{tabular}{lcc}
 		\toprule
 		Category & Real & Spurious \\
 		\midrule
@@ -2448,16 +2448,76 @@ same reasons that caused the error detection.
 \section{Predicate Abstraction}
 \label{sec:paeval}
 
+\begin{table}[buh!]
+	\vskip6pt
+	\caption{Evaluation of predicate abstraction over SV-COMP benchmark
+		and the Forester test test.
+	}
+	\centering
+	\begin{tabular}{lcc}
+		\toprule
+		Category & New errors found & Newly proved programs  \\
+		\midrule
+		HeapMnipulation & $9$ & $2$ \\
+		MemorySafety & $1$ & $2$ \\
+		Forester test set & $0$ & $4$  \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:pares}
+\end{table}
+
 This section provides evaluation of the Forester using predicate abstraction.
 The predicate abstraction is used in the way described in Section \ref{sec:impl}.
 So the first run is done using height abstraction with height $1$ and when a spurious
 counterexample is found, the analysis creates the predicates and follows with
 the predicate abstraction.
+This method ensures that Forester successfully passes all the cases that it did
+before because the first run remains the same.
 First, the number of the new cases that Forester can analyse due to
 the predicate abstraction.
 Then the newly analysed cases are studied more deeply and
-the Forester performance is compared to Predator, winner in MemorySafety
-category of SV-COMP'15.
+the Forester performance is compared to Predator, winner in HeapManipulation
+and the best sound tool in MemorySafety category of SV-COMP'15.
+
+The results summarizing the evaluation of the predicate abtraction over SV-COMP'15
+benchmark and Forester test suite is in Table \ref{tab:pares}.
+We distinguish between the programs the programs with a new detected error
+and the programs proved to be correct.
+The most new errors is detected in HeapManipulation category of SV-COMP'15
+benchmark where $9$ errors have been detected in the programs
+mentioned in the previous section.
+We also proved $2$ programs from the LDV project to be correct.
+In the memory safety category the results are worse but this is partially caused
+by the fact that this category contains less test cases.
+Finally, we prove correctness of $4$ programs from Forester test set
+which cannot be proved without use of the predicate abstraction.
+The programs manipulates the data structures like doubly-linked list
+or trees (with parent pointers).
+These programs does not needed creating boxes during boxes although
+some use of these data structures can lead to the use of boxes.
+
+The main problem that complicated successfull analysis of
+more programs is again low maturity of the Forester tool.
+It does not support all the C language constructions
+or it fails due to an internal error because some unexpected
+state occurs during an analysis.
+This causes that lot of test cases remain unanalysed.
+Another thing needing improvement is to develop the symbolic
+execution for purposes of the SV-COMP competition rules and benchmark
+where only an error breaking a given specification is reported
+by analyser.
+This is problematic mainly because a garbage is often created
+in a program from benchmark but the analysis should continue
+and check whether an error label is not reached.
+In this case an forest automaton needs to be modified
+by removing the garbage to continue the anlysis avoiding
+an unexpected Forester state that causes an internal error.
+A design and an implementation of this would be nice future work.
+
+Now the particular programs analysis is given comparing performance
+of Forester and Predator.
+The programs described here are mainly able to analyse due to the
+backward run and predicate analysis.
 
 \chapter{Conclusion}
 \label{ch:concl}
