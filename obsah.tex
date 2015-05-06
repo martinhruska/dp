@@ -2214,6 +2214,8 @@ We used g++, version, 4.9 for compiling Forester and gcc, version 4.8,
 as a compiler for the analyzed programs by Forester.
 The measured time is the CPU time.
 The results of the experiments are the averages of the five measurings.
+The evaluations over SV-COMP benchmark are done following the rules of
+SV-COMP competition \cite{www:svcomp}.
 
 \section{Forester with VATA Evaluation}
 
@@ -2380,7 +2382,7 @@ This could fully clarify the reasons why the slow down even happen.
 		\midrule
 		HeapMnipulation & $8$ & $3$ \\
 		MemorySafety & $10$ & $0$ \\
-		Forester test set & $-$ & $8$ \\
+		Forester test set & $-$ & $7$ \\
 		\bottomrule
 	\end{tabular}
 	\label{tab:bwres}
@@ -2396,6 +2398,20 @@ This was done because Forester cannot verified
 that a found error is real before backward run implementation
 and therefore cannot the report them correctly in SV-COMP'15 competition
 evaluation.
+
+Note that there is difference in reporting error between
+Forester test set and SV-COMP benchmark.
+All found errors, including a memory garbage detection, are reported
+and the analysis is stoped after the detection in Forester test set.
+On the other side, only the errors breaking a given specification
+cause stopping the analysis in context of SV-COMP benchmark.
+Particularly, the garbage in SV-COMP test cases often should not
+stop the analysis but the analysis should continue to
+detect another error like an invalid pointer dereference.
+We respect the specific rules for both test tests in these evaluation.
+However, it is possible to configure whether
+Forester should stop after a garbage detection by
+macro {\tt FA\_CONTINUE\_WITH\_GARBAGE} in file \emph{config.h}.
 
 The implementation of backward run confirms the $10$ real errors in the programs
 in the memory safety category of SV-COMP benchmark and
@@ -2416,7 +2432,8 @@ The results of evaluation at the existing Forester test set are following.
 There are $8$ cases when a spuriousness of found error was proved.
 The confirming of the real errors does not make sense because
 it is expected that a test set contains only the cases with the known results.
-Therefore the correct detection of the real errors were verified also before the backward run implementation.
+Therefore the correct detection of the real errors were verified
+also before the backward run implementation.
 
 The important contribution of backward run is guarantee of correctness when
 an error in a program is reported to the user.
