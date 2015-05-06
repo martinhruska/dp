@@ -2452,15 +2452,15 @@ same reasons that caused the error detection.
 	\vskip6pt
 	\caption{Evaluation of predicate abstraction over SV-COMP benchmark
 		and the Forester test test.
+		Timeout is set to 100 second.
 	}
 	\centering
 	\begin{tabular}{lcc}
 		\toprule
-		Category & New errors found & Newly proved programs  \\
+		Category & Forester & Predator  \\
 		\midrule
-		HeapMnipulation & $9$ & $2$ \\
-		MemorySafety & $1$ & $2$ \\
-		Forester test set & $0$ & $4$  \\
+		Red black list, error & $0.12$ & $timeout$ \\
+		Red black list, correct & $1.10$ & $timeout$ \\
 		\bottomrule
 	\end{tabular}
 	\label{tab:pares}
@@ -2518,6 +2518,25 @@ Now the particular programs analysis is given comparing performance
 of Forester and Predator.
 The programs described here are mainly able to analyse due to the
 backward run and predicate analysis.
+
+\begin{table}[buh!]
+	\vskip6pt
+	\caption{Comparison of Forester and Predator on the hard cases.
+		Forest is able to analyse these programs due to the backward
+		run and predicate abstraction implementation.
+	}
+	\centering
+	\begin{tabular}{lcc}
+		\toprule
+		Category & New errors found & Newly proved programs  \\
+		\midrule
+		HeapMnipulation & $9$ & $2$ \\
+		MemorySafety & $1$ & $2$ \\
+		Forester test set & $0$ & $4$  \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:pares}
+\end{table}
 
 \chapter{Conclusion}
 \label{ch:concl}
