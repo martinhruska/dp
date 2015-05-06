@@ -2370,34 +2370,37 @@ This could fully clarify the reasons why the slow down even happen.
 
 \begin{table}[buh!]
 	\vskip6pt
-	\caption{SV-COMP benchmark evaluation of backward run.%table shows the number of errors confirmed
+	\caption{Evaluation of backward run at SV-COMP benchmark
+		and the Forester test test.
 	}
 	\centering
 	\begin{tabular}{llr}
 		\toprule
-		category & real & spurious \\
+		Category & Real & Spurious \\
 		\midrule
-		heapmanipulation & $8$ & $3$ \\
-		memorysafety & $6$ & $0$ \\
+		HeapMnipulation & $8$ & $3$ \\
+		MemorySafety & $10$ & $0$ \\
+		Forester test set & $-$ & $8$ \\
 		\bottomrule
 	\end{tabular}
 	\label{tab:bwres}
 \end{table}
 
-Backward run implementation was evaluated at SV-COMP benchmark.
+Backward run implementation was evaluated at SV-COMP benchmark
+and also at test set distributed with Forester.
 The evaluation was done by analysing the programs that was correct
 but Forester found an (spurious) error in them.
-We also checked whether the real errors are
-really marked as real.
-Note that before the implmentation of backward run
-Forester was not able to confirm that a found error is real.
+We also checked whether backward run correctly
+reports that the real errors are really real.
+This was done because Forester cannot verified
+that a found error is real before backward run implementation
+and therefore cannot the report them correctly in SV-COMP'15 competition
+evaluation.
 
-The implementation of backward run confirms the $6$ real errors in the programs
+The implementation of backward run confirms the $10$ real errors in the programs
 in the memory safety category of SV-COMP benchmark and
 of the new $8$ real errors in the heap manipulation category.
 Moreover, the~$3$ spurious counterexamples were detected in heap manipulation category.
-The test cases with the~spurious counterexamples are further resolved by implementing predicate
-abstraction.
 The results are summarized in Table \ref{tab:bwres}.
 The analyzed programs in SV-COMP benchmark includes 
 e.g., programs from LDV (Linux Drivers Verification) project
@@ -2408,6 +2411,12 @@ Note that Forester does not successfully process all the programs in the test se
 because it does not currently support all the C language constructions.
 It causes that the number of the found errors, spurious or real, is not as high as it would be when
 Forester could analyze all the programs in the benchmark.
+
+The results of evaluation at the existing Forester test set are following.
+There are $8$ cases when a spuriousness of found error was proved.
+The confirming of the real errors does not make sense because
+it is expected that a test set contains only the cases with the known results.
+Therefore the correct detection of the real errors were verified also before the backward run implementation.
 
 The important contribution of backward run is guarantee of correctness when
 an error in a program is reported to the user.
