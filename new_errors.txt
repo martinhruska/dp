@@ -1,0 +1,9 @@
+../../forester-regre/test-f0049.c - pa+
+../../forester-regre/test-f0053.c - pa+
+
+../../forester-regre/test-f0008.c - 
+../../forester-regre/test-p0507.c - gb
+../../forester-regre/test-f0017.c - gb
+../../forester-regre/test-f0035.c - gb
+../../forester-regre/test-f0043.c - proved to be correct, pa+
+../../forester-regre/test-f0054.c - pa+

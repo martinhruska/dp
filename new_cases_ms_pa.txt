@@ -1,0 +1,2 @@
+/home/martin/forester/fa/sv-comp/c/memsafety/test-0235_false-valid-deref.i FALSE
+/home/martin/forester/fa/sv-comp/c/list-ext-properties/test-0019_1_false-valid-memtrack.i FALSE(valid-memtrack)
