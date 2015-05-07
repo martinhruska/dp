@@ -2551,8 +2551,23 @@ Predator in this case reported a spurious error.
 Forester detects that the error is spurious but was
 unable to estabilish a predicate set avoiding this error.
 It created gradually predicate defining that list would not
-be $3, 5, \cdost$ long but was unable to generalize
+be $3, 5, \cdots$ long but was unable to generalize
 the predicates to all odd numbers.
+
+It is necessary admit that predicate abstraction
+is not fully complete.
+It needs to be implemeted more efficiently to get better
+performance on the hard cases.
+The new predicates are not also created in the most
+precise way so some state may be not abstract
+although it would be theoritically possible.
+Then predicate abstraction often causes an internal
+Forester error when a garbage is created but the
+analysis continues because an absence of another
+kind of error should be proved.
+Continuing in analysis in such cases was not
+originally supported by Forester before its extension
+done as part of this thesis.
 
 \begin{table}[buh!]
 	\vskip6pt
@@ -2569,7 +2584,7 @@ the predicates to all odd numbers.
 		Red black list, error       & $0.12$   &  $timeout$ \\
 		SLL with integers, correct  & $0.12$   &  $0.03$ \\
 		SLL with integers, error    & $0.02$   &  $0.03$ \\
-		Tree, correct               & $251.03$ &  $timeout$
+		Tree, correct               & $251.03$ &  $timeout$ \\
 		SLL of even length, correct & $timeout$ & $false positive$ \\
 		\bottomrule
 	\end{tabular}
@@ -2580,14 +2595,42 @@ the predicates to all odd numbers.
 \chapter{Conclusion}
 \label{ch:concl}
 
-The main goals of this thesis were (a) to implement version of Forester tool that uses the VATA library for tree automata representation and manipulation
-and (b) to extend verification procedure based on forest automata with backward run for detection of the spurious errors found in the analysed program.
-The theory of forest automata and related theory of tree automata has been studied and described in this thesis and the verification procedure
+The main goals of this thesis were (a) to implement version of Forester tool
+that uses the VATA library for tree automata representation and manipulation
+and (b) to extend verification procedure based on forest automata with
+backward run for detection of the spurious errors found in the analysed program.
+The theory of forest automata and related theory of tree automata has been studied
+and described in this thesis and the verification procedure
 based on forest automata has been also explored to fulfill the thesis goals.
-The connection of Forester and \vata\ was designed and implemented after the analysis of the both tools.
+
+The connection of Forester and \vata\ was designed and implemented
+after the analysis of the both tools.
 Forester had to be refactored for this purposes.
+The first goal has been already reached and the version of Forester
+using the VATA library successfully participated in competition SV-COMP 2015 \cite{www:svcomp}.
 
-The first goal has been already reached and the version of Forester using the VATA library successfully participated in competition SV-COMP 2015 \cite{www:svcomp}.
-The knowledge about Forester and related verification procedure gained during the work on the term project will be further employed for design
-and implementation of backward run in the Forester tool which is the second goal of this master thesis.
+Then backward run over symbolic states was designed for Forest automata based shape anlysis
+an the design was implemented to tool Fotester.
+Predicate abstraction over forest automata was also designed empoying the predicates
+created by backward run.
+It was also implemented in tool Forester.
 
+Backward run and predicate abstraction were evaluated on SV-COMP benchmark and
+Forester test suite.
+It enables analysing of some new programs.
+Morever, Forester is the only one sound tool able to verify red black lists (and similiar data structures)
+in fully automatical way after the extension with predicate abstraction and backward run.
+
+On the other side, a lot of cases were not analysed
+because Forester does not support used C language constructions
+or analysing of a program lead to an internal verfier error.
+Predicate abstraction is not also fully complete.
+It needs to further improved to get better performance
+and to be able to continue also when a garbage is
+created (and a program is, for example, verified for absence of invalid
+dereferences).
+Then there are also conceptual improvements of the theory.
+The backward run and predicate analysis should be generalized
+to the hierarchical forest automata.
+A generalazition of predicates to make possible to verifity
+data structures like singly-link lists is another challange.
