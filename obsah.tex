@@ -2450,17 +2450,18 @@ same reasons that caused the error detection.
 
 \begin{table}[buh!]
 	\vskip6pt
-	\caption{Evaluation of predicate abstraction over SV-COMP benchmark
-		and the Forester test test.
-		Timeout is set to 100 second.
+	\caption{Comparison of Forester and Predator on the hard cases.
+		Forest is able to analyse these programs due to the backward
+		run and predicate abstraction implementation.
 	}
 	\centering
 	\begin{tabular}{lcc}
 		\toprule
-		Category & Forester & Predator  \\
+		Category & New errors found & Newly proved programs  \\
 		\midrule
-		Red black list, error & $0.12$ & $timeout$ \\
-		Red black list, correct & $1.10$ & $timeout$ \\
+		HeapMnipulation & $9$ & $2$ \\
+		MemorySafety & $1$ & $2$ \\
+		Forester test set & $0$ & $4$  \\
 		\bottomrule
 	\end{tabular}
 	\label{tab:pares}
@@ -2514,29 +2515,67 @@ by removing the garbage to continue the anlysis avoiding
 an unexpected Forester state that causes an internal error.
 A design and an implementation of this would be nice future work.
 
-Now the particular programs analysis is given comparing performance
-of Forester and Predator.
-The programs described here are mainly able to analyse due to the
-backward run and predicate analysis.
+Now the particular programs analysis is given
+comparing performance of Forester and Predator.
+The programs described here are possible to analyse due to the
+backward run and predicate analysis implementation.
+Table \ref{tab:patimes} summarizes the results.
+Forester outperformed Predator in verication of a red black list,
+but moreover it is the only one sound tool able to verify these
+kind of data structures.
+The other test case is a singly-linked list with integer
+as data members.
+The items of the analysed singly-linked list are ordered
+by the value of their data.
+So for examaple, a distance between head of the list and a 
+node having integer $1$ as a data member is smaller than
+the distance between a node having integer $2$ as a data member.
+In case of verification of correct program, Predator outperforms Forester
+because Forester found few spurious counterexamples
+before the shape invariant was computed.
+When there is an error in a program manipulating this
+data structure then Forester is lightly faster
+but the times are very similiar.
+
+Another case when Predator ran out of time
+is a tree which (without the parent pointers) ensures
+that each left successor node have allocated it
+right successor node.
+Forester is able to verify correctness of such a structure
+but it is the most time demanding task of this set.
+Finally, the last tested program is one traversing
+a singly-linked list of even length and then
+freeing the list two nodes at time (what is safe because
+the number of nodes is even).
+Predator in this case reported a spurious error.
+Forester detects that the error is spurious but was
+unable to estabilish a predicate set avoiding this error.
+It created gradually predicate defining that list would not
+be $3, 5, \cdost$ long but was unable to generalize
+the predicates to all odd numbers.
 
 \begin{table}[buh!]
 	\vskip6pt
-	\caption{Comparison of Forester and Predator on the hard cases.
-		Forest is able to analyse these programs due to the backward
-		run and predicate abstraction implementation.
+	\caption{Evaluation of predicate abstraction over SV-COMP benchmark
+		and the Forester test test.
+		Timeout is set to 1000 second.
 	}
 	\centering
 	\begin{tabular}{lcc}
 		\toprule
-		Category & New errors found & Newly proved programs  \\
+		Category & Forester & Predator  \\
 		\midrule
-		HeapMnipulation & $9$ & $2$ \\
-		MemorySafety & $1$ & $2$ \\
-		Forester test set & $0$ & $4$  \\
+		Red black list, correct     & $1.10$   &  $timeout$ \\
+		Red black list, error       & $0.12$   &  $timeout$ \\
+		SLL with integers, correct  & $0.12$   &  $0.03$ \\
+		SLL with integers, error    & $0.02$   &  $0.03$ \\
+		Tree, correct               & $251.03$ &  $timeout$
+		SLL of even length, correct & $timeout$ & $false positive$ \\
 		\bottomrule
 	\end{tabular}
-	\label{tab:pares}
+	\label{tab:patimes}
 \end{table}
+
 
 \chapter{Conclusion}
 \label{ch:concl}
