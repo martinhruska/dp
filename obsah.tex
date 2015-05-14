@@ -2606,31 +2606,43 @@ based on forest automata has been also explored to fulfill the thesis goals.
 The connection of Forester and \vata\ was designed and implemented
 after the analysis of the both tools.
 Forester had to be refactored for this purposes.
+Then the adapter pattern was used to create interace between Forester and VATA.
 The first goal has been already reached and the version of Forester
 using the VATA library successfully participated in competition SV-COMP 2015 \cite{www:svcomp}.
 
 Then backward run over symbolic states was designed for Forest automata based shape anlysis
 an the design was implemented to tool Fotester.
+Non-hierarchical forest automata intersection was implemented for
+the purposes of backward.
+The intersection of forest automata is not only necessary part of backward run
+but it is nice theoretical contribution of this work since it has not
+been yet proposed.
 Predicate abstraction over forest automata was also designed empoying the predicates
 created by backward run.
-It was also implemented in tool Forester.
+Predicate abstraction employs bottom up tree automata in the VATA
+which was also implemented (but not designed) as the part of this work.
 
 Backward run and predicate abstraction were evaluated on SV-COMP benchmark and
 Forester test suite.
-It enables analysing of some new programs.
+These new techniques makes possible to process some programs that Forester was not able
+to analyze before.
 Morever, Forester is the only one sound tool able to verify red black lists (and similiar data structures)
 in fully automatical way after the extension with predicate abstraction and backward run.
+This work participated in the student conference \emph{Excel@FIT 2015} \cite{www:excel}.
+A paper about this work was accepted to a local proceedings of the conference
+and it was awarded with the second prize in the category "Scientific contribution".
 
-On the other side, a lot of cases were not analysed
-because Forester does not support used C language constructions
-or analysing of a program lead to an internal verfier error.
-Predicate abstraction is not also fully complete.
-It needs to further improved to get better performance
-and to be able to continue also when a garbage is
-created (and a program is, for example, verified for absence of invalid
-dereferences).
-Then there are also conceptual improvements of the theory.
+However, Forester is still not able to analyse a lot of cases
+because the tool does not support used C language constructions
+or an analysis of a program lead to an internal verifier error.
+Predicate abstraction is not also yet fine-tuned.
+It needs to further improvements for better performance
+and also a conceptual extension that makes it able to continue also
+when a garbage is created (and for example an absence of invalid
+dereferences is checked in a program is verified).
+Then there are also conceptual extensions of the theory.
 The backward run and predicate analysis should be generalized
 to the hierarchical forest automata.
-A generalazition of predicates to make possible to verifity
-data structures like singly-link lists is another challange.
+An abstraction over the predicates to make possible to verify
+data structures like singly-link lists of even length is
+another challange.
