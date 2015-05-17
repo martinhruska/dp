@@ -522,16 +522,16 @@ Consider programs manipulating dynamic data structures.
 These programs change shape of a heap (and so reach another heap configuration)
 by performing operations like an allocation of the new memory nodes on the heap
 or removing the old ones.
-Since the dynamic data structures are unbounded the number of
-the reachable heap configurations is infinite.
+Since the dynamic data structures in these programs can be
+unbounded the number of the reachable heap configurations is infinite.
 However, it is possible to represent the infinite state space by forest automata in finite way.
 Then we can perform shape analysis over the forest automata representation of the reachable
-heap configurations to discover whether no undesirable behavior like a dereference of uninitialized
-pointer happen.
+heap configurations to discover whether no undesirable behavior
+like a dereference of uninitialized pointer happens.
 
-This chapter provides an overview of the shape analysis based forest automata introduced in \cite{forester12}.
+This chapter provides an overview of the shape analysis based on forest automata introduced in \cite{forester12}.
 First, a heap representation using FA is described and then
-we provide overview of symbolic execution that employs framework of abstract interpretation.
+we provide overview of symbolic execution that employs the framework of abstract interpretation.
 
 \section{Heap Representation}
 \label{sec:hd}
@@ -539,26 +539,29 @@ we provide overview of symbolic execution that employs framework of abstract int
 It is possible to view a \emph{heap} (more precisely, a single heap configuration)
 as a (directed) graph where each allocated heap cells corresponds to a node in the graph \cite{forester13}.
 The heap cells consists of \emph{pointer selectors} and \emph{data selectors}.
-A pointer selectors could point to another graph node or to the value \emph{null} or it could be undefined.
+A pointer selectors could point to another graph node or to the value \emph{null} or it could be \emph{undefined}.
 A data selector picks a data from some finite data domain.
 %When we consider the pointer variables of a program it also holds that they can have pointer and data selectors.
+A heap can be represented by FA but it needs to be decomposed
+to the trees first.
 We need to split a heap graph to the trees to be able to represent in by forest automata.
-The splitting is done in the following manner.
-We identify the heap cut-points (corresponding to the already defined term \emph{cut-points})
-which are the heap cells pointed by a pointer variable or by more then one other heap cells by their pointer selectors.
-The heap is then split to the trees whose roots nodes are cut-points identified in the previous step.
-The pointer selectors that pointed to the cut-points are redirected to the corresponding root references which interconnects
-particular tree components (and provides possibility to reconstruct the original graph again).
+The splitting is done by the following method.
+We identify the heap cut-points (corresponding to the already defined term \emph{cut-points}).
+That are the heap cells pointed by a pointer variable or by more then one pointer selector of
+the other heap cells.
+The heap is then split to the trees whose roots nodes are the cut-points identified in the previous step.
+The pointer selectors that pointed to the cut-points are redirected to the corresponding root references which interconnect
+the particular tree components (and provides possibility to reconstruct the original graph again).
 Finally, the created tuple of the trees is called a forest.
 Please note, that the mentioned procedure corresponds to the terms defined in Chapter \ref{ch:prel}
-so it is possible to achieve canonical forest as it was described in Section \ref{subsec:mcforest}.
+so it is possible to obtain a canonical forest as it was described in Section \ref{subsec:mcforest}.
 
 Let us formalize the idea given above.
-We denote a pointer selector by $PSel$, a data selector by $DSel$ and data domain by $\mathbb{D}$ \cite{techrep}.
+We denote a pointer selector by $PSel$, a data selector by $DSel$ and data domain by $\mathbb{D}$.
 A single heap configuration is a io-graph $g_{st}$ over the ranked alphabet of the structured labels from $2^\Gamma$
-with sub-labels from the ranked alphabet $\Gamma = PSel \cup (DSel \times \mathbb{D})$ having the
+with the sub-labels from the ranked alphabet $\Gamma = PSel \cup (DSel \times \mathbb{D})$ having the
 ranking function that assigns $1$ to the pointer selectors and $0$ to the data selectors.
-The values of data selectors are stored in the structured labels as sub-labels from $DSel \times \mathbb{D}$.
+The values of data selectors are stored in the structured labels as the sub-labels from $DSel \times \mathbb{D}$.
 A node $v$ of a graph representing a heap reflects by its label the internal structure of
 the related allocated memory cell in the heap so it holds that $l_g(v) \in 2^\Gamma$.
 A null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) = \emptyset$
@@ -580,10 +583,10 @@ a next item and also integer data variable, written in C:
 \end{center}
 Then a allocated cell of this singly-linked list on the heap with value $13$ in \texttt{data} variable and pointer to a cell named $s_{next}$
 in the \texttt{next} variable could be represented
-by a node $s$ with following label $l_g(s) = \{next_g(s_{next}),(data_g,13),()\}$.
-As you can see, the pointer selector $next_g \in PSel$ represents the pointer variable \texttt{next} from \texttt{SLL} structure
-has really rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing \texttt{data} variable from \texttt{SLL} structure
-has rank $0$.
+by a node $s$ with following label $l_g(s) = \{next_g(s_{next}),(data_g,13)()\}$.
+As you can see, the pointer selector $next_g \in PSel$ represents the pointer variable \texttt{next} from the \texttt{SLL} structure
+has really the rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing
+\texttt{data} variable from \texttt{SLL} structure has the rank $0$.
 \eexmp
 
 The mentioned method describes how to decompose a heap graph to forest, concretely we use the io-forests.
@@ -592,42 +595,48 @@ Moreover, a language of forest automaton is a set of such forests.
 So is is possible to represent a set of the reachable heap configurations at a point of the analysed program.
 Precisely, the forest automata of higher level respecting canonicity are used in the verification method
 because they have richer expressive power then the non-hierarchical forest automata.
-The forest automata of higher level also makes possible to represent data structure with unbounded number
-of the cut-points by their folding into the boxes what is further described later.
+The forest automata of higher level also makes possible to represent
+a data structures with an unbounded number of the cut-points by folding the cut-points
+into the boxes what is described later.
 
-Not only the allocated memory on the heap is modeled by forest automata during the verification procedure but also
-a \emph{stack frame} of the actually analyzed function of the original program is represented by forest automata.
+Not only the allocated memory on the heap is modeled by forest automata
+in the verification procedure but also a \emph{stack frame} of the actually
+analyzed function of the original program is represented by forest automata.
 Particularly, the io-forests and forest automata have from their definitions exactly one (index of) input port and
-just the input port $sf$ keeps a information about the stack frame.
+just the one input port $sf$ keeps a information about the stack frame.
 
 \section{Symbolic Execution}
 \label{sec:se}
 
-So far we described representation of heap configurations using forest automata.
+So far we described representation of the heap configurations using forest automata.
 Now we cover how the forest automata representation is computed for each point of the analysed program.
 FA-based verification procedure is a standard \emph{abstract interpretation} \cite{cousot:77}.
 The concrete domain assigns to each program location a set of pairs
 $(\sigma,H)$ where a mapping $\sigma$ maps each variable
-to a node in $H$, to a $\texttt{null}$ or to an undefined value, and $H$ is a single heap configuration.
-The abstract domain than assigns to each program location a finite set of pairs
+to a node in $H$, to a $\texttt{null}$ or to an \emph{undefined} value, and $H$ is a single heap configuration.
+The abstract domain assigns to each program location a finite set of pairs
 $(\sigma, F)$ (called \emph{abstract configuration}) where $\sigma$ maps again each variable to a
 $\texttt{null}$ value or to undefined value or to an index of TA in $F$ and $F$ is a forest automata
 of higher level respecting canonicity representing a set of heaps configurations.
-Note that a set of FA is needed in abstract domain to represent one program locations (since
-abstract domain maps to the set of abstract configurations).
+Note that a set of FA is needed in the abstract domain to represent
+one program location (since abstract domain maps a program location
+to the set of abstract configurations).
 FA are not closed under union so it is not possible to represent the sets of heaps by single FA.
 
-The verification starts from initial abstract configuration that consists an FA for initial heap configuration representing io-graph
+The verification starts from an initial abstract configuration that consists an FA for initial heap configuration representing io-graph
 $g_{\mathit{sf}}$ where $g$ consists from two nodes.
-The first one is $\texttt{null}$ and the second one is empty stack frame $sf$ with $l_g(\mathit{sf}) = \emptyset$.
+The first one is $\texttt{null}$ and the second one is the empty stack frame $sf$ with $l_g(\mathit{sf}) = \emptyset$.
 The sequence of \emph{abstract transformers} related to the program statements is then iteratively applied to the abstract configurations.
 The process of applying abstract transformers over abstract domain is called \emph{symbolic execution}.
 As it was said, each abstract transformer correspond to a statement of the analyzed program.
 It is possible to define a function $f_{\texttt{op}}(g_{st})$ related to an operation \texttt{op} from the intermediate code of the analysed program.
 This function models semantics of \texttt{op} in concrete domain in such way that $f_{\texttt{op}}(g_{\mathit{st}})$
-returns an io-graph representing the heap configuration obtained after execution of the concrete operation \texttt{op} over concrete domain.
-The abstract transformers $\tau_{\texttt{op}}$ are defined for each concrete operation \texttt{op} reflecting semantics of $f(\texttt{op})$.
-The abstract transformer $\tau_{\texttt{op}}$ applied to a FA $S$ representing heap in abstract domain returns a result FA $S' = \tau_{\texttt{op}}(S)$
+returns an io-graph representing the heap configuration obtained after the execution of
+the concrete operation \texttt{op} over concrete domain.
+The abstract transformers $\tau_{\texttt{op}}$ are defined for each concrete
+operation \texttt{op} reflecting semantics of $f(\texttt{op})$.
+The abstract transformer $\tau_{\texttt{op}}$ applied to a FA $S$
+representing the heap in abstract domain returns a result FA $S' = \tau_{\texttt{op}}(S)$
 such that $\bigcup_{F' \in S'} \llbracket F' \rrbracket = \{ f_{\texttt{op}}(g_{sf}) \,|\, g_{sf} \in \llbracket F \rrbracket \wedge F \in S \}$.
 The abstract transformer is applied separately to each forest $F \in S$.
 
@@ -635,20 +644,22 @@ The abstract transformers related to a program statement in a program location a
 abstract configurations in every program location reaches fixpoint.
 Each iteration follows this procedure:
 \begin{enumerate}
-		\item The sets of abstract configurations at each program point are updated by applying abstract transformers following
-			these steps:
+		\item The sets of abstract configurations at each program point are updated by applying
+			the abstract transformers following these steps:
 			\begin{enumerate}
-				\item Some boxes of FA in abstract configuration are unfold to uncover accessed part of heaps by abstract transformers.
-					This step is called \emph{normalization}.
+				\item Some boxes of FA in abstract configuration are unfold to uncover the accessed parts of heaps by abstract transformers.
+					This step is called \emph{unfolding}.
 				\item The update of abstract configuration is done.
 				\item The new boxes are \emph{learnt} by method described nicely in \cite{forester13}
 					and these boxes are fold again.
 					This is repeated until it is not possible to find the new boxes.
-				\item FA in abstract configuration made canonicity respecting.
+				\item FA in abstract configuration is made canonicity respecting.
 			\end{enumerate}
 		\item At junctions corresponding to the loops the union is followed by \emph{widening}.
-			This requires also checking language inclusion between sets of FA to check whether fixpoint has been reached.
-			It is also necessary to transform the FA to canonicity respecting form before inclusion checking.
+			This requires also checking language inclusion between sets
+			of FA to check whether a fixpoint has been reached.
+			It is also necessary to transform the FA to canonicity
+			respecting form before inclusion checking.
 \end{enumerate}
 
 Widening currently consists of repeating the following steps to each $F$ in the abstract configurations of a junction point until the fixpoint is reached:
@@ -662,30 +673,35 @@ Widening currently consists of repeating the following steps to each $F$ in the 
 It was mentioned that we need canonicity respecting FA to be able checking inclusion of languages of FA.
 This is done by operation called \emph{normalization} further described in Subsection \ref{subsec:norm}.
 Subsection \ref{subsec:boxes} provides brief description of cases when the boxes are applied.
+Finally, the methods of abstraction over FA are described in \ref{subsec:abstraction}.
 
 \subsection{Normalization}
 \label{subsec:norm}
 
 Normalization is done over a FA $F = (A_1 \cdots A_N,\pi)$ and its result is canonicity respecting FA.
-Normalization consist of the following steps:
+Normalization consists the following steps:
 \begin{itemize}
-		\item We obtain form of $F$ in which roots of trees of transformed forests corresponds to
-			cut-points in a uniform way.
-			It meas that $\forall i \in \{1,\ldots,n\}$ and for all accepted forests $f_1,\ldots,f_n$ holds
+		\item We merge $TA$ of $F$ into a form where roots of accepted forests are cut-points only.
+			So when there is a TA $A$ whose roots of the accepted trees are
+			not the cut-points in $L(F)$ and there is a TA $B$ that contains references
+			to the root references to $A$, then $A$ is connected
+			to $B$ at the places where $B$ has references to the root of $A$ so a new
+			TA $B_A = (Q_A \cup Q_B, \Gamma, \Delta_{A+B}, R_B)$ is created.
+			Transition rules set $\Delta_{A+B}$ is $\Delta_A \cup \Delta_B$ with
+			the substituted transition $q \rightarrow  \overline{a} (q_1 \cdots q_i \cdots q_n) \in \Delta_B$
+			by $q \rightarrow  \overline{a} (q_1 \cdots q_a \cdots q_n) \in \Delta_B$,
+			where $q_i$ is a root reference to $A$ and $q_a$ is the root of $A$. 
+		\item $TA$ of $F$ are reordered by canonical ordering of cut-points.
+		\item We obtain form of $F$ in which the roots of trees of forests from language of the transformed
+			forest automaton corresponds to the cut-points respecting the unique ordering.
+			It meas that $\forall i \in \{1,\ldots,n\}$ and for all accepted forests $f=(t_1,\ldots,t_n)$ holds
 			one of the following conditions:
 			\begin{itemize}
-				\item Root of $f_i$ is the $j-th$ cut-point in the canonical ordering of an accepted forest $\Rightarrow$
-					It is the $j-th$ cut-point in the canonical ordering of all accepted forests.
+				\item The root of $t_i$ is the $j$-th cut-point in the canonical ordering of the cutpoints
+					of the graph of the accepted forest $\Rightarrow$
+					It is the $j$-th cut-point in the canonical ordering of all accepted forests.
 				\item Otherwise, root of $f_i$ is not a cut-point of any accepted forests.
 			\end{itemize}
-		\item We merge $TA$ of $F$ into a form where roots of accepted forests are cut-points only.
-			So when there is a TA $A$ whose accepted trees are not cut-points in $L(F)$ and there is
-			a TA $B$ that contains references to the root references to $A$, then $A$ is connected
-			to $B$ at places where $B$ has references to the root of $A$ so a new
-			TA $B_A = (Q_A \cup Q_B, \Gamma, \Delta_{A+B}, R_B)$ is created.
-			Transition rules set $\Delta_{A+B}$ is $\Delta_A \cup \Delta_B$ with substituted transition $q \rightarrow  \overline{a} (q_1 \cdots q_i \cdots q_n) \in \Delta_B$
-			by $q \rightarrow  \overline{a} (q_1 \cdots q_a \cdots q_n) \in \Delta_B$, where $q_i$ is a root reference to $A$ and $q_a$ is the root of $A$. 
-		\item $TA$ of $F$ are reordered by canonical ordering of cut-points.
 \end{itemize}
 
 \subsection{Boxes}
@@ -695,10 +711,12 @@ It was already explained how the heap is decomposed to the forests.
 One part of the decomposition process is identifying the cut-points.
 But it could happen that there is infinitely many cut-points in the graphs representing the heaps.
 It is the case of e.g. doubly linked list where each node is a cut-point itself.
-This could be resolved by employing boxes (box is a symbol of alphabet of forest automata of higher level which is also forest automata as it was mentioned in Chapter \ref{ch:prel}).
-Since it is possible for FA to use other FA as symbols we can fold recurring sub-graphs to the boxes that are further used as the labels
+This could be resolved by employing the boxes (box is a symbol of alphabet of forest automata
+of higher level which is also forest automata as it was mentioned in Chapter \ref{ch:prel}).
+Since it is possible for FA to use other FA as symbols we can fold recurring sub-graphs to the boxes.
+They are further used as the labels
 and so reduce the number of cut-points (to a bounded count).
-When it is needed to manipulate a graph described by a FA hidden in the box unfolding is done.
+When it is needed to manipulate a graph described by a FA hidden in the box, then the unfolding is done.
 The steps of verification procedure where folding and unfolding is needed has been mentioned in the beginning of this section
 and its formal definition is given in Chapter \ref{ch:prel}.
 The boxes can be learn during analysing of a program automatically by the method proposed in \cite{forester13} or
@@ -710,40 +728,45 @@ it can be given to the analyzer manually by a user.
 We mentioned that forest automata are able to handle also infinite state spaces
 rising from a possible unboudness of the mentioned dynamic data structures.
 However, there is still the problem of state explosion that often makes
-nearly impossible to finish verification procedure of a system in real time
+nearly impossible to finish verification procedure of a system in the real time
 and moreover, not even termination of the verification procedure is guaranteed at all.
 Therefore the abstraction over the forest automata is introduced to increase probability of termination
 and to accelerate the method.
 The abstraction over forest automata is based on the framework of \emph{abstract regular tree model checking} \cite{artmc}.
 
 The abstraction accelerates the computation by merging states of forest automaton that are equivalent
-to an equivalent relation over states of forest automaton.
-Formally, the abstraction $\alpha$ over a tree automaton $M=(Q, \Sigma, \Delta, R)/$ is
+according to a given equivalence relation over the states of forest automaton.
+Formally, the abstraction $\alpha$ over a tree automaton $M=(Q, \Sigma, \Delta, R)$ is
 a function $\alpha: Q \rightarrow Q/_{\eqrel{M}}$ such that $\alpha(q) = \eqclass{q}{M}$
 where $\eqrel{M} \subseteq Q \times Q$ is an equivalence relation.
 We denote $\alpha(M)$ the tree automaton obtained by applying $\alpha$ to $Q$.
-It holds that $Q/\eqrel{M} \subseteq Q$ and also that $L(M) \subseteq L(\alpha(M))$.
+It holds that $Q/_{\eqrel{M}} \subseteq Q$ and also that $L(M) \subseteq L(\alpha(M))$.
 Since the abstraction is defined for a single tree automaton
 it is performed component-wise over a forest automaton.
 
 The forest automata based verification currently employs \emph{height abstraction}.
-This abstraction merges states with the equivalent languages upon to a given string length.
-So the range of abstraction function is set of equivalence classes of relation $\heqrel{M}$
-such that $\forall q_1,q_2 \in Q: q_1 \eqrel{M} q_2 \defarrow \langlen{M}{q_1} = \langlen{M}{q_2}$ where
+This abstraction merges the states with the equivalent
+languages upon to a given tree height.
+So the range of abstraction function is a set of the equivalence classes of the relation $\heqrel{M}$.
+The relation $\heqrel{M}$ is defined as follows:
+$\forall q_1,q_2 \in Q: q_1 \heqrel{M} q_2 \defarrow \langlen{M}{q_1} = \langlen{M}{q_2}$ where
 $\langlen{M}{q}$ $=$ $\{ w \in \Sigma^n \,|\, |w| \leq n \wedge wv \in \langstate{M}{q} \wedge |v| \geq 0\}$
 and $n\in \mathbb{N}$ is height of the abstraction.
 
-The abstraction over forest automata overapproximate set of reachable
+The abstraction over forest automata overapproximate the set of the reachable
 configurations of a program (what is formally expressed by $L(M) \subseteq L(\alpha(M))$).
-This brings mentioned acceleration of verification procedure but on the other hand
-could led to a detection of a spurious counterexample which is not present
-in the original program but it occurs in a heap configuration created by abstraction.
-The program verification is restarted after the detection of spurious counterexample
-but it uses a refined abstraction $\alpha'$ what is abstraction such that $L(\alpha'(M)) \subseteq L(\alpha(M))$.
-The refined abstraction can prevent reaching the detected spurious counterexample again.
-In the case of height abstraction the refinement is done by increasing the height $n$.
+This brings the mentioned acceleration of the verification procedure.
+On the other hand, it could led to a detection of a spurious counterexample which is not present
+in the original program but it caused by a heap configuration created by abstraction.
+In \cite{cegar} a technique for avoiding a spurious counterexample was proposed.
+It is based on restarting the program analysis when a spurious error is found.
+But the new run of the analysis  a refined abstraction $\alpha'$
+what is abstraction such that $L(\alpha'(M)) \subseteq L(\alpha(M))$.
+The refined abstraction may prevent reaching the detected spurious counterexample again.
+In the case of height abstraction this refinement is done by increasing the height $n$.
 However the refinement does not guarantee that the detected spurious counterexample will not
 be detected again the next run.
+Morever, no refinement has been implemented in the Forester tool yet.
 This would be resolved by using predicate abstraction which is described later in Chapter \ref{ch:backward}
 and it application to forest automata is one of the merits of this master thesis.
 
@@ -752,44 +775,50 @@ and it application to forest automata is one of the merits of this master thesis
 
 As it was mentioned in the introduction, FA based verification is implemented by a tool
 called Forester.
-Since the FA are closely related to TA as it was shown in Chapter \ref{ch:prel} so
+Since FA are closely related to TA as it was shown in Chapter \ref{ch:prel} so
 Forester also depends on an implementation of TA.
 It currently has its own implementation of TA providing the operations over TA needed during verification procedure.
 However it is quite impractical to maintain a special TA library inside of Forester
 and it would be more practical to employ some existing efficient TA library.
-The VATA library is a very efficient library which provides implementation of the standard operations over TA like union or intersection etc.,
-but it also implements the state-of-the-art algorithms \cite{tacas10} for language inclusion checking which efficiency
+The VATA library is a very efficient library which provides implementation
+of the standard operations over TA like union or intersection etc.
+It mainly aims to implementations of the state-of-the-art algorithms \cite{tacas10}
+for language inclusion checking which efficiency
 is also crucial for performance of Forester.
-It seems logical according to these facts to connect Forester with the VATA library employing VATA like a backend TA library for Forester.
+It arises from these facts to connect Forester with the VATA library
+employing VATA like a backend TA library for Forester.
 
 This chapter provides a description of the VATA library followed by a description of Forester.
 
 \section{The VATA Library}
 \label{sec:VATA}
 
-\Vata\ is open source library for nondeterministic tree automata.
+\Vata\ is an open source library for nondeterministic tree automata.
 Its main application is in the field of formal verification.
-VATA is licensed under GPL, version 3, and can be obtained from its official website \cite{www:libvata}.
+VATA is licensed under GPL, version 3, and it can be obtained from its official website \cite{www:libvata}.
 Implementation programming language is C++.
 It is the only library to our knowledge implementing state-of-the-art algorithms for checking inclusion of NTA languages
 what makes it suitable for use as a Forester backend library.
-However, \vata\ does not only provide implementation of algorithms for NTA but also the highly efficient implementation of
-algorithms for checking language inclusion of nondeterministic finite automata \cite{bt:hruska}.
+However, \vata\ does not only provide implementation of the algorithms for NTA
+but also the highly efficient implementation of the algorithms for checking language inclusion of
+nondeterministic finite automata \cite{bt:hruska}.
 
 \subsection{Design}
-\Vata\ currently provides methods for representation of NTA in explicit encoding and also in semi-symbolic (top-down and bottom-up)
-encoding using \emph{MTBDD} but it has been designed to be easy extended by other encodings (for others automata).
-The library provides API for creating and manipulating NTA and also command line interface (cli) build around
-the API for experimenting with a tree automata defined in a text format directly from command line.
+\Vata\ currently provides the methods for representation of NTA
+in explicit encoding and also in semi-symbolic (top-down and bottom-up)
+encoding using \emph{MTBDD}.
+But it has been designed to be easy extended by other encodings (for others automata).
+The~library provides API for creating and manipulating NTA and also command line interface (cli) build around
+the API for experimenting with tree automata defined in a text format directly from command line.
 The main concept of the design of the library is given in Figure \ref{fig:vata}.
 As you can see there are the three main parts in the library design:
 \begin{enumerate}
 	\item \emph{Parsers} -- Parsing an input automaton from a text file.
-		Timbuk \cite{timbuk} is currently the only one supported format for parsing input automata.
+		Timbuk \cite{timbuk} is currently the only one supported format for parsing the input automata.
 	\item \emph{Serializers} -- Serializing an automaton to a text file.
 		Timbuk format is again the only one supported format.
 	\item \emph{Automata encodings} -- The particular encodings of NTA.
-		An encoding should consists of core module implementing NTA representation itself
+		An encoding should consists a core module implementing NTA representation
 		and also the operations over NTA in this encoding.
 \end{enumerate}
 
@@ -803,11 +832,12 @@ As you can see there are the three main parts in the library design:
 
 A \emph{program} (e.g. cli of VATA) employing the three parts of \vata\ works as follows.
 An input automaton is loaded by one of the parsers to an intermediate representation.
-The wrapping program chooses internal encoding of NTA to which is automaton stored from intermediate encoding (note that it is also
+The wrapping program chooses an internal encoding of NTA to which is automaton stored
+from intermediate encoding (note that it is also
 possible to create automaton in the chosen encoding directly using API provided by VATA).
-Then the automaton is processed by applying the operations implemented by module of the chosen encoding.
-Finally, automaton could be serialized to an output format.
-When one wants to add her own encoding then she needs to implement only core of encoding (with API for creating automaton itself)
+Then the automaton is processed by applying the operations implemented by a module of the chosen encoding.
+Finally, the automaton could be serialized to an output format.
+When one wants to add her own encoding then she needs to implement only a core of encoding (with API for creating automaton itself)
 and needed operations over TA and can employ already implemented parses and serializers in \vata.
 
 \subsection{Implemented NTA Encodings}
@@ -815,16 +845,17 @@ and needed operations over TA and can employ already implemented parses and seri
 It was mentioned that there are currently implemented two representation of TA and both are described in the following subsection.
 
 Using \emph{explicit encoding} NTA transition relation is represented by a hierarchy of the hash tables as it is shown in Figure \ref{fig:explnta}.
-The first level of the hash tables hierarchy (\emph{top-level look-up tables}) maps each state $q$ of an automaton to 
-a second level of the hash tables hierarchy (\emph{transition cluster}) where are stored all symbols which
-are presented in the transition where $q$ is at left-handed side.
+The first level of the hash tables hierarchy (\emph{top-level look-up tables}) maps each state $q$ to 
+the second level of the hash tables hierarchy (\emph{transition cluster}).
+There are stored all symbols presented in the transition with state $q$ at the left-handed side.
 Each symbol $a$ in a transition cluster is mapped to a pointer to a set in the third level of hierarchy (\emph{sets of pointers to tuples}).
-The set contains pointers to tuples which are at right-handed side in a transition with $q$ at left-handed side and with $a$ as a symbol.
+The set contains pointers to the tuples which are at the right-handed side in
+a transition with $q$ at the left-handed side and with $a$ as symbol.
 The tuples are stored at a special set where every tuples is stored only once.
-Note that it also possible to share part of transition relation between different automata what
-brings higher efficiency in space complexity of implementation.
-Module for explicit encoding also stores explicitly a set of the final states of a NFA but on
-the other side it does not explicitly store a set of all states because it can be obtained from the transition relation.
+Note that it is also possible to share part of transition relation between different automata.
+This brings the higher efficiency in space complexity of implementation.
+Module for explicit encoding also stores explicitly a set of the final states of a NFA.
+On the other side, it does not explicitly store a set of all states because it can be obtained from the transition relation.
 
 \begin{figure}[bt]
 \begin{center}
@@ -859,22 +890,23 @@ the other side it does not explicitly store a set of all states because it can b
 Another already implemented encoding is \emph{semi-symbolic} one based on VATA own implementation of MTBDD package.
 This encoding is efficient mainly for TA with the large alphabets.
 Because semi-symbolic encoding and MTBDD are not in the aim of this thesis they are not be described in detail
-but it is possible to find deeper description in \cite{mt:lengal}.
+but it is possible to find a deeper description in \cite{mt:lengal}.
 The main principle of semi-symbolic encoding is shown in Figure \ref{fig:symnta}.
 First of all it is necessary to distinguish between (a) top-down and (b) bottom-up variants of this encoding.
 The first one maps each state $q$ of a NTA using MTBDD to the sets of the tuples of states such that that it is possible
 to make transition from $q$ under a symbol $a$ to a tuple in appropriate set (each set of tuples is dedicated
 to one symbol under which it is possible to make transition from $q$).
-The former one symmetrically maps each n-tuple $(q_1 \cdots q_n)$ of a NFA using MTBDD to the sets of states
-where each set $S$ is dedicated to a symbol $a$ of the NFA and contains states such that there exists a transition
+The former one symmetrically maps each n-tuple $(q_1 \cdots q_n)$ of a NTA using MTBDD to the sets of states.
+Each such a set $S$ is dedicated to a symbol $a$ of the NTA and
+it contains states such that there exists a transition
 with $(q_1 \cdots q_n)$ at the right-handed side and symbol $a$ and state from the set $S$ at the left-handed side.
-The final state set of a NTA is again represented by explicit set in both variants,
-a state set is not stored explicitly because one can obtain it from the transition relation.
-the symbols are encoded (as binary strings) in MTBDD.
+The final state set of a NTA is again represented by explicit set in the both variants.
+A state set is not stored explicitly because one can obtain it from the transition relation.
+The symbols are encoded (as binary strings) in MTBDD.
 
 All of the mentioned encodings currently support efficient language inclusion checking using algorithm
 from \cite{tacas10}.
-On the other side the other operations are not currently implemented by all encodings.
+On the other side, the other operations are not currently implemented by all encodings.
 The full enumeration of the supported operations for the particular encodings is given in Table \ref{tab:vataop}.
 
 \input{tab/vataop.tex}
@@ -882,26 +914,31 @@ The full enumeration of the supported operations for the particular encodings is
 \section{Forester}
 \label{sec:FA}
 
-Forester is open source tool for verification of program manipulation complex dynamic data structures.
-It currently supports program in C language.
-Forester is distributed as a \emph{GCC} plugin under GPL license, version 3, and can be obtained from its official website \cite{www:forester}.
-Tool is written in C++.
+Forester is an open source tool for verification of programs manipulating
+complex dynamic data structures.
+It currently supports the programs in C language.
+Forester is distributed as a \emph{GCC} plugin under GPL license, version 3,
+and it can be obtained from its official website \cite{www:forester}.
+The tool is written in C++.
 
 \subsection{Design}
 
 Forester is implemented as a GCC plugin but it does not analyze directly intermediate code of GCC called GIMPLE but it
 uses Code Listener infrastructure \cite{cl11} to provide fronted over GIMPLE.
 
-Please see Figure \ref{fig:fa_exec} to get a high level overview of the verification process performed by Forester. 
-Forester starts analysis of a program by translation of intermediate code representation provided by Code Listener
-to its own microcode.
-Microcode represents each program statement by one or few instructions associated abstract transformers.
-Symbolic execution is then execute over this microcode.
+Please see Figure \ref{fig:fa_exec} to get a high level overview of the process performed by Forester. 
+Forester starts an analysis of a program by translation of intermediate
+code representation provided by Code Listener to its own microcode.
+The microcode represents each program statement by one
+or a few instructions associated with the abstract transformers.
+Symbolic execution is then executed over this Forester microcode.
 Abstract domain represented by FA (which are also the core part of a symbolic state) is gradually transformed by the abstract transformers
 represented by the microcode instructions during the symbolic execution.
-When Forester detects an error the symbolic execution is aborted and the analyzed program is claimed as incorrect one.
-When symbolic execution is over then Forester checks whether there is no left garbage (of course, garbage is gradually checked also during the symbolic execution)
-and if it is not then a shape invariant has been found and the analyzed program is determined as correct.
+When Forester detects an error the symbolic execution is aborted and
+the analyzed program is claimed as incorrect one.
+When symbolic execution is done then Forester checks whether there is no left garbage
+(of course, garbage is gradually checked also during the symbolic execution).
+If it is not then a shape invariant has been found and the analyzed program is determined as correct.
 
 \begin{figure}[bt]
 	\begin{center}
@@ -911,31 +948,37 @@ and if it is not then a shape invariant has been found and the analyzed program 
 	\label{fig:fa_exec}
 \end{figure}
 
-A little deeper description of conceptual design of Forester (which is shown in Figure \ref{fig:fa_design}) and relations
-between its modules is going to be given now.
+A deeper description of conceptual design of Forester (which is shown in Figure~\ref{fig:fa_design})
+and the relations between its modules is going to be given now.
 Please note that implementation of Forester is not explicitly separated to the stand-alone compilation modules so the notion of the modules
 used in following text is more abstract to provide reader basic summary of the Forester design.
 One module could be e.g. a set of closely related classes with a similar purpose.
-As it was mentioned above the Code Listener representation of GCC intermediate code is mainly used by Forester \emph{Compiler} module.
-Compiler then converts Code Listener instructions to the Forest own \emph{Microcode Instructions} and creates their list over which the \emph{Symbolic Execution} is performed.
-Symbolic execution then execute microcode instructions (abstract transformers) which manipulates \emph{Symbolic State} and of course
-also \emph{Forest Automata} included in symbolic states.
-Symbolic execution also need \emph{Symbol Context} which is created for each function (and also for global space)
-and keeps information about variables used in the function, about function arguments or about stack frame layout.
-A symbolic state provides information about the state of the heap which is represented by a FA and it also keeps the information about
+As it was mentioned above, the Code Listener representation of GCC intermediate code is mainly used by Forester \emph{Compiler} module.
+Compiler then converts Code Listener instructions to Forester own \emph{Microcode Instructions}
+and creates their list over which the \emph{Symbolic Execution} is performed.
+Symbolic execution then executes the microcode instructions (abstract transformers)
+which manipulates \emph{Symbolic State} and of course
+also \emph{Forest Automata} included in the symbolic states.
+Symbolic execution also needs \emph{Symbol Context} which is created for each function (and also for global space).
+It keeps information about the variables used in the function,
+about the function arguments or about the stack frame layout.
+A symbolic state provides information about the state of the heap which is represented
+by a FA and it also keeps the information about
 the corresponding microcode instructions.
-\emph{Forest Automata} module provides methods for manipulation FA need during verification procedure.
+\emph{Forest Automata} module provides the methods for manipulation FA needed during a verification procedure.
 The operations like normalization or abstraction over FA are not part of the module containing FA implementation but are provided
-like classes which take FA as parameters.
+like the classes which take FA as the parameters.
 So these operation could be understood as another module \emph{Operation over Forest Automata}.
 Finally, Forester currently has its own implementation of \emph{Tree Automata}.
-It is very lightweighted implementation containing optimized operations directly for Forester purposes.
-One of them is operation for language inclusion checking using simulation which efficiency is also crucial for Forester performance.
+It is very lightweighted implementation containing the optimized
+operations directly for the Forester purposes.
+One of them is operation for language inclusion checking using simulation relation
+which efficiency is also crucial for Forester performance.
 The advantage of this implementation is its simplicity and
-the efficiency get by optimizing the implementation specially to the Forester.
+the efficiency raising from the optimizing the implementation specially to the Forester.
 On the other side, it is not easy to maintain such a optimized implementation.
-Especially, when one considers that there is still progress in field of design of the efficient algorithms
-and the improvement of an algorithm brings much higher efficiency then implementation optimization.
+Especially, when one considers that there is still progress in the field of design of the efficient algorithms
+and an improvement of an algorithm brings often much higher efficiency then an implementation optimization.
 
 \begin{figure}[bt]
 	\begin{center}
@@ -945,7 +988,7 @@ and the improvement of an algorithm brings much higher efficiency then implement
 	\label{fig:fa_design}
 \end{figure}
 
-Please note, this is just the conceptual high level view of Forester design.
+Please note, this is just the conceptual high level view of the Forester design.
 A real implementation is much more complicated (e.g. Forest automata are implemented by two classes: \emph{FA} and \emph{FAE})
 and full of the technical details.
 A full description of the implementation is also not the aim of this text.
@@ -955,35 +998,38 @@ VATA could bring some advantages.
 We summarize them here again.
 The first one is that it is much easier to maintain one library where
 the state-of-the-art algorithms are implemented and optimized.
-Since VATA and Forester is developed by the same developers it also easy to added
-to VATA operations needed by Forester.
+Since VATA and Forester is developed by the same developers it also easy to add
+to VATA the operations needed by Forester.
 Having narrow interface between TA library and the rest of Forester
 also improves code quality of Forester in the sense of modularity, maintainability and code organization.
-These arguments lead us to implement a version of Forester using VATA.
-This is described in Section \ref{ch:fova}.
+These benefits lead us to implement a version of Forester using VATA.
+It is further described in Section \ref{ch:fova}.
 
 
 \subsection{Implementation of Forest Automata Concepts}
 \label{subsec:faimpl}
 
-This subsection describes an implementation of the forest automata-based verification procedure in Forester.
+This subsection describes an implementation of the forest automata 
+based verification procedure in Forester.
 The core of the forest automata module is class {\tt FA}.
 The implementation corresponds to the definitions given in Chapter \ref{ch:prel}.
 Class FA has a data member representing a vector of tree automata $(t_1 \cdots t_n)$.
 It also has a data member keeping a reference to an automaton representing the global variables
 and a reference to the automata representing the local variables of the actually executed function. %TODO define ABP
-The labels of the TA transitions are represented by the structure {\tt NodeLabel}.
-This structure contains a data member determining the type of the root node of a transition
-(whether it is a general node, a data node or a node containing a vector of data).
-A value related to the type of the node is also stored as a data member of the structure.
 The basic operations over an FA (like adding or removing a TA from an FA) are encapsulated in class FA.
 The another class providing operations over FA is class {\tt FAE}. 
 
+The labels of the TA transitions are represented by the structure {\tt NodeLabel}.
+It can be defined as a tuple $NL=(T,V)$.
+This structure contains a data member $T$ determining the type of the root node of a transition
+(whether it is a general node, a data node or~a node containing a vector of data).
+A value $V$ related to the type of the node is also stored as a data member of the structure.
+
 As it was already mentioned, the forest automata are further used in the representation of a symbolic state.
 An implementation of the representation of a symbolic state is in class {\tt SymState}.
-The class keeps a reference to a Forester microcode instruction $I$ to which the symbolic state corresponds.
+The class keeps a reference to a Forester microcode instruction $I$ to which the~symbolic state corresponds.
 It has a data member that is a pointer to a forest automaton $F$ (an instance of class {\tt FAE})
-representing the actual memory state.
+representing the actual memory state in the symbolic state.
 Another data member of class SymState is a set of registers $\regsset$.
 We denote set $\regsset$ by $\regs$. 
 The register are local or global ones.
@@ -993,30 +1039,32 @@ the global state, e.g., the block of global variables in the symbolic state.
 The second one then represents the allocated memory of the actually executed function.
 The local registers serve as temporary memory used in
 the microcode instructions for data manipulation.
-Putting together the data members of class {\tt SymState}
+Putting together the data members of class {\tt SymState},
 we can define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
 
-The values of the registers are instances of structure {\tt Data}.
+The values of the registers are instances of a structure {\tt Data}.
 We can formally define structure Data as $\ddata$ where
 $T$ is a data type,
 $S \in \natnum$ is a size of data,
 $V$ is a value of type $T$,
 $MB=(D_1 \cdots D_n)$ represents nested data if they are present (this is the case when $D$ represents a data structure)
 and $D_i$ is another instance of data.
-$T$ could be one of the following data types: pointer, reference to a TA, integer, boolean, structure or some other data type.
+$T$ could be one of the following data types: pointer, reference to a TA, integer, boolean,
+structure or generally some other data type.
 $T$ could be also undefined or it could state that type is unknown.
-We describe in detail one of the types -- the root reference
-whose values are defined as $RR=({\tt Root},{\tt Displ})$
+We describe in detail one of the types -- the root reference.
+Its values are defined as $RR=({\tt Root},{\tt Displ})$
 where ${\tt Root} \in \natnum$ is an index of a tree automaton in $F$
-and ${\tt Displ} \in \natnum$ is an index of a selector in a label of
-the transition from the TA root pointed by ${\tt Root}$.
-The operations for manipulation with a symbolic state are partially provided by class {\tt SymState}
+and ${\tt Displ} \in \natnum$ is an index of a selector in a structured label of
+the transition with ${\tt Root}$ at the left-handed side.
+The~operations for manipulation with a symbolic state are partially provided by class {\tt SymState}
 and some additional operations are provided by class {\tt VirtualMachine}.
 
 We already described the data structures used for the implementation of the forest automata concepts
 and the related symbolic execution.
 The symbolic execution using this data structures is realized by gradually appending
 and removing the symbolic states from a queue.
+It implementation is in class \emph{SymExec}.
 When a symbolic state is taken from the queue a microcode instruction contained in
 the symbolic state is executed.
 Some instructions during its execution appends a new symbolic state to the queue.
@@ -1027,7 +1075,7 @@ The microcode instructions executed during the symbolic execution are described 
 \label{subsec:microinstr}
 
 This sections provides a description of the Forester microcode instructions
-which correspond to the abstract transformers in context of abstraction interpretation.
+which correspond to the abstract transformers in abstraction interpretation.
 Firstly, we introduce some examples how the C statements are translated
 to the Forester microcode instructions, then we define the instructions
 more formally and we give a complete list of them.
@@ -1043,24 +1091,23 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{verbatim}
 	\end{quote}
 	
-	Consider also the two variables \code{struct T *x, *y} used in the next examples.
+	Consider also two variables \code{struct T *x, *y} used in the next examples.
 	Note that all constants used in the examples are dependent to a concrete Forester
 	run and they are chosen randomly in this text.
-	The syntax of instructions in the examples is following:
+	The syntax of the instructions in the examples is following:
 	$$ op\ r_0,\ r_1,\ r_2$$
-	$op$ is a name of a instruction,
+	where $op$ is a name of a instruction,
 	$r_0, r_1, r_2$ are operands such that $r_0$ is a destination register,
 	$r_1$ and $r_2$ are the source registers.
-	Some instructions do not have three registers as parameters but most of them
-	have just two.
-	It is also possible that there is a constant instead of a register
-	as an operand of the instruction.
+	The instructions do not have to have all three registers as the parameters.
+	Indeed, the most of them have just two.
+	A constant may be also used as an operand instead of the registers as a parameter.
 	When $[r+c]$ is used as an operand then the instruction dereferences a root reference in register $r$.
-	Exactly, the instruction access directly a selector with the displacement $c$ in a label of the transition with
-	the referenced root as the parent state.
-	Note that when it is not stated otherwise it is referred to a selector in a label of a transition
-	where the root of the transition is the referenced TA by the specified register.
-	In the following text the registers $r_1,\ldots,r_n$ are local ones and
+	In this case, the instruction accesses directly a selector with the displacement $c$ in a label of the transition with
+	root at the left-handed side.
+	We will further consider the selector in a label of transition with
+	the referenced root at lef-handed side if it is not stated otherwise.
+	In the following text the registers $r_1,\ldots,r_n$ are local ones.
 	$GLOB$ and $ABP$ are global registers such that $GLOB$ register contains reference to a FA representing
 	global variables and $ABP$ register contains reference to a FA representing local memory.
 
@@ -1078,16 +1125,17 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{verbatim}
 	\end{quote}
 
-	Firstly the size of a new allocated data (in this case the size is $4$) is stored to the register $0$ at line~$1$.
+	Firstly the size of the new allocated data (in this case the size is $4$) is stored to the register $0$ at line~$1$.
 	Then the new instance of structure {\tt Data} is created and stored to register $0$ at line $2$.
-	A new TA $t$ is created at line $3$.
+	A~new TA $t$ is created at line $3$.
 	The TA $t$ has one transition from the root with a label that consists one pointer selector {\tt next} whose
 	displacement in the label is $0$ and the size is $4$.
 	The displacement defines the order of the selector in the label.
-	The instruction \codix{node} also stores a root reference to $t$ to register $0$.
-	Finally lines $4$ a $5$ perform adding root reference pointing to $t$ to a FA that represents
+	The instruction \codix{node} stores a root reference to $t$ to register $0$.
+	Finally lines $4$ a $5$ add a root reference pointing to $t$ to a FA representing
 	a memory state of the actually executed function (which is in this case the function {\tt main}).
-	In this case a selector related to the pointer x has displacemnt $12$ in the label of TA referenced by the register $1$.
+	In this case a selector related to the pointer x has displacemnt $12$ in the label of TA
+	representing the function memory state.
 	The instruction at line $6$ then checks whether no garbage was created by the previous instructions.
 \eexmp
 
@@ -1104,14 +1152,14 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{verbatim}
 	\end{quote}
 
-	The first instruction stores a root reference to an TA representing heap pointed by the \codix{x} pointer to register $0$.
-	In this case, a node with a root reference is pointed by the selector with displacement displacement $12$ in a label in TA referenced by register $ABP$.
+	The first instruction stores a root reference to a TA representing heap pointed by the pointer \codix{x} to register $0$.
+	In this case, a node with a root reference is pointed by the selector with the displacement $12$ in a label in TA referenced by register $ABP$.
 	The second instruction performs an isolation of the selector with displacement $0$ in the TA referenced by register $0$.
-	This causes a creation of a new TA if \codix{x->next} points to an allocated memory (because a new
+	This creates of a~new TA if \codix{x->next} points to an allocated memory (because a new
 	cut-point is created when pointer \codix{y} also points to this memory).
 	Otherwise the instruction does not do anything.
-	The instruction at line $3$ loads to register $0$ a root reference from a selector of TA referenced by register $0$.
-	The instruction at line $4$ moves a reference to TA that represents a local memory state to register $1$.
+	The~instruction at line $3$ loads to register $0$ a root reference from a selector of TA referenced by register~$0$.
+	The instruction at line $4$ moves a reference to TA that represents a local memory state to register~$1$.
 	Finally, the instruction at line $5$ copies the root reference from register $0$ to
 	a TA node pointed by pointer \codix{y} selector.
 	The last instruction checks whether no garbage is presented.
@@ -1129,11 +1177,11 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{quote}
 
 	The first instruction loads to register $0$ a root reference to TA representing heap pointed by \codix{x}.
-	The reference to the TA is stored in a node pointed by a selector with displacement $12$
-	in a label of TA referenced by register \codix{ABP}.
-	The second one isolates all selectors of the TA referenced by register $0$
-	Then the third instruction removes node pointed by register $0$
-	and finally invalidates all references to it.
+	The reference to this TA is stored in a selector with displacement $12$
+	in TA referenced by register \codix{ABP}.
+	The second command isolates all selectors of the TA referenced by register~$0$.
+	Then the third instruction removes TA pointed by register $0$ from FA
+	and then it invalidates all references to it.
 	The last instruction again checks whether there is not created garbage by performing this instruction.
 
 \eexmp
@@ -1152,10 +1200,11 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{verbatim}
 	\end{quote}
 
-	The first instruction loads to register $3$ a root reference pointed by a selector (related to pointer \codix{x}).
+	The first instruction loads to register $3$ a root reference pointed by a selector (related to pointer \codix{x})
 	with displacement $16$ in TA referenced by register \codix{ABP} (what is TA modeling actually executed function).
 	Then the data selector \codix{x->data} (which has displacement $4$ in label in TA reference by register $3$)
-	is isolated and a data value from this selector	is loaded to register $r$ by the instructions at line $2$ and $3$.
+	is isolated.
+	A data value from this selector	is loaded to register $r$ by the instructions at line $2$ and $3$.
 	The instructions at line $4$ and $5$ prepare data selector \codix{y->data} in the same way
 	as the selector \codix{x->data} has been prepared.
 	Finally at line $6$ the data value in register $3$ is copied to TA node pointed by
@@ -1174,7 +1223,7 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{quote}
 
 	The instruction at line $1$ loads a root reference pointed by a selector
-	with displacement $12$ in TA referenced by register \codix{ABP}.
+	with displacement $12$ in TA referenced by register \codix{ABP}
 	related to a pointer $x$ to register $0$.
 	The second instruction does the same thing as the previous one but for a pointer $y$
 	and register $1$.
@@ -1192,10 +1241,10 @@ $r_d \in \regs$ to denote the destination register,
 $r_l \in \regs$ to denote a local register and
 $r_g \in \regs$ to denote a global register.
 Note that the source register is also a global or a local one and the same holds for the destination register.
-The source and destination registers are parameters of some instructions.
-We use $\regssub{r}{r'}$ to denote a set of the registers which is same as
+The~source and destination registers are the parameters of some instructions.
+We use $\regssub{r}{r'}$ to denote a~set of the registers which is the same as
 the set $\regs$ but register $r$ is substituted by register $r'$.
-A symbol $I_n$ denotes next instruction following an instruction actually executed.
+A symbol $I_n$ denotes the next instruction following an instruction actually executed.
 We define semantics of each instruction formally using a function 
 $f: \instrset \times \symset \rightarrow \symset$
 where $\symset$ is a set of all symbolic states and $\instrset$ is a set of all instructions.
@@ -1207,16 +1256,16 @@ A list of the microcode instructions used in Forester with description
 of their semantics follows.
 Each instruction is described informally first and then its effect is defined
 in the notion of the function $f$.
-The instructions are divided to the two parts, the first part contains
-the instructions modifying forest automata,
-the second part the other instructions.
+The instructions are divided to the two parts.
+The first part contains the instructions modifying forest automata.
+The second part consists the rest of the other instructions.
 
 \subsubsection{The Instructions Modifying Forest Automata}
 \begin{itemize}
 	\item {\tt acc\_sel($r_d$)} isolates the $i$-th selector of a label
 		in the transition from the root of a given TA.
 		The root of TA is defined by the destination register $r_d$.
-		This instruction checks whether a selector pointed by the destination register
+		This instruction checks whether a~selector pointed by the destination register
 		selects a node that represents allocated memory node or undefined pointer.
 		In the first case the node is isolated to a new TA and the original node in the
 		original TA is replaced by a root reference to the new TA.
@@ -1266,10 +1315,10 @@ the second part the other instructions.
 		The location is selected by a selector with displacement $o$ in a label of $t$.
 		
 		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
-		where $F'$ is a FA obtained from $F$ by assignment
-		$S_{F[i]}^{displ} = r_{d}$,
-		$F[i]$ is a TA of $F$ referenced by a root reference $\rref$ stored in $r_s$ register,
-		$o$ is an offset which is a parameter of this instruction,
+		where $F'$ is a FA obtained from $F$ by an assignment
+		$S_{F[i]}^{displ} = r_{s}$,
+		$F[i]$ is a TA of $F$ referenced by a root reference $\rref$ stored in $r_d$ register,
+		$o$ is an~offset which is a parameter of this instruction,
 		$i=\droot$ and $displ=\ddispl + o$.
 	
 	\item {\tt stores($r_d,r_s,o$)} instruction does the same as the previous
@@ -1326,7 +1375,7 @@ the second part the other instructions.
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{r_s}}{I_n}$.
 	
 	\item {\tt bnot($r_d$), inot($r_d$)} instructions negates a value in the destination register and
-		creates a new symbolic state with the negated value in the destination register.
+		it creates a new symbolic state with the negated value in the destination register.
 		{\tt bnot} negates integer and {\tt inot} negates the boolean value.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\neg r_d}}{I_n}$.
@@ -1339,12 +1388,12 @@ the second part the other instructions.
 		where $o$ is offset which is a parameter of this instruction
 		and $\rrefreg{r_s}$.
 	
-	\item {\tt move\_reg\_inc($r_d$,$r_{s_1}$,$r_{s_2}$,)} instruction does same thing as the previous one but moreover
+	\item {\tt move\_reg\_inc($r_d$,$r_{s_1}$,$r_{s_2}$)} instruction does same thing as the previous one but moreover
 		it increases a displacement by a value in the second source register $r_{s_2}$ (which is
 		present for this instruction).
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl + r_{s_2}}}}{I_n}$
-		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are source registers such that
+		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are the source registers such that
 		$\rrefreg{r_{s_1}}$, $r_{s_2}$ is integer value.
 	
 	\item {\tt get\_greg($r_{ld}$,$r_{gs}$)} loads a value from the global, source register $r_{gs}$ to
@@ -1393,9 +1442,9 @@ the second part the other instructions.
 			$i=\droot$,
 			$displ=\ddispl + o$.
 
-	\item {\tt loads($r_d,r_s,o$)} instruction does the same as the previous	one but manipulates the structures.
+		\item {\tt loads($r_d,r_s,o$)} instruction does the same as {\tt load} instruction but manipulates the structures.
 		
-		Formal definition is the same but the result store in the selector is a structure.
+		Formal definition is the same but the result stores in the selector is a structure.
 
 	\item {\tt load\_ABP($r_d$,$r_s$,$o$), load\_GLOB($r_d$,$r_s$,$o$)} instructions do the same as
 		the previous instruction but loads a value from a TA pointed by $r_{ABP}$ or $r_{GLOB}$ register.
@@ -1404,29 +1453,30 @@ the second part the other instructions.
 		$ABP$ and $GLOB$ are used instead of $r_s$.
 
 	\item {\tt push\_greg($r_s$)} instruction creates a new global register $r_g$
-		and fills it with a value in the source register $r_s$.
+		and fills it with a value in the~source register $r_s$.
 		
 		$f(\stdsym) = \symstate{F}
 		{\regs\cup \{r_g\}}
 		{I_n}$
 		where $r_g$ is a new global register such that $r_g = r_s$.
 	
-	\item {\tt pop\_greg($r_g$, $r_s$)} instruction takes a value in the last created
+	\item {\tt pop\_greg($r_g$,$r_s$)} instruction takes a value in the last created
 		global register and stores it to the source register.
 		The global register is then deleted.
 		
 		$f(\stdsym) = \symstate{F}
-		{\regssubmin{r_g}{r_d}{r_g}}
+		{\regssubmin{r_s}{r_g}{r_g}}
 		{I_n}$
 		where $r_g$ is the lastly created global register.
 
 	\item {\tt cond($r_s$,$I_t$,$I_e$)} instruction represents a condition in the original code.
 		It creates a new symbolic state with the same forest automaton and appends
 		it to the queue.
-		The new state contains an instruction which corresponds to a \textit{then} ($I_t$)
-		or \textit{else} ($I_e$) branch of the condition.
-		The instruction for the new state is chosen according to
-		the content of the source register $r_s$.
+		The new state can contain instruction $I_t$ when the condition is true
+		and \emph{then} branch is performed.
+		Otherwise, instruction $I_e$ is used in the next state for case when
+		the condition is false.
+		The value of condition is stored in the source register $r_s$.
 
 		$f(\stdsym) = \symstate{F}{\regs}{r_s ? I_t : I_f}$
 		where $I_t$ is instruction used when $r_s$ has true value and
@@ -1445,7 +1495,7 @@ the second part the other instructions.
 		are two source registers with values of integer type.
 
 	\item {\tt eq, neq, ge, gt, le, lt}($r_d$,$r_{s_1}$,$r_{s_2}$) instructions
-		makes a corresponding comparison of the values in the source registers $r_{s_1}$
+		makes a corresponding comparison of the~values in the source registers $r_{s_1}$
 		and $r_{s_2}$.
 		The result of the comparison stores to the destination register $r_d$.
 		
@@ -1466,7 +1516,7 @@ the second part the other instructions.
 		{\regssub{r_d}{x}}
 		{I_n}$
 		where $x$ is a structure created from the values of the registers $r_s,r_{s+i_1},r_{s+i_2}, \ldots, r_{s+i_n}$.
-		The values $i_1, i_2, \ldots, i_n$ are offsets defined as the parameters of this instruction.
+		The values $i_1, i_2, \ldots, i_n$ are the offsets defined as the parameters of this instruction.
 	
 	\item {\tt abort()} instruction aborts program execution.
 	
@@ -1475,7 +1525,7 @@ the second part the other instructions.
 		
 		$f(\stdsym) = \stdsym$ if $r_s = c$, otherwise
 		symbolic execution is aborted.
-		Constant $c$ is a parameter of this instruction.
+		Constant $c$ is a~parameter of this instruction.
 	
 	\item {\tt error()} instruction throws an exception representing
 		a local error in program.
