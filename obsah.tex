@@ -85,16 +85,16 @@ Chapter \ref{ch:concl} summarizes this master thesis.
 \chapter{Preliminaries}
 \label{ch:prel}
 
-This chapter contains the definitions of the concepts further used in this thesis.
-First, graphs, trees and forests are defined together along the automata accepting them in Section \ref{sec:graph}.
+This chapter provides the theoretical foundations of this thesis.
+First, graphs, trees and forests are defined along the automata accepting them in Section~\ref{sec:graph}.
 Then the previously defined concepts are further extended to hierarchical ones in Section \ref{sec:fah}.
 This section follows the definitions and a the structure used in \cite{techrep}.
 
 \section{Graphs, Trees and Forests}
 \label{sec:graph}
 
-Assume a word $w = a_1 \cdots a_n$, we denote $i$-th symbol of $w$ as $a_i$.
-We denote $dom(f)$ the domain of a total mapping $\funcdecl{f}{A}{B}$ and its range is denoted by $rng(f)$.
+Assume a word $w = a_1 \cdots a_n$, we denote the $i$-th symbol of $w$ as $a_i$.
+We denote $dom(f)$ the~domain of a total mapping $\funcdecl{f}{A}{B}$ and its range is denoted by $rng(f)$.
 
 \subsection{Graphs and Trees}
 \label{subsec:graph}
@@ -102,7 +102,7 @@ A \emph{ranked alphabet} is a finite set of symbols $\Sigma$ and a related mappi
 assigns to a symbol its rank.
 A (directed, ordered, labelled) \emph{graph} is a total map $\funcdecl{g}{V}{\Sigma \times V^{*}}$ where $V$ is a finite set of nodes.
 The items of the set $\Sigma$ are in context of the graphs called \emph{labels}.
-Map $g$ maps each node $v\in V$ to:
+The map $g$ maps each node $v\in V$ to:
 \begin{enumerate}
 	\item a label $\alpha \in \Sigma$ that we denote by $l_g(v)$.
 	\item a sequence of \emph{successors} $(v_1 \cdots v_n) \in V^n$ for $n \in \mathbb{N}$.
@@ -112,11 +112,14 @@ It holds that $\#(l_g(v)) = |S_g(v)|$.
 We will omit subscript $g$ when no ambiguity is possible.
 
 A \emph{leave} of $g$ is a node $v \in V$ such that $S_g(v) = \epsilon$.
-An \emph{edge} of $g$ is a pair $v \mapsto (a, v_1 \cdots v_n))$ where $v, v_1, \ldots, v_n \in V$,
+An \emph{edge} of $g$ is a pair $v \mapsto (a, v_1 \cdots v_n)$ where $v, v_1, \ldots, v_n \in V$,
 $a \in \Sigma$ such that $g(v) = (a, v_1 \cdots v_n)$.
-\emph{In-degree} of a node $v' \in V$ in graph $g$ is the overall number of its occurrences in $g(v)$ for any $v \in V$.
-We denote in-degree of a node $v \in V$ by $idg_g(v)$ and we omit again subscript $g$ whenever it is possible.
-More formally, in-degree is defined as $idg(v') = |\{v \mapsto (a, v_1 \cdots v_n) \,|\, v \mapsto (a, v_1 \cdots v_n)
+\emph{In-degree} of a node $v' \in V$ in the graph $g$ is the overall number of
+its occurrences in $g(v)$ for any $v \in V$.
+We denote in-degree of a node $v \in V$ by $idg_g(v)$ and
+we omit again subscript $g$ whenever it is possible.
+More formally, in-degree is defined as
+$idg(v') = |\{v \mapsto (a, v_1 \cdots v_n) \,|\, v \mapsto (a, v_1 \cdots v_n)
 \emph{ is an edge such that } \exists i \in \{1,\ldots,n\}: v' = v_i\}|$.
 The \emph{joins} of $g$ are nodes $v \in V$ such that $idg(v') > 1$.
 
@@ -127,7 +130,7 @@ The path $p$ has \emph{length} $n$ what we denote by $length(p) = n$.
 The path $p$ is acyclic if $\forall u_i,u_j \in p: i \neq j \Rightarrow u_i \neq u_j$.
 A \emph{cost} of an acyclic path is sequence $i_1, \ldots, i_n$.
 The path $p$ is \emph{cheaper} than another path $p'$ iff the cost of $p$ is lexicographically smaller than that of $p'$. 
-A node $u \in V$ is \emph{reachable} from a node $v \in V$ iff that is a path from $v$ to $u$ or $u=v$.
+A node $u \in V$ is \emph{reachable} from a node $v \in V$ iff there is a path from $v$ to $u$ or $u=v$.
 A node $u \in V$ is a \emph{root} of $g$ iff all nodes $v \in V$ are reachable from $u$.
 We use the term $root$ also for a mapping $\funcdecl{root}{g}{V}$ which maps a graph to its root.
 When there is a root in a graph then the graph is called \emph{rooted}.
@@ -136,15 +139,16 @@ A \emph{tree} $t$ is a graph which is either empty, or it has exactly one root a
 each node is a successor of at most one of the other nodes).
 
 \bexmp
-We illustrate some terms about graphs and trees related to a graph $t$ in Figure \ref{fig:graph_tree}.
+We illustrate some terms related to the graphs and trees.
+Consider a graph $t$ in Figure \ref{fig:graph_tree}.
 There is a set of nodes $V=\{v_1,v_2,v_3,v_4,v_5\}$ and
 an alphabet $\Sigma = \{a,b\}$ with a ranking function $\#$ such that $\#(a) = 2$ and $\#(b) = 0$.
 Then the graph $t$ is mapping $t(v_1) = (a, (v_2,v_3))$, $t(v_2) = (b, ())$,
 $t(v_3) = (a, (v_4, v_5))$, $t(v_4) = (b, ())$, $t(v_5) = (b, ())$.
 The leaves of $t$ are $v_2, v_4, v_5$.
 The edges correspond to the definition of $t$ so there is for example
-edge $v_1 \mapsto (a,(v_2,v_3))$.
-There different paths but to illustrate the concept of path we give
+an edge $v_1 \mapsto (a,(v_2,v_3))$.
+There are many paths but to illustrate the concept of path we give
 definition of path from $v_1$ to $v_5$ which is $v_1, 2, v_3, 2, v_5$.
 Thus we can say that $v_5$ is reachable form $v_1$.
 Since all nodes are reachable from $v_1$ then $v_1$ is a root of $t$.
@@ -171,7 +175,7 @@ The forest $t_1 \cdots t_n$ (we suppose that the sets of nodes of the trees are 
 be constructed by interconnecting roots by the related root reference.
 E.g., a root reference $2$ in $t_1$ would be replaced by the root node of $t_2$.
 Let's formalize the idea of construction of $\fagr$.
-$\fagr$ contains an edge $v \mapsto (a,v_1 \cdots v_m)$ iff $\exists i \in \{1, \ldots, n\} \ \exists(v \mapsto (a, v_1' \cdots v_m')) \in edges(t_i)
+The graph $\fagr$ contains an edge $v \mapsto (a,v_1 \cdots v_m)$ iff $\exists i \in \{1, \ldots, n\} \ \exists(v \mapsto (a, v_1' \cdots v_m')) \in edges(t_i)
 \ \forall j \in \{1,\ldots,m\}: v_j = h(v_j')$ where $edges(t_i)$ is the set of all edges of the tree $t_i$ and
 \[ h(v_j') = \left\{
   \begin{array}{l l}
@@ -187,14 +191,13 @@ The forest $f$ consists three trees, $t_1$ with a root $u_1$,
 $t_2$ with a root $v_1$ and $t_3$ with a root $w_1$.
 The alphabet $\Sigma$ of the trees is same as in Example \ref{ex:graph} but $f$
 is defined over $\Sigma \cup \{\overline{2}, \overline{3}\}$
-where $\overline{2}, \overline{3}$ denotes the root references $u_5$, $v_3$.
-to the second and the third tree.
+where $\overline{2}, \overline{3}$ denotes the root references
+to the roots $u_5$ and $v_3$ of the second and the third tree.
 
 We can obtain a graph $\otimes t_1,t_2,t_3$ shown in Figure from $t_1, t_2, t_3$.
 The edges with root references are replaced by another edges leading to the roots
 of the referenced trees.
-A created graph is in Figure \ref{fig:forest_graph}.
-
+A~created graph is in Figure \ref{fig:forest_graph}.
 	\begin{figure}[bth]
 	\begin{center}
 		\scalebox{1}
@@ -205,7 +208,7 @@ A created graph is in Figure \ref{fig:forest_graph}.
 			\hspace{0.55cm}
 			\input{fig/prel/for3.tikz}
 		}
-		\caption{A forest $f$ consisting the three trees $t_1, t_2, t_3$ with roots $u_1, v_1, w_1$}.
+		\caption{A forest $f$ consisting 3 trees $t_1, t_2, t_3$ with roots $u_1, v_1, w_1$.}
 	  \label{fig:forest}
 	\end{center}
 	\end{figure}
@@ -214,10 +217,11 @@ A created graph is in Figure \ref{fig:forest_graph}.
 	\begin{center}
 		\input{fig/prel/for_graph.tikz}
 		\caption{A graph $\otimes t_1,t_2,t_3$ obtained from a forest in Figure \ref{fig:forest}.
-		The green edges are the ones added to create the graph from forest}.
+		The green edges are the ones added to create the graph from forest.}
 	  \label{fig:forest_graph}
 	\end{center}
 	\end{figure}
+\vspace{-0.5cm}
 \eexmp
 
 \subsection{Graphs and Forests with Ports}
@@ -231,18 +235,19 @@ is an input port and $\phi_1 \cdots \phi_n$ is a sequence of output ports.
 The ports in $\phi$ are unique.
 If a root of $g_\phi$ is $\phi_1$ then $g_\phi$ is called \emph{accessible}.
 
-The \emph{cut-points} of a graph $g_\phi$ is the set of its ports and joins and we denote this set by $cps(g_\phi)$.
+The \emph{cut-points} of a graph $g_\phi$ is the set of its ports
+and joins and we denote this set by $cps(g_\phi)$.
 Formally, $cps(g_\phi)=\{v \in V\,|\, v \in \phi \vee idg(v) > 1\}$.
 
 An \emph{io-forest} is a pair $f=(t_1 \cdots t_n, \pi)$ such that $n \geq 1$ and $\pi \in \{1,\ldots,n\}^n$
-is a sequence of port indices, where $\pi_1$ is a input port index and $\pi_2 \ldots \pi_{|\pi|}$ is a sequence
+is a sequence of port indices, where $\pi_1$ is an input port index and $\pi_2 \ldots \pi_{|\pi|}$ is a sequence
 of the output ports indices.
 As in the case of the ports the indices are unique.
 It is also possible to construct an io-graph $\otimes f$ from a forest $f$ such that
-$\otimes f = (\otimes t_1 \cdots t_n,root(t_{\pi_{1}},\ldots,t_{\pi_{n}}))$.
-So the ports of $\otimes f$ are roots of the trees indexed by indices in $\pi$.
-This means that a root of the tree pointed by $\pi_1$ is an input port of $\otimes f$ and
-the roots of the trees pointed by the other indices in $\pi$ are the output ports of $\otimes f$.
+$\otimes f = (\otimes t_1 \cdots t_n,root(t_{\pi_{1}}),\ldots,root(t_{\pi_{n}}))$.
+So the ports of $\otimes f$ are the roots of the~trees indexed by indices in $\pi$.
+This means that a node of the graph pointed by $\pi_1$ is an input port of $\otimes f$.
+The nodes (that were roots of the trees) pointed by the other indices in $\pi$ are the output ports of $\otimes f$.
 
 \bexmp
 Recall graph $t$ from Figure \ref{fig:graph_tree}.
@@ -253,11 +258,11 @@ Because $v_1$ is the root the tree $t_\phi$ is accessible.
 The cut-points of $t_\phi$ are $v_1, v_4, v_5$.
 
 In Figure \ref{fig:forest} we shown the forest $f$.
-This forest could be extended to a io-forest $f_{io}=((t_1,t_2,t_3),\pi)$ by defining sequence of port indices $\pi$
-which could be e.g., $(1,3)$.
+This forest could be extended to a io-forest $f_{io}=((t_1,t_2,t_3),\pi)$ 
+by defining a sequence of the port indices $\pi$ which could be e.g., $(1,3)$.
 Then a graph $\otimes f_{io}$ is a pair $(\otimes (t_1,t_2,t_3)$, $(u_1,w_1))$.
-The graph $\otimes (t_1,t_2,t_3)$ is the same as in Figure \ref{fig:forest_graph}.
-The input port $u_1$ is related to the input port index $1$ of $f_{io}$
+The graph $\otimes (t_1,t_2,t_3)$ is the same as in Figure~\ref{fig:forest_graph}.
+The input port $u_1$ is indeed the node $root(t_1)$
 and the output port $w_1$ is related to the output port index $3$.
 \label{ex:iograph}
 \eexmp
@@ -267,7 +272,7 @@ and the output port $w_1$ is related to the output port index $3$.
 
 There are two properties of the forests, minimality and canonicity, that we will further employ.
 The properties make possible to represent an io-forest in unique way.
-That enables manipulating with io-forest it in deterministic way.
+That enables manipulating with io-forest deterministically.
 An io-forest $f_m=(t_1 \cdots t_n, \phi)$ representing a graph $\otimes f$ is \emph{minimal}
 iff the roots of trees $t_1,\ldots,t_n$ corresponds to the cut-points of $\otimes f$,
 so there is a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n\} )\}$ and $cps(\otimes f)$.
@@ -296,7 +301,7 @@ quadruple $A = (Q, \Sigma, \Delta, R)$ where
 	\item $Q$ is a finite set of \emph{states}
 	\item $\Sigma$ is a ranked alphabet
 	\item $\Delta$ is a set of \emph{transition rules} where transitions have a form $(q,a,q_1 \cdots q_n)$ where $q,q_1,\ldots,q_n \in Q$, $a \in \Sigma$, $n \geq 0$ and $\#a = n$.
-		Alternatively, we write $q \xrightarrow{a} (q_1 \cdots q_n)$ to denote a $(q,a,q_1 \cdots q_n) \in \Delta$.
+		Alternatively, we write $q \xrightarrow{a} (q_1 \cdots q_n)$ to denote $(q,a,q_1 \cdots q_n) \in \Delta$.
 		When $n=0$ then the rule is called \emph{leaf rule}.
 	\item $R \subseteq Q$ is a set of \emph{root states}.
 \end{itemize}
@@ -344,7 +349,7 @@ and $\pi = I_1 \cdots I_n$ where $I_1,\ldots, I_n \in \{1, \ldots, n\}$ is a seq
 There are two kinds of languages related to FA.
 The first one is forest language obtained by Cartesian product of the languages of particular TA (and port indices) of FA
 and hence the forest language is a set of the io-forests.
-The second one is the graph language obtained by connecting the io-forests from forest language to io-graphs.
+The second one is the graph language obtained by connecting the io-forests from the forest language to io-graphs.
 Formally, the \emph{forest language} of the FA $F$ is the set of io-forests $L_f(F)= L(A_1) \times \ldots L(A_n) \times \{\pi\}$.
 Note that it is necessary to add to the Cartesian product also the sequence of indices to preserve structure of io-forests
 and hence to be able to construct graph language of $F$ in deterministic way.
@@ -380,12 +385,12 @@ $\Sigma$ is same as in Example \ref{ex:ta},
 $\Delta=\{p_1 \xrightarrow{a} (p_2,p_3),
 p_2 \xrightarrow{b} (),
 p_3 \xrightarrow{b} ()\}$
-and $R\{p_1\}$.
-TA $B$ has $t_2$ in its language.
+and $R=\{p_1\}$.
+TA $B$ contains $t_2$ in its language.
 Finally, we define a TA $C=(Q_C,\Sigma, \Delta_C, R_C)$ where $Q_C=\{r_1\}$,
 $\Sigma$ is again the same as before,
-$\Delta= r_1 \xrightarrow{b} ()\}$
-and $R\{r_1\}$.
+$\Delta= \{r_1 \xrightarrow{b} ()\}$
+and $R=\{r_1\}$.
 A set $L(C)$ contains $t_3$.
 Putting all defined automata together we can construct a forest automata $F=((A,B,C),(1,3))$.
 The io-forest $f_{io}$ is in the forest language $L_f(F)$ of $F$ because it belongs
@@ -402,19 +407,22 @@ but we need to define hierarchical forest automata to be able to represent
 another class of data structures (further described in \ref{subsec:boxes}), like doubly-linked lists or trees with root pointers.
 For creating the hierarchy of forest automata we need to introduce \emph{structured labels}.
 This labels could contain another forest automata.
-The hierarchy then comes from the fact that forest automata of a certain level
-are defined over structured labels containing FA of lower levels.
+So when a label containing a non-hierarchical FA is used as a label
+in alphabe of FA $F'$ then $F'$ is FA of the firest level.
+Then the hierarchy of FA is created by nesting the FA of lower level
+to the labels of FA of higher lavel.
 
 \subsection{Structured Labels}
 
 $\Gamma$ is a ranked alphabet of \emph{sub-labels} with defined total ordering $\sqsubset$.
-Let $g$ be a graph defined over $2^\Gamma$ where $A$ denotes a symbol of $g$ and $\forall A \subseteq \Gamma: \#A = \sum_{a\in A} \#a$.
-The graph $g$ has edges in the form $v \mapsto (\{a_1,\ldots,a_m\},v_1 \cdots v_n)$ where
+Let $g$ be a graph defined over $2^\Gamma$ where $A$ denotes a label of $g$ and $\forall A \subseteq \Gamma: \#A = \sum_{a\in A} \#a$.
+The~graph $g$ has edges in the form $v \mapsto (\{a_1,\ldots,a_m\},v_1 \cdots v_n)$ where
 $a_1 \sqsubset a_2 \sqsubset \ldots \sqsubset a_m$ and $\sum_{a \in \{a_1,\ldots,a_n\}} \# a = n$.
 We denote such edge by $e$.
-Each edge $e$ consists \emph{sub-edges} that creates sequence $e\langle 1\rangle = v \mapsto (a_1,v_1 \cdots v_{\#a_1}) \cdots e\langle n\rangle= v \mapsto (a_m,v_{n-\#a_m+1} \cdots v_m)$.
-We denote $i$-th sub-edge of $e$ in $g$ by $e\langle i\rangle = v \mapsto (a_i,v_k \cdots v_l)$ where $i \in \{1,\ldots,m\}$ or
-we can also denote it by indices from $\{k,\ldots,l\}$.
+Each edge $e$ consists \emph{sub-edges} that creates sequence
+$e\langle 1\rangle = v \mapsto (a_1,v_1 \cdots v_{\#a_1}) \cdots e\langle n\rangle= v \mapsto (a_m,v_{n-\#a_m+1} \cdots v_m)$.
+We denote the $i$-th sub-edge of $e$ in $g$ by $e\langle i\rangle = v \mapsto (a_i,v_k \cdots v_l)$ where $i \in \{x \in \natnum | 1 \leq x \leq m\}$ or
+we can also denote it by indices from $\{x \in \natnum | k \leq x \leq l\}$.
 We use $SE(g)$ to denote all sub-edges of graph $g$.
 A node $v$ of a graph is \emph{isolated} if it is not part of any sub-edge.
 Formally, a node $v$ is isolated iff $\nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l): v = v' \wedge \nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l)\ \exists v'' \in \{v_k,\ldots, v_l\}: v = v''$.
@@ -427,15 +435,18 @@ A (finite, non-deterministic, top-down) \emph{tree automata} (over structured la
 \begin{itemize}
 	\item $Q$ is a finite set of states.
 	\item $\Gamma$ is a ranked alphabet.
-	\item $\Delta$ is a set of transition rules set with rules in the form $(q,\{a_1,\ldots,a_m\},q_1 \cdots q_n)$ where $q,q_1,\ldots,q_n \in Q$, $\{a_1,\ldots,a_m\} \in \Gamma$.
-	Each rule could be interpreted as a sequence of the \emph{rule-terms} $d\langle 1\rangle = q \mapsto (a_1,q_1 \cdots q_{\#a_1}) \cdots d\langle n\rangle= q \mapsto (a_m,q_{n-\#a_m+1} \cdots q_n)$ and
+	\item $\Delta$ is a set of transition rules set with the rules in the form
+		$(q,\{a_1,\ldots,a_m\},q_1 \cdots q_n)$
+		where $q,q_1,\ldots,q_n \in Q$, $\{a_1,\ldots,a_m\} \in \Gamma$.
+	Each rule could be interpreted as a sequence of the \emph{rule-terms}
+	$d\langle 1\rangle = q \mapsto (a_1,q_1 \cdots q_{\#a_1}) \cdots d\langle n\rangle= q \mapsto (a_m,q_{n-\#a_m+1} \cdots q_n)$ and
 	we denote the $i$-th rule term of sequence again by $d\langle i\rangle$ where $i \in \{1,\ldots,m\}$.
 	\item $R\subseteq Q$ is a finite set of root states.
 \end{itemize}
 
 \subsection{Forest Automata of Higher Level}
 
-Finally, we can extend also FA to a version defined over structured labels.
+Finally, we can extend also FA to a version defined over the structured labels.
 Informally, a forest automaton of a higher level has another forest automata (of lower lever) as the symbols on its edges.
 This makes possible to build a hierarchy of forest automata.
 Let formalize this idea.
@@ -444,20 +455,23 @@ So let $\Gamma_1$ be a set of all forest automata over $2^\Gamma$ and let the el
 All forest automata of \emph{level $i$} form the set $\Gamma_i$.
 A forest automaton $F$ of level $i$ is defined over the ranked alphabet $2^{\Gamma \cup \Delta}$ where $\Delta$ is a subset of forest automata of
 level $i-1$ which are called \emph{boxes} of $F$.
-The \emph{Rank} $F$ of an FA $F$ is the number of its output port indices.
+The \emph{rank} of an FA $F$ is the number of its output port indices.
 Finally, the set of all forest automata of all levels $\sum_{i \geq 0} \Gamma_i$ is denoted by $\Gamma^{*}$ and it is ordered by a total ordering $\sqsubset_{\Gamma_*}$.
 
-We define operation \emph{sub-edge replacement} which help us to define semantics of forest automata of higher level.
-Informally, the sub-edge replacement removes a sub-edge and matches its origin and outputs with a new graph serving like a substitution of the sub-edge.
-This operation will be further used for replacement of sub-edge of FA with by a graph represented by FA of lower level.
+We define an operation \emph{sub-edge replacement}
+which help us to define semantics of forest automata of higher level.
+Informally, the sub-edge replacement removes a sub-edge and matches its origin
+and the outputs with a new graph serving like a substitution of the sub-edge.
+This operation will be further used for a replacement of sub-edge of FA
+with by a graph represented by FA of lower level.
 
 Formally, let $g$ be a graph with an edge $e \in edges(g)$ and sub-edge $e\langle i\rangle = v_1 \rightarrow (a,v_2 \cdots v_n)$.
 Let $g_{\phi}'$ be an io-graph such that $|\phi| = n$.
 We assume that $dom(g) \cap dom(g') = \emptyset$.
-The sub-edge $e\langle i\rangle$ could be replaced by $g'$ such that $\forall j \in \{1,\ldots,n\}: l_{g}(v_j) \cap
+The sub-edge $e\langle i\rangle$ could be replaced by $g'$ if $\forall j \in \{1,\ldots,n\}: l_{g}(v_j) \cap
 l_{g'}(\phi_j) = \emptyset$
 (this conditions checks whether there is no successor of $v_j$ and $\phi_j$ reachable over the same
-label from both nodes).
+label from the both nodes).
 The result of replacement (if it is possible to do it) is denoted as $g\subst{g'_\phi}{e\langle i\rangle}$.
 The result is the graph $g_n$ in a sequence $g_0 \cdots g_n$ of graphs which are defined as follows: 
 \begin{itemize}
@@ -488,14 +502,15 @@ a graph $g$ over ranked alphabet $\Gamma$ is called \emph{$\Gamma$-semantics}.
 \emph{$\Gamma$-semantics} is formally defined as a set of graphs $g'$ such that $g \prec^* g'$.
 We denote it as $\llbracket g \rrbracket_\Gamma$ or just simply $\llbracket g \rrbracket$ when it is
 clear which alphabet we speak about.
-Finally, \emph{$\Gamma$-semantics} is defined for a FA $F$ of higher level as follows $\llbracket F \rrbracket = \bigcup_{g_\phi \in L(F)} (\llbracket g \rrbracket \times \{\phi\})$.
-Please note that the the meaning of $L(F)$ and $L_f(F)$ has not been changed so the both sets (languages) can contain just graphs (or forests)
-over structured labels.
+Finally, \emph{$\Gamma$-semantics} is defined for a FA $F$ of higher level as follows
+$\llbracket F \rrbracket = \bigcup_{g_\phi \in L(F)} (\llbracket g \rrbracket \times \{\phi\})$.
+Please note that the meaning of $L(F)$ and $L_f(F)$ has not been changed
+so the both sets (languages) can contain just graphs (or forests) over structured labels.
 
 When we recall the definition of canonicity respecting FA we will find that it is applicable also for FA of higher level.
 A FA $F$ is canonicity respecting if $\forall f \in L_f(F): \emph{f is canonical}$ and since definition of canonical $f$
-is not affected by extending labels to the structured ones the meaning of canonicity is same as for basic FA.
-The language inclusion checking is again possible in component-wise way like in the case of basic FA what is
+is not affected by extending labels to the structured ones the meaning of canonicity is the same as for basic FA.
+The language inclusion checking is again possible in the component-wise way like in the case of basic FA what is
 proofed in \cite{forester:techrep}.
 
 %TODO sets of FA. are they really needed anywhere?
