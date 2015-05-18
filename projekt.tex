@@ -92,17 +92,16 @@
   keywords.en={forest automata, formal verification, static analysis, complex data structures, tree automata, backward run, predicate abstraction.}, %klicova slova v anglickem jazyce
   %Abstract
   abstract.cs={
-	  Lesní automaty jsou formalismem používaným pro analýzu a verifikaci programu, které pracují s dynamickými datovými strukturami.
-	  Koncept lesních automatů je založen na stromových automatech a verifikační procedura na tomto konceptu postavená byla implementována v nástroji Forester.
-	  Ten implementuje vlastní knihovnu pro manipulaci se stromovými automaty.
-	  Nicméně existuje knihovna VATA, která obsahuje vysoce efektivní implementaci algoritmů
-	  pro práci se stromovými automaty a to především algoritmů pro test inkluze jazyků stromových automatů,
-	  což je stěžejní operace i při práci s lesními automaty.
-	  Prvním cílem této práce je tedy vytvoření varianty nástroje Forester založené na knihovně VATA.
-	  Druhým cílem je potom rozšíření verifikační procedury založené na lesních automatů o zpětný běh, který
-	  při nalezení chyby ve verifikovaném programu slouží k určení toho, zdali je chyba skutečná nebo byla způsobena
-	  abstrakcí použitou během průběhu verifikace, což je informace použitelná pro zjemnění predikátové abstrakce.
-	  První cíl byl již splněn a varianta nástroje Forester používající knihovnu VATA se účastnila soutěže SV-COMP 2015.
+	  V této práci je rozvíjena existující metoda pro shape analýzu programů založená na lesních automatech.
+	  Dále je také vylepšována implementace této metody, nástroj Forester.
+	  Lesní automaty jsou založeny na stromových automatech a Forester obsahuje jejich jednoduchou implementaci.
+	  Prvním přínosem této práce je nahrazení této implementace knihovnou VATA, která obsahuje algoritmy
+	  pro efektivní reprezentaci a manipulaci stromových automatů.
+	  Verze nástroje Forester používající knihovnu VATA se zúčastnila mezinárodní soutěže SV-COMP 2015.
+	  Za druhé, verifikace založená na lesních automatech je v této práci rozšířena o analýzu nalezených protipříkladů.
+	  Výsledek této analýzy určuje, zdali nalezené chyba je reálná nebo nepravá, což lze dále použít pro zjemnění
+	  predikátové abstrakce.
+	  Právě predikátová abstrakce využívající informace ze zpětného běhu je také navržena a implementována jako součást této práce.
   }, % abstrakt v ceskem jazyce
   abstract.en={
 	  In this work, we develop an existing method for shape analysis based on so called forest automata,
@@ -114,8 +113,7 @@
       Secondly, we have extended the forest automata based verification method with a counterexample analysis.
       The results of the counterexample analysis can be then used to check whether
       a found error is a~spurious or a real one what could be used for refinement of predicate abstraction.
-	  Furthermore, we apply backward run for refinement of predicate abstraction which has been also developed
-	  as a part of this work.
+	  Furthermore, we design and implement predicate abstraction with the information from backward run.
   }, % abstrakt v anglickem jazyce
   %Prohlaseni
   declaration={Prohlašuji, že jsem tuto diplomovou práci vypracoval samostatně pod vedením\\ pana Mgr. Lukáše Holíka, Ph.D.},
