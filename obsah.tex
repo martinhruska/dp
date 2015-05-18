@@ -49,43 +49,61 @@ This work focuses on a verification procedure based on the concept of forest aut
 combines benefits of the both mentioned approaches \cite{forester11}.
 
 Forest automata have been introduced in \cite{forester11} and
-they are an extension of finite automata or, more precisely, extension of finite tree automata (TA).
+they are an extension of finite tree automata (TA).
 They are used as an abstract domain in a verification procedure which performs symbolic execution of the analyzed program.
 A~prototype of this verification procedure has been implemented in a tool called \emph{Forester} \cite{www:forester}.
-Forester verifies programs written in C~language and it detects safety violations like invalid dereferences, invalid frees,
-memory leaks and also reachability of an error program location.
-It is cable to verify non-trivial data structures like skip-lists of the~second and the~third level.
-However, the current implementation is far from perfectness.
-E.g., Forester currently does not support the complete C language syntax and %TODO
-it is not also yet possible to check whether a found error is real or spurious.
-It is also needed to refactor some parts of Forester code before any extension of the tool.
+Forester verifies programs written in C and detects safety violations such as invalid dereferences, invalid frees,
+memory leaks, and also reachability of an error line.
+It is capable of verifying non-trivial data structures such as skip-lists of the~second and the~third level.
+However, the current implementation is far from perfect.
+For instance, Forester currently does not support the complete syntax of C and %TODO
+it also does not check whether a found error is real or spurious.
 A~general goal of this work is to improve Forester in the areas described further.
 
-Since FA are highly related to the finite tree automata, the first goal of this work is to change
-the~underlying implementation of finite tree automata in Forester to \vata\ -- a state-of-the-art library for TA manipulation \cite{libvata}.
-Particularly, this consists creating an interface between Forester and VATA to employ VATA as a TA library for Forester backend
-which should bring better maintainability and modularity than having a special TA library implementation within Forester as it is now.
-The second goal of this work is to design and implement \emph{backward run} for FA based verification
-which enables checking spuriousness of an error found in a program.
-The error could be spurious because too strong abstraction over FA is used.
-The information gained by backward run could be used for the refinement of \emph{predicate abstraction} (one kind of abstraction over FA)
-to prevent verification procedure from getting the same spurious error again.
+One of the problems of Forester is low modularity and maintainability of the code.
+The first goal of this thesis is to improve it by changing the~underlying implementation
+of finite tree automata in Forester to \vata\ -- a state-of-the-art library for TA manipulation \cite{libvata}.
+This should bring better maintainability and modularity than having
+a special TA library implementation within Forester as it is now.
+%The VATA library implements very efficiently the most of state-of-the-art algorithms for TA
+%and it is better to implement the algorithms efficiently with implementation optimizations
+%only at the one place (in VATA) then spending time with optimizing the implementation
+%of the same algorithms in Forester again.
+%The code with implementation optimization is also not easy maintainable in long term.
+%So it is again better to put this effort only once in the VATA library.
+But it is needed to refactor some parts of Forester code before any change of the tool.
+Then it would be possible to design and implement an interface between Forester and VATA.
+
+Another weakness of Forester is lack of the analysis of detected errors.
+Since Forester uses abstraction to deal with unboudness of dynamic data structures
+it possible that a found error is spurious and its detection is caused by overapproximating abstraction.
+When this happens then the analysis of the detected error can determine
+whether the error is a real or a spurious one.
+The results of the counterexample analysis can be also used for refinement of abstraction.
+Then the analysis can be restarted with the refined abstraction.
 This gradual refinement is known as \emph{counterexample-guided abstraction refinement} (CEGAR) \cite{cegar}.
-However, Forester does not currently use the mentioned predicate abstraction but \emph{height abstraction} %TODO
-because predicate abstraction needs backward run for creating the new predicates.
+%The verification procedure cannot verify correct programs with detected spurious error without this refinement.
+%It can also detect a spurious error instead of the real one because the verification procedure ends after the
+%first error detection without the analysis of the found error.
+So the second goal of this thesis is to design and implement the analysis of the counterexamples
+and the results use for refinement of abstraction (when a spurious error is found).
+The method for analysing counterexamples is \emph{backward run}
+and its results will be used for refinement of \emph{predicate abstraction}.
+Forester does not currently use the mentioned predicate abstraction but \emph{height abstraction}
+because predicate abstraction needs backward run for creating the new predicates for refinement.
 Height abstraction is less precise and less flexible compared to predicate abstraction.
 Implementing predicate abstraction enables analysis of even more complex data structures like red-black trees.
 Therefore, a~part of the second goal is an implementation of predicate abstraction using backward run in Forester.
 
-The outline of this document is following.
-In Chapter \ref{ch:prel} the preliminaries are given.
+The outline of this master thesis is following.
+In Chapter \ref{ch:prel}, the preliminaries are given.
 The verification procedure based on FA is covered in Chapter \ref{ch:fav}.
-Chapter \ref{ch:tools} provides description of \vata\ and Forester tool
+Chapter \ref{ch:tools} provides description of \vata\ and Forester
 and Chapter \ref{ch:fova} describes an implementation of the version of Forester tool using \vata.
 The design and the implementation of backward run and predicate abstraction
-for FA base verification is given in Chapter \ref{ch:backward}.
+for FA based verification is given in Chapter \ref{ch:backward}.
 Finally, Chapter \ref{ch:eval} contains an overview of experimental evaluation and 
-Chapter \ref{ch:concl} summarizes this master thesis.
+Chapter \ref{ch:concl} summarizes this thesis.
 
 \chapter{Preliminaries}
 \label{ch:prel}
