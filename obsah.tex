@@ -2315,8 +2315,10 @@ Therefore we use height abstraction with the height $1$
 what was the original configuration of Forester before the
 modifications done as a part of this thesis.
 
-\begin{table}[buh]
+\begin{table}[bt]
 	\vskip6pt
+	\caption{Comparison of Forester with and without VATA on the Forester regress test suite.
+	}
 	\centering
 	\begin{tabular}{|l | c | c |}
 		\hline
@@ -2328,8 +2330,6 @@ modifications done as a part of this thesis.
 		Default    & $65.00$ & $43.00$ \\
 		\hline
 	\end{tabular}
-	\caption{Comparison of Forester with and without VATA on the Forester regress test suite.
-	}
 	\label{tab:vataregre}
 \end{table}
 
@@ -2358,8 +2358,11 @@ perform the advanced optimization between Forester and VATA as it does
 when Forester uses it own tree automata module.
 
 
-\begin{table}[buh]
+\begin{table}[bt]
 	\vskip6pt
+	\caption{Comparison of Forester with and without VATA on the hard cases.
+		Compiled with g++ default optimization.
+	}
 	\centering
 	\begin{tabular}{|l | c | c |}
 		\hline
@@ -2377,9 +2380,6 @@ when Forester uses it own tree automata module.
 		Linux driver snippet     & $9.931$ & $5.08$  \\ 
 		\hline
 	\end{tabular}
-	\caption{Comparison of Forester with and without VATA on the hard cases.
-		Compiled with g++ default optimization.
-	}
 	\label{tab:vatadef}
 \end{table}
 
@@ -2419,8 +2419,11 @@ needed to be done as the future work.
 Otherwise, the analysis programs with heap represented by forest automata
 with a lot of states would be inneficient.
 
-\begin{table}[buh]
+\begin{table}[bt]
 	\vskip6pt
+	\caption{Comparison of Forester with and without VATA on the hard cases.
+		Compiled with g++ with level -O3 of optimization.
+	}
 	\centering
 	\begin{tabular}{|l | c | c |}
 		\hline
@@ -2438,9 +2441,6 @@ with a lot of states would be inneficient.
 		Linux driver snippet     & $1.07$ & $1.92$  \\ 
 		\hline
 	\end{tabular}
-	\caption{Comparison of Forester with and without VATA on the hard cases.
-		Compiled with g++ with level -O3 of optimization.
-	}
 	\label{tab:vataopt}
 \end{table}
 
@@ -2457,7 +2457,7 @@ This could fully clarify the reasons why the slow down happen.
 \section{Backward Run Evaluation}
 \label{sec:bweval}
 
-\begin{table}[buh!]
+\begin{table}[bt]
 	\vskip6pt
 	\caption{Evaluation of backward run at SV-COMP benchmark
 		and the Forester test test.
@@ -2535,7 +2535,7 @@ only to the programs that use the supported C language constructions.
 \section{Predicate Abstraction}
 \label{sec:paeval}
 
-\begin{table}[buh!]
+\begin{table}[bt]
 	\vskip6pt
 	\caption{Comparison of Forester and Predator on the hard cases.
 		Forest is able to analyse these programs due to the backward
@@ -2656,7 +2656,7 @@ kind of error should be proved.
 %originally supported by Forester before its extension
 %done as part of this thesis.
 
-\begin{table}[buh!]
+\begin{table}[h]
 	\vskip6pt
 	\caption{Evaluation of predicate abstraction over SV-COMP benchmark
 		and the Forester test set.

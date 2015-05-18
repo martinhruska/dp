@@ -26,7 +26,7 @@
 \newcommand{\heqclass}[2]{[#1]_{\heqrel{#2}}}
 
 \newcommand{\abstr}[0]{\tau_{op}}
-\newcommand{\rabstr}[0]{\tau_{op^1}}
+\newcommand{\rabstr}[0]{\tau_{-op}}
 \newcommand{\abs}[0]{\alpha}
 \newcommand{\pabs}[0]{\alpha_{\predset}}
 
@@ -35,7 +35,8 @@
 
 \newcommand{\pred}[0]{P}
 \newcommand{\predset}[0]{\mathcal{P}}
-\newcommand{\predaut}[0]{\mathcal{A^P}}
+\newcommand{\predaut}[0]{A^\mathcal{P}}
+\newcommand{\predauti}[1]{A^\mathcal{P}_{#1}}
 \newcommand{\peqrel}[0]{\sim_\predset}
 
 \newcommand{\lfunc}[2]{\lambda #1 \,:\, #2}
@@ -57,7 +58,7 @@
 \newcommand{\sbwd}[0]{S^{B}_{i}}
 \newcommand{\sbwdp}[1]{S^{B}_{#1}}
 \newcommand{\isfwd}[0]{I_{F}}
-\newcommand{\isfwdp}[1]{I_{F_{#1}}}
+\newcommand{\isfwdp}[1]{I^{#1}_{F}}
 \newcommand{\sfwd}[0]{S^{F}_{i}}
 \newcommand{\sfwdp}[1]{S^{F}_{#1}}
 \newcommand{\ftraceseq}[0]{S^{F}_1 \cdots S^{F}_n}
@@ -66,8 +67,9 @@
 \newcommand{\btraceseq}[0]{S^{B}_1 \cdots S^{B}_n}
 \newcommand{\btrace}[0]{BT}
 %\newcommand{\isbwd}[0]{I^{B}}
-\newcommand{\isbwd}[0]{I_{F}^{-1}}
-\newcommand{\isbwdp}[1]{I_{F_{#1}}^{-1}}
+\newcommand{\isbwd}[0]{-I_{F}}
+\newcommand{\isbwdp}[1]{-I_{F}^{#1}}
+\newcommand{\ipred}[0]{I_{P}}
 \newcommand{\bstdsym}[0]{\symstate{F}{\regs}{\isbwd}}
 
 %isect
