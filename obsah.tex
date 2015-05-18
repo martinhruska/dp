@@ -2,46 +2,51 @@
 
 The importance of computers in our everyday life has largely increased over the past few decades.
 A~lot of us can only hardly imagine doing their jobs without a help of an appropriate computer program
-and we also spend a plenty of time using computers (e.g. personal computers or mobile devices) in leisure time.
-The~computer programs are also often used in very critical instances like autopilot in an airplane.
-But the growing number of applications of computer programs brings also the~need for their greater safety and security.
+and we also spend a plenty of time using computers (e.g., personal computers or mobile devices) in leisure time.
+The~computer programs are also often used in critical applications like autopilot in an airplane.
+The growing number of applications of computer programs brings also the~need for their greater safety and security.
 
-However, a guarantee of software correctness is not an easy task
-because the programs often go through many states during the computation
-and it could be very time and space consuming or even impossible to check whether no undesirable behavior
-may appear in any of those states.
+It is not an easy task to guarantee that a software has the specified (safe) properties.
+The~programs often go through many states during the computations
+and it could be very time and space consuming or even impossible to check whether no undesirable behaviour
+may appear in any of the program runs.
 One of the approaches to ensure the software quality is \emph{testing} (and dynamic analysis) which is based
-on running the program in the different contexts with the different inputs
+on running the program in different contexts with different inputs
 and matching a program behavior and the outputs with the expected ones.
-This method can satisfy many of the requirements for the software quality and often covers the great space of the program behaviors.
-On the~other side, it is only possible to prove presence of the~errors using testing not their absence \cite{dijkstra}.
-Moreover finding some errors during testing does not mean that all errors are eliminated.
+This method can satisfy the most of the software quality requirements and often covers the most of the program behavior.
+On the~other side, it is only possible to find the~errors using testing, not to prove their absence \cite{dijkstra}.
+Finding some errors during testing does not mean that all errors are eliminated.
 
 The mentioned weakness of testing can be resolved by \emph{formal verification}.
 Formal verification aims at using rigorous mathematical methods to check whether a given system meets a given specification \cite{fav:lecture}.
 There are three main branches of formal verification.
-The first one is \emph{model checking} which systematically explores the states of a~model (e.g. model of a program) to
+The first one is \emph{model checking} which systematically explores the states of a~system (e.g., a program) or its model to
 prove that the model satisfies the property.
 The second one is \emph{static analysis} which is done over a source code (or some modification of it) of a system
-without a need of its execution.
+without a need of its explicit execution and it rather explores a syntatic structure of the analysed program.
 One of the important and very widely used approaches in static analysis is called \emph{abstract interpretation} where the analysis is performed by
 applying abstract transformers corresponding to the original program semantics over an abstract domain.
+Model checking and static analysis are overlapping in present.
+Abstract interpretation is an example of technique that is consider
+to be the static analysis technique but it also has some attributes of
+the model checking techniques.
 The last approach is \emph{theorem proving}.
-It proves the program safety in a standard mathematical way -- starting from the axioms and using the inference rules to
-verify the properties of a given system.
+It proves the program safety in the standard mathematical way --
+starting from axioms and using inference rules to verify properties of the given system.
 Theorem proving can be partially automated.
 
-This work deals with a specific part of static analysis called \emph{shape analysis} which is focused on the verification of programs manipulating
-complex data structures (like the different kinds of lists and trees), typically allocated on the heap.
-The properties checked are for example checking whether no dangling
-pointers are dereferenced (no invalid dereferences), whether all allocated memory on a heap is also freed
-during the program execution (no memory leaks) or whether there is not freed pointer without assigned memory (no invalid free).
-There are different approaches to this kind of static analysis with the different advantages.
-For example, the approach based on \emph{separation logic} \cite{seplog,seplog07} provides great scalability of a verification procedure.
-On the other side, the automata based approach, particularly \emph{abstract regular tree model checking} (ARTMC) \cite{artmc}, is
-superior in its flexibility and generality.
-This work focuses on the verification procedure based on the concept of forest automata (FA) which
-combines benefits of the both mentioned approaches.
+This work deals with a specific branch of static analysis called \emph{shape analysis} which is focused on verification of programs manipulating
+complex dynamic data structures (such as different kinds of lists and trees),typically allocated on the heap.
+Checked properties are for example absence of invalid pointer dereference,
+whether no invalid pointer is freed (no invalid free) or
+whether all alocated memory is freed during the program execution (no memory leaks).
+There are different approaches to shape analysis with different advantages.
+For example, the approach based on \emph{separation logic} \cite{seplog,seplog07} provides great scalability.
+On the other hand, automata based approaches, particularly \emph{abstract regular tree model checking} (ARTMC) \cite{artmc}, is
+superior in its flexibility and generality (but some state-of-the-art separation logic methods
+has comparable generality \cite{biabduction}).
+This work focuses on a verification procedure based on the concept of forest automata (FA) which
+combines benefits of the both mentioned approaches \cite{forester11}.
 
 Forest automata have been introduced in \cite{forester11} and
 they are an extension of finite automata or, more precisely, extension of finite tree automata (TA).
@@ -427,6 +432,7 @@ We use $SE(g)$ to denote all sub-edges of graph $g$.
 A node $v$ of a graph is \emph{isolated} if it is not part of any sub-edge.
 Formally, a node $v$ is isolated
 iff $\nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l): v = v' \wedge \nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l)\ \exists v'' \in \{v_k,\ldots, v_l\}: v = v''$.
+If you read this really carefully, you got a beer on me. % EGG
 A graph $g$ is \emph{unambiguously determined} by $SE(g)$ if $g$ has no isolated nodes.
 
 \subsection{Tree Automata over Structured Labels}
@@ -1355,6 +1361,7 @@ The second part consists the rest of the other instructions.
 		The size $S$ of $D$ is determined by an integer value in the source register $r_s$.
 		The created instance will be further used for creating of a new TA
 		and it is yet stored to the destination register.
+		The second present for the attentive reader. % EGG
 		
 		$f(\stdsym) = \symstate{F}{
 		\regssub{
@@ -1635,6 +1642,7 @@ in the original TA library).
 \emph{VATAAdapter} also sometimes performs mentioned conversion of the data types.
 There are also the methods implemented by adapter not presented
 in VATA like method \emph{unfoldAtRoot} performing some kind of an unfolding.
+(I bet you will not read an implementation part, so here is one mug if you do.) % EGG
 The methods of this kind are very Forester specific.
 So it is not sensible to add them to a general purpose library like VATA is
 and it is better to implement them in interface like class VATAAdapter is.
@@ -1887,6 +1895,7 @@ The function should have the reverse semantics
 to the function $f$ from Section \ref{subsec:microinstr}.
 We further denote the previous instruction $\ipred$ in forward run
 that precedes the actually reversed instruction.
+Another drink on me for reading this (but only when you read carefully). % EGG
 
 \begin{comment}
 This section provides a description of the reverse operations for

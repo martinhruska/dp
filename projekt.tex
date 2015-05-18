@@ -95,12 +95,13 @@
 	  V této práci je rozvíjena existující metoda pro shape analýzu programů založená na lesních automatech.
 	  Dále je také vylepšována implementace této metody, nástroj Forester.
 	  Lesní automaty jsou založeny na stromových automatech a Forester obsahuje jejich jednoduchou implementaci.
-	  Prvním přínosem této práce je nahrazení této implementace knihovnou VATA, která obsahuje algoritmy
+	  Prvním přínosem této práce je nahrazení této implementace knihovnou VATA, která obsahuje optimalizované algoritmy
 	  pro efektivní reprezentaci a manipulaci stromových automatů.
 	  Verze nástroje Forester používající knihovnu VATA se zúčastnila mezinárodní soutěže SV-COMP 2015.
 	  Za druhé, verifikace založená na lesních automatech je v této práci rozšířena o analýzu nalezených protipříkladů.
-	  Výsledek této analýzy určuje, zdali nalezené chyba je reálná nebo nepravá, což lze dále použít pro zjemnění
-	  predikátové abstrakce.
+	  Výsledek této analýzy je možné výužít následujícími způsoby.
+	  Prvním je určení toho, zda je nalezené chyba reálná nebo naopak nepravá.
+	  Druhým je pak zjemnění predikátové abstrakce pomocí predikátů odvozených při zpětném běhu.
 	  Právě predikátová abstrakce využívající informace ze zpětného běhu je také navržena a implementována jako součást této práce.
   }, % abstrakt v ceskem jazyce
   abstract.en={
@@ -112,8 +113,10 @@
       The version of Forester using the VATA library participated in the competition SV-COMP 2015.
       Secondly, we have extended the forest automata based verification method with a counterexample analysis.
       The results of the counterexample analysis can be then used to check whether
-      a found error is a~spurious or a real one what could be used for refinement of predicate abstraction.
-	  Furthermore, we design and implement predicate abstraction with the information from backward run.
+      a found error is a~spurious or a real one.
+	  The results can be also used for refinement of predicate abstraction.
+	  Predicate abstraction using information from backward run is also designed and implemented as
+	  part of this thesis.
   }, % abstrakt v anglickem jazyce
   %Prohlaseni
   declaration={Prohlašuji, že jsem tuto diplomovou práci vypracoval samostatně pod vedením\\ pana Mgr. Lukáše Holíka, Ph.D.},
@@ -121,7 +124,8 @@
   acknowledgment={Rád bych poděkoval vedoucímu této práce, Mgr. Lukáši Holíkovi, Ph.D., za odborné rady a vedení při tvorbě této práce.
   Dále bych rád poděkoval Ing. Ondřeji Lengálovi za četné konzultace, během kterých mě trpělivě seznamoval s nástrojem Forester, 
   Prof. Ing. Tomáši Vojnarovi, Ph.D., a Mgr. Adamu Rogalewiczovi, Ph.D.,
-  za poskytnuté rady během konzultací.} % nepovinne
+  za poskytnuté rady během konzultací.
+  Také děkuji Ing. Tomáši Fiedorovi za cenné připomínky k finální podobě technické zprávy.} % nepovinne
 }
 
 %Abstrakt (cesky, anglicky)
