@@ -1539,23 +1539,25 @@ The second part consists the rest of the other instructions.
 \chapter{Forester with VATA}
 \label{ch:fova}
 
-This chapter describes a process of porting Forester to \vata, its difficulties and design and it also deals with implementation
+This chapter describes porting Forester to \vata, its design and difficulties and it also deals with implementation
 itself.
 
 First of all it is important to declare that we use \vata\ implementation of explicit encoding of TA because
-it is currently the only one that support the most of needed operations over TA and it is also more efficient than
-semi-symbolic encoding for purposes of Forester because no large alphabets are used during the verification procedure
-so the advantage of the semi-symbolic encoding would not be fully utilized here.
+it is currently the only one that support the most of needed operations over TA.
+It is also more efficient than
+semi-symbolic encoding for purposes of Forester because no large alphabets are used during the verification procedure.
+The advantage of the semi-symbolic encoding would not be fully utilized here.
 
-Forester implementation is currently far from being mature and high structural dependency is
+Forester implementation is currently far from maturity and the high structural dependency is
 one of its bottlenecks.
-So the first thing needed to be done is reducing number of dependencies between classes (described in Section \ref{sec:forester_prep}).
+So the first thing needed to be done is reducing number of dependencies between the classes (described in Section \ref{sec:forester_prep}).
 Then it would be possible to apply design pattern \emph{adapter} \cite{gamma95} (described in Section \ref{sec:adapter}) to create
-an interface between Forester and \vata\ (implementation itself is described in \ref{sec:fova_impl}).
+an interface between Forester and \vata\ (implementation itself is described in Section \ref{sec:fova_impl}).
 Applying of adapter design pattern makes possible to include VATA without need of rewriting
 Forester to the names of methods and data members used in VATA.
 It creates also only one place (particularly adapter class) connecting Forester and VATA instead of
-including VATA into many of the Forester classes and so it prevents from creating too strong relation between them.
+including VATA into many of the Forester classes.
+So it prevents from creating too strong relation between Forester and VATA.
 
 \section{Forester Refactoring}
 \label{sec:forester_prep}
@@ -1563,27 +1565,29 @@ including VATA into many of the Forester classes and so it prevents from creatin
 The original implementation of tree automata library has also strong dependencies
 the other classes.
 Hence it was needed to refactore implementation before it was possible to create adapter class for VATA API.
-The core class of original tree automata is class \emph{TA} and there are also related classes,
+The core class of the original tree automata is class \emph{TA} and there are also related classes,
 e.g. class \emph{TT} for transitions representation or class \emph{Antichain} for language inclusion checking using the Antichain algorithm from \cite{tacas10}.
 This set of classes realizing original tree automata library will be further referred as \emph{tree automata module}.
 
 The refactoring is mainly based on reduction of a number of data types and data members declared
 to be \emph{public} (in sense of the C++ programming language).
-This is by exploiting features provided by C++11 \cite{stroustrup13} which brings methods (keyword \emph{auto})
+This is by exploiting the features provided by C++11 \cite{stroustrup13}
+which brings the methods (namely keyword \emph{auto})
 for auto deduction of the data types by compiler.
 That provides possibility to make some of data types of the original tree automata module \emph{private}.
-\emph{Iterator} is another concept often used in combination with auto deduction of types to reduce the need to export internals of tree automata module.
-The combination of these two patterns are used for example when one needs to iterate over all transitions of tree automata or all transitions which
-have same state as parent.
+\emph{Iterator} is another concept often used in combination with auto deduction of types to reduce the number of export the internals of tree automata module.
+The combination of these two patterns are used for example when one needs
+to iterate over all transitions of tree automata or all transitions which
+have the same state as parent.
 These kinds of iterations are quite common in Forester.
 Another part of refactoring consists of simple replacing access of the class data members by the corresponding getters and setters method.
 Reducing of structural dependencies is also done by emphasis application of \emph{Law of Demeter} \cite{lod89} what practically
 means that classes using TA explicitly should implement methods providing information about TA instead of providing instance of TA object itself.
-E.g., when one class wants to know whether a given state is final in an tree automaton of an forest automaton then FA implementation should
-implement a method providing this information instead of providing access to its TA.
+E.g., when one class wants to know whether a given state is final in an tree automaton of a forest automaton then FA implementation should
+implement a method providing this information instead of providing access to it private TA data member.
 That helps us to make a smaller interface for TA module.
 However, also after this refactoring Forester source code is still far from accomplishing the mentioned good practices (and also those not mentioned)
-in the whole source code.
+access the whole source code.
 
 \section{Adapter Design Pattern}
 \label{sec:adapter}
@@ -1591,11 +1595,14 @@ in the whole source code.
 \emph{Adapter} is structural design patter \cite{gamma95} used for creating interface between classes incompatible classes.
 Adapter in notion of UML is shown in Figure \ref{fig:adapter}.
 Adapter consists from a class \emph{Adaptee} which is the class that we want to make compatible with
-another class \emph{Client} which wants to use the methods of Adaptee.
+another class \emph{Client}.
+Client wants to use the methods of Adaptee.
 Class \emph{Adaptor} is the one providing connection between Client and Adaptee.
-Adaptor could be implemented as inherited class from Adaptee and employs the concept of inheritance to redirect
+There are two ways how to implement Adaptor.
+The first one is to implement Adaptor as an inherited class from Adaptee
+and to employ the concept of inheritance to redirect
 method calls to its parent (with some possible preprocessing).
-Another possible implementation is composing Adaptee to Adaptor and using Adaptor like an interface to Adaptee.
+The second possible implementation is composing Adaptee to Adaptor and using Adaptor like an interface to Adaptee.
 Adaptor also could add a new method that combines Adaptee methods to achieve wanted operations.
 
 \begin{figure}
@@ -1616,52 +1623,54 @@ Adaptor is a newly implemented class \emph{VATAAdapter} which description is in 
 \label{sec:fova_impl}
 
 The main part of the adapter patter is in our case newly implemented class \emph{VATAAdapter} playing role of Adaptor.
-We decided to used the implementation approach to Adaptor, preferring composition over inheritance,
-because it is more suitable for our purposes since we often needs to rename methods 
-(name of a method in Forester differs from name of a method in VATA performing same operation)
-or convert a data type of parameter of tree automata operation (e.g. from vector to set). 
+We decided to use the implementation approach to Adaptor preferring composition over inheritance,
+because it is more suitable for our purposes since we often needs to rename methods.
+E.g., a name of a method in Forester differs from name of a method in VATA performing the same operation.
+A convertion of a data type of parameter of tree automata operation is also sometimes needed, e.g. from vector to set. 
 
 The class \emph{VATAAdapter} instantiates class \emph{ExplicitTreeAut} from VATA as its private data member
 and redirects to this instance method calls from Forester (the names of methods of VATAAdapter are the same as they were
 in the original TA library).
 \emph{VATAAdapter} also sometimes performs mentioned conversion of the data types.
-There are methods implemented by adapter not presented in VATA like method \emph{unfoldAtRoot}
-performing some kind of an unfolding.
-The methods of this kind are very Forester specific so it is not sensible to add them to general purpose library like VATA is
+There are also the methods implemented by adapter not presented
+in VATA like method \emph{unfoldAtRoot} performing some kind of an unfolding.
+The methods of this kind are very Forester specific.
+So it is not sensible to add them to a general purpose library like VATA is
 and it is better to implement them in interface like class VATAAdapter is.
 
 We originally supposed that it would be possible to keep the original TA module along VATA adapter
 to be able to easily switch between them.
 However it has proved that this would bring high overhead in some situations.
 E.g., a~conversion of some data types would be needed in this case
-what is overhead compared to implementation where data types compatible with VATA are used directly in the Forester code.
+what is overhead compared to implementation where the data types compatible
+with VATA are used directly in the Forester code.
 Hence we decided to remove the original tree automata module and further support only version of Forester with \vata.
 
 \chapter{Developing Backward Run and Predicate Abstraction for Forest Automata Based Verification}
 \label{ch:backward}
 
 As we already mentioned when an error in analysed program is detected
-it is necessary to check whether the error is real one or spurious
-so it is created by an overapproximating abstraction over automata.
+it is necessary to check whether the error is real one or spurious.
+A spurious error can be created by an overapproximating abstraction over automata.
 The analysis of spuriousness is done by \emph{backward run} which has not
-yet been designed and implemented in forest automata based verification yet.
-When it is proved that the error is spurious we have to refine abstraction to avoid
-reaching the error again and restart analysis with the refined abstraction.
+yet been designed and implemented for forest automata based shape analysis.
+When it is proved that the error is spurious we refine abstraction to avoid
+reaching the error again.
+The analysis is then restarted with the refined abstraction.
 This principle of gradually refinement of abstraction is based on CEGAR framework \cite{cegar}.
 
-In this work, we propose using predicate abstraction \cite{artmc} in forest automata based verification
-which has more fining tuning then currently used height abstraction.
-Predicate abstraction can be refined by obtaining \emph{predicates} from backward run
-what guarantees that the spurious error will not be reached again.
+In this work, we propose application of predicate abstraction \cite{artmc} for forest automata.
+Predicate abstraction has more fining tuning then currently used height abstraction.
+Predicate abstraction can be refined by \emph{predicates} obtained from backward run.
+It guarantees that the spurious error will not be reached again.
 However, we restrict ourselves only on basic forest automata, not the hierarchical ones.
 
 The structure of this chapter is following.
-The first Section \ref{sec:mybw} describes backward and predicate abstraction run generally
-then the second Section contains design of backward run for forest automata.
-Section \ref{sec:predicates} provides description of design of
-predicate abstraction for forest automata.
+The first Section \ref{sec:br} describes backward and predicate abstraction run generally.
 Section \ref{sec:isect} describes algorithm for intersection of non-hierarchical forest automata
-that is needed for backward run.
+Then Section \ref{sec:brdesign} contains design of backward run
+and Section \ref{sec:padesign} describes design of predicate abstraction for forest automata.
+Section \ref{sec:impl} covers implementation of both.
 Finally, an implementation of both concepts is described at Section \ref{sec:impl}.
 
 \section{Backward Run and Predicate Abstraction}
@@ -1669,7 +1678,7 @@ Finally, an implementation of both concepts is described at Section \ref{sec:imp
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[width=1\linewidth]{fig/artmc.png}
+	\includegraphics[scale=0.9]{fig/artmc.png}
 	\caption{
 		Figure is taken from \cite{artmc}.
 		Figures illustrates principle of forward and backward run and
@@ -1677,56 +1686,55 @@ Finally, an implementation of both concepts is described at Section \ref{sec:imp
 	\label{fig:bwrun}
 \end{figure}
 
-As we described in Section \ref{ch:fav}, the abstract transformers $\abstr$
+We described in Section \ref{ch:fav} that the abstract transformers $\abstr$
 related to the concrete program operations are gradually applied to forest automata
 starting from a forest automaton modelling an empty heap.
 This gradual application of abstract transformers in the same order
-with the concrete program operations is called \emph{forward run}.
-Formally, a forest automaton at a program point $n$ is obtained by
+the concrete program operations is called \emph{forward run}.
+Formally, a forest automaton representing the memory state 
+at program point $n$ is obtained by
 $\abstr^n(\abstr^{n-1}(\ldots \abstr^{1}(F^{empt}) \ldots))$ in forward run
 where $\abstr^i$ is an abstract transformer related to the concrete
-program operation at $i-th$ point of program and $F^{empt}$ is
+program operation at the $i$-th point of program and $F^{empt}$ is
 a forest automata modelling an empty (initial) heap.
 Moreover, normalization, box folding and abstraction is performed
-as a part of abstract transformers at some program locations as
-it was described in \ref{ch:fav}.
+as a part of the abstract transformers at some program locations as
+it was described in Chapter \ref{ch:fav}.
 
 Consider that a program error is detected at the $n$-th program location
 during the forward run.
 The verification of non-spuriousness of the error is done by gradual applying
-\emph{reverse abstract transformers} $\rabstr$ over forest automata
-starting from the point where the error was found
-and checking whether intersection of languages of forest automata from forward run
+\emph{reverse abstract transformers} $\rabstr$ over forest automata.
+It starts from the point where the error was found.
+Then checking whether an intersection of the languages of forest automata from forward run
 and backward run is non-empty at each program point.
 This process is called backward run.
-Formally, we compute forest automaton $\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F^{n}) \ldots))$
-for each program location from the $n$-th point back to the beginning.
+Formally, we compute forest automata by application $\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F^{n}) \ldots))$
+from the $n$-th point back to the beginning.
 We check whether $\forall 0 \leq i \leq n: L(\rabstr^1(\ldots \rabstr^{i}(F^{i}) \ldots)) \cap
-L(\abstr^n(\ldots \abstr^{1}(F^{empt}) \ldots)) \neq \emptyset$
-and when the intersection is empty the the found error is declared
-to be spurious.
+L(\abstr^i(\ldots \abstr^{1}(F^{empt}) \ldots)) \neq \emptyset$,
+When the intersection is empty the found error is reported as spurious.
 
 This principle is illustrated by Figure \ref{fig:bwrun}.
 Figure shows a forest automata language before (green area)
 and after (yellow area) abstraction at a program location where abstraction is performed.
-One oval consisting green and yellow part represents language of a forest automaton
+One oval consisting green and yellow part represents a language of a forest automaton
 in a symbolic state of symbolic execution.
 Figure also shows how a forest automaton (and it language) is gradually changed
-by abstract transformers what is illustrated by lines connecting ovals.
+by abstract transformers what is illustrated by lines connecting the ovals.
 A~found error is shown as a red area in the last oval.
 The backward run starts from this error and it finds
 that an error is spurious because an intersection (the orange areas) of
 forest automata language from backward (the blue ovals) and forward
 (the green and yellow area) run is empty at level of the symbolic state
-with language $L(M^{\alpha}_{k-1})$.
+with the language $L(M_{k-1})$.
 
 So far we describe principle of backward run so we cover
-also predicate abstraction that is based on the one introduced
-in \cite{artmc}.
+predicate abstraction now.
 Predicate abstraction is not yet used in forest automata based verification
 because it looses it advantages over height abstraction without
 a backward run which detects the predicates to refine predicate abstraction
-in case of a spurious counterexample detection.
+in the case of a spurious counterexample detection.
 
 Let $\predset=\{\pred_1, \ldots, \pred_n\}$ be a set of predicates.
 A predicate $\pred \in \predset$ is a language represented by
@@ -1736,10 +1744,10 @@ over a set of states $Q$ of TA $A=(Q,\Sigma,\delta, R)$ basically
 merges states in the same equivalence class of a equivalence relation.
 The predicate abstraction introduces a equivalence relation $\peqrel$
 where the states of tree automaton are equivalent when
-they have empty intersection with the same predicates.
+they have an empty intersection with the same predicates.
 Formally, $\forall q_1,q_2 \in Q: q_1 \peqrel q_2 \defarrow
-(\forall \pred \in \predset: \langstate(A,q_1) \cap \pred \neq \emptyset
-\Leftrightarrow \langstate(A, q_2) \cap \pred \neq \emptyset)$.
+(\forall \pred \in \predset: \langstate{A}{q_1} \cap \pred \neq \emptyset
+\Leftrightarrow \langstate{A}{q_2} \cap \pred \neq \emptyset)$.
 Note, that predicate abstraction is defined over a TA
 and its extension to FA will be described later.
 
@@ -1748,6 +1756,8 @@ tree automata from a FA in backward run that has empty language
 intersection with the related FA from the forward run.
 Then the new forward run can be started using the extended predicate
 set for the abstraction.
+The new predicates should prevent the merging the states that caused
+detection of the spurious error again.
 Note that the abstraction merges at most the same states as
 in the previous run.
 TODO: dukaz, proc je takto dobre.
@@ -1765,11 +1775,11 @@ The input of the algorithm are two non-hierarchical forest automata $\F_{\A}$
 and $\F_{\B}$ and the output is a forest automaton $\F_{\CC}$ such that
 $\lang(\F_{\A}) \cap \lang(\F_{\B}) = \lang(\F_{\CC})$.
 
-The algorithm starts with initialized helping data structures and
+The algorithm starts with initialization auxiliary data structures and
 resulting automaton at lines $3-5$.
 Then it iterates over all pointer variables (in symbolic state) of the analysed program
-that are visible at the point of program where intersection is performed
-and it call the function \emph{intersect} over states of FA pointed
+that are visible at the point of program where the intersection is performed.
+Then it calls the function \emph{intersect} over the states of FA pointed
 by the variables.
 
 The function intersect takes as the input these states and
@@ -1778,27 +1788,27 @@ The function also manipulates the structures created in the beginning of the
 whole algorithm.
 It gradually creates the part of the resulting intersection forest automata that starts
 from the input states.
-The result of this function is index of TA created by the function in the resulting FA.
+The result of this function is index of TA created by the~function in the resulting FA.
 It process so-called product states during it computation.
 A product state is basically a pair $(r,s)$ where $r$ is a state of $\F_{\A}$
 and $s$ is a state of $\F_{\B}$.
 
 The function creates a product state from the input states $lhs$ and $rhs$ and
-adds it to the set of already processed product states if it is not already processed,
-otherwise it returns index of such product state in the result automaton.
+adds it to the set of already processed product states if it is not already processed.
+Otherwise it returns index of such product state in the result automaton.
 This is done at line $1-3$.
 Then the counter of processed product states is increased and
-stack \emph{workset} is initialized to serve like a auxiliary data
+the stack \emph{workset} is initialized to serve like auxiliary data
 structure where the product states are stored to be processed later at line $4-8$.
 
 The function creates a new TA with the product state $lhs$ and $rhs$ as the root
 and with an empty transition relation at line $8$.
-Then the product states from the workset are gradually processed at the cycle beginning
+Then the product states from the workset are gradually processed at the~cycle beginning
 at line $9$.
 We denote $(r,s)$ the actually processed product state.
 There are several cases how the product state is managed.
-The first case is when both $r$ and $s$ are the references to other
-tree automata.
+The first case is when both $r$ and $s$ are the references
+to the other tree automata.
 Then the function intersect is called recursively on the referenced
 root states and creates a new TA with index $cp$.
 Finally the product state $(r,s)$ is added to the resulting FA
@@ -1814,8 +1824,8 @@ These cases are in algorithm processed at line $16-18$ and $20-22$.
 The last one case is when both $r$ and $s$ are not root references
 but the standard states of FA.
 Then it is iterated over all $a \in \Sigma$ with $\#(a) = n$
-and a new transition $t$ is added to the transition relation $\Delta$.
-where $t = (r,s) \xrightarrow ((r_1,s_1) \cdots (r_n, s_n))$ such that
+and a new transition $t$ is added to the transition relation~$\Delta$.
+where $t = (r,s) \xrightarrow{a} ((r_1,s_1) \cdots (r_n, s_n))$ such that
 $(r_1 \cdots r_n) \in \post{a}{r}$, $(s_1 \cdots s_n) \in \post{a}{s}$ and
 $\post{a}{q} = \{(q_1 \cdots q_n) \in Q^n\,|\, q \xrightarrow{a} (q_1 \cdots q_n) \in \Delta\}$.
 Finally, when the product state $(r_i,s_i)$ where $1 \leq i \leq n$ is a new one
@@ -1828,7 +1838,7 @@ This last case corresponds to lines $24-30$ in the algorithm.
 \label{sec:brdesign}
 
 We described backward run generally in the beginning of this chapter.
-Now, a more technical and algorithmically description takes a place.
+Now, a more technical and algorithmical description takes a place.
 We recall the definitions given in Section \ref{subsec:microinstr}.
 
 It was mentioned that the tool Forester implements the abstract
@@ -1836,17 +1846,18 @@ transformers as the instructions of its microcode.
 The input C program is translated to the list $T=\isfwdp{1}, \isfwdp{2},\ldots, \isfwdp{n}$
 of the microcode instructions.
 These instruction are executed over a symbolic state of a program
-and generates a new symbolic state.
+and generates a~new symbolic state.
 The part of symbolic state are also forest automata representing
 the reachable heap configurations in a given symbolic state.
 
 The forward run is done by going through $T$ in the forward order.
 The trace of symbolic states $\ftraceseq$ is get by the forward run.
 We denote the trace by $\ftrace$ and we call it \emph{forward trace}.
-The state $\sfwdp{i}$ is the input of the instruction $\isfwdp{i+1}$
-where $i \geq 0$ and the $\sfwdp{i+1}$ is the resulting symbolic state. 
+The~state $\sfwdp{i}$ is the input of the instruction $\isfwdp{i+1}$
+where $ 0 \leq i \leq n$ and the $\sfwdp{i+1}$ is the resulting symbolic state
+of the instruction.
 
-The extension by backward run is quite straightforward.
+The extension with backward run is quite straightforward.
 When an error is detected in a symbolic state $\sfwd{i}$
 then the backward run starts from this symbolic state.
 The backward run is done by going through $T$ in the reverse order
@@ -1855,24 +1866,26 @@ over $\sbwdp{i+1}$ obtaining $\sbwdp{i}$.
 We obtain the \emph{backward trace} $\btraceseq$ by the backward run.
 We denote the trace by $\btrace$.
 
-In contrast to the conceptual view of the backward run given in Section \ref{sec:br}
-it is not necessary to compute FA with the language
-$L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B)$ directly
-by the algorithm for the intersection of forest automata to get the successor
+It is not necessary to compute FA with the language
+$L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B)$ to get the successor
 symbolic state in backward run (and also to detect spurious counterexample
 by checking whether $L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B) = \emptyset$)
 after the execution of each instruction in the backward run.
 Indeed, it is sufficient to compute intersect FA only for
 the microcode instructions {\tt FI\_abs(), FI\_fix()}
-because only these instructions performs an abstraction.
+because only these instructions performs an abstraction,
+so they can cause a spurious error.
 The other instruction are precise and elementary enough
-that they could reversed without needing to make intersection.
+that they could be reversed without needing to make intersection.
 
 The method of execution of the backward is already described so
 the next sections provides the description of the inverse microcode instructions.
 We describe each instruction informally first and then the instruction is defined in the notion
-of the function $\grev: \grevinter$ which should has the reverse semantics
+of the function $\grev: \grevinter$.
+The function should have the reverse semantics
 to the function $f$ from Section \ref{subsec:microinstr}.
+We further denote the previous instruction $\ipred$ in forward run
+that precedes the actually reversed instruction.
 
 \begin{comment}
 This section provides a description of the reverse operations for
@@ -1905,19 +1918,20 @@ added to the backward trace $\btrace$.
 		If the value is a reference or a null pointer then the new
 		state is just copy of $\sbwd$.
 		Otherwise if the value type is void pointer then the new symbolic
-		state has the same values in the registers as the state $\sbwd$ has but
-		the value of the register $r_d$ is substituted by the value $r'_{d}$ in $\sfwd$
+		state has the same values in the registers as the state $\sbwd$ has.
+		But the value of the register $r_d$ is substituted by the value $r'_{d}$ in $\sfwd$
 		because the register $r_d$ in $\sbwd$ contains reference to a TA $t$
-		representing heap pointed by the allocated pointer by this instruction.
+		representing heap pointed by the allocated pointer by this instruction in forward run.
 		TA $t$ is then removed from FA and all references to it are set invalidated.
 
 		$\grev(\bstdsym) = \symstate{F'}
 			{\regssub{r_{d}}{r'_{d}}
 			}
-			{\isfwd}$
+			{\ipred}$
 			where $\stdsym = \sbwd$,
 			$r_{d} \in \sbwd$, $r'_{d} \in \sfwd$
-			and $F'$ is obtained from $T$ by removing TA $t$ referenced by the register $r_d$.
+			and $F'$ is obtained from $T$ by removing TA $t$ referenced by the register $r_d$
+			and invalidating all references to it.
 
 	\item {\tt FI\_node\_free}
 		Instruction reverses the effect of freeing memory.
@@ -1931,10 +1945,10 @@ added to the backward trace $\btrace$.
 
 		$\grev(\bstdsym) = \symstate{F'}
 			{\regs}
-			{\isfwd}$
-			where $\stdsym = \sbwd$ and $F'= r(F \cup \{T\})$ where
+			{\ipred}$
+			where $\stdsym = \sbwd$ and $F'= l(F \cup \{T\})$ where
 			$T$ is TA referenced by $RR$ in the register $r_d$ in $\sfwd$
-			and $r$ performs relabeling such that $r \xrightarrow{undef} () \in F
+			and $l$ performs relabeling such that if $r \xrightarrow{undef} () \in F
 			\wedge r \xrightarrow{RR} () \in F''$ then $r \xrightarrow{undef} ()$ is
 			replaced by $r \xrightarrow{RR} ()$ and $F''$ is FA of $\sfwd$.
 
@@ -1959,23 +1973,23 @@ added to the backward trace $\btrace$.
 		it reverses storing a structure to a FA.
 
 	\item {\tt FI\_abs(), FI\_fix()}
-		Reversion is done by creating a new symbolic state identical to the state $\sbwd$.
+		The reversion is done by creating a new symbolic state identical to the state $\sbwd$.
 		Then a new FA created by the intersection of FA of $\sbwd$ and FA of $\sfwd$ is assigned
-		to the new symbolic state.
+		to the~new symbolic state.
 
 		$\grev(\bstdsym) = \symstate{F'}
 			{\regs}
-			{\isfwd}$
+			{\ipred}$
 			where $\stdsym = \sbwd$, $F' = F \cap F_{FWD}$ and $F_{FWD}$ is
 			FA of $\sfwd$.
 
 	\item {\tt FI\_push\_greg($r_g$)}
-		Instruction creates a new symbolic state identical to the state $\sbwd$ but
-		the last global register from the new state is removed (what inverts push operation).
+		Instruction creates a new symbolic state identical to the state $\sbwd$ but~the
+		last global register from the new state is removed (what inverts push operation).
 
 		$\grev(\bstdsym) = \symstate{F}
 		{\regs \setminus \{r_g\}}
-		{\isfwd}$ where $\sbwd = \stdsym$ and $r_g$
+		{I}$ where $\sbwd = \stdsym$ and $r_g$
 		is the last global register added to the state.
 
 	\item {\tt FI\_pop\_greg($r_g$)}
@@ -1983,7 +1997,7 @@ added to the backward trace $\btrace$.
 		then the register $r_g$ from $\sbwd$ is moved to the
 		forest automaton of the new state (what actually reverts pop)
 		and finally the original value of $r_g$ in $\sfwd$ is stored
-		to the corresponding register int the new state.
+		to the corresponding register in the new state.
 	
 		$\grev(\bstdsym) = \symstate{F}
 		{\regs \cup \{r_g\}}
@@ -1991,19 +2005,21 @@ added to the backward trace $\btrace$.
 		is the last global register added to the state.
 	
 	\item {\tt FI\_set\_greg($r_g$)}
-		Instruction creates a new symbolic state identical to the $\sbwd$,
-		loads an old value of the global register $r_g$ from $\sfwd$
-		and sets the value of $r_g$ in the new state to it.
+		Instruction creates a new symbolic state identical to the $\sbwd$.
+		It loads an old value of the global register $r_g$ from $\sfwd$
+		and the sets the value of $r_g$ in the new state to it.
 
 		$\grev(\bstdsym) = \symstate{F}
-		{\regs \cup \{r_g\}}
-		{\isfwd}$ where $\sbwd = \stdsym$.
+		{\regssub{r_{g}}{r'_{g}}
+		}
+		{\isfwd}$ where $\sbwd = \stdsym$ and $r'_{g}$
+		is the register of $\sfwd$.
 
 	\item {\tt FI\_abort}
 		This instruction is not reversible.
 
 	\item {\tt FI\_acc\_sel}
-		Instruction has empty semantics.
+		Instruction has an empty semantics.
 		The original instruction isolates a selector
 		and so it can create a new TA.
 		It is not necessary to reverse this operation
@@ -2024,13 +2040,13 @@ added to the backward trace $\btrace$.
 The following instructions do simply an assignment to the register.
 So reversing them consist creating a symbolic state $S'$ with
 the same registers as the symbolic state $\sbwd$ has
-and a substitution of the original destination register $r_d$ of $\isfwd$ in $S'$
+and a substitution of the original destination register $r_d$ of $S'$
 by the value of the same register in the state $\sfwd$ (denoted by $r'_d$).
 Formally, $\grev(\stdsym) = \symstate{F}
 			{\regssub{r_{d}}{r'_{d}}
 			}
 			{I}$
-			where $\stdsym = \sbwd$.
+			where $\stdsym = \sbwd$ and $r'_{d} \in \sfwd$.
 
 \begin{itemize}
 
@@ -2106,11 +2122,11 @@ and let $\pabs$ be an abstraction function merging states of a tree automaton ac
 to the equivalence relation $\peqrel$,
 then $\fpabs(F_1) = F_2 \defarrow \forall i \in \{1,\ldots,n\}: B_i = \pabs(A_i)$.
 
-This also implies that the states are merged only in on tree automata not across the different
+This also implies that the states are merged only in one tree automata not across the different
 tree automata of forest automata.
-However, merging states of different tree automata can be more efficient (since
+However, merging the states of different tree automata can be more efficient (since
 a forest automaton with smaller number of states is created) but this
-work porposes the first version of predicate abstraction and more
+work purposes the first version of predicate abstraction and more
 fine tuning including theoretical correctness of the new method could
 be done as the future work.
 
@@ -2119,17 +2135,17 @@ Furthemore, we use compressive representation of predicates
 proposed in \cite{artmc} where the predicates are the langages $\lang(A,q)$
 of the states $q \in Q$ of a tree automaton $A=(Q,\Sigma,\Delta, R)$
 Checking whether a state of a tree automaton has non-empty intersection
-with the same sets of predicates as another state of the automaton is done by the following method.
+with the~same sets of predicates as another state of the automaton is done by the following method.
 Consider again TA $A$ and the set of predicates $\predset = \{\pred_1, \ldots, \pred_n\}$
-that are represented by set of TA $\{\predaut_1, \ldots, \predaut_m\}$.
-Note that one TA can preresent more predicates.
-Then we create the product automata $A \times \predaut_1, \ldots, A \times \predaut_m$.
+that are represented by set of TA $T=\{\predauti{1}, \ldots, \predauti{m}\}$.
+Note that one TA can repreresent more predicates.
+Then we create the product automata $A \times \predauti{1}, \ldots, A \times \predauti{m}$.
 We use the algorithm for the bottom-up tree automata intersection from \cite{mt:lengal}.
-Each of product automata $A \times \predaut_i$, where $1 \leq i \leq$, has the state set
-containing the product states of the form $(p,q) \in Q_A \times Q_{\predaut_i}$.
-Then it is possible to define function $m: Q_A \rightarrow 2^{Q_{\predaut_1} \cup \ldots
-\cup Q_{\predaut_m}}$ as follows: $m(p) = \{q \in Q_{\predaut_1} \cup \ldots \cup Q_{\predaut_m}\,|\,
-\exists A \times \predaut_i: (p,q) \in Q_{A \times \predaut_i}\}$.
+Each of product automata $A \times \predauti{i}$, where $1 \leq i \leq n$, has the state set
+containing the product states of the form $(p,q) \in Q_A \times Q_{\predauti{i}}$.
+Then it is possible to define function $m: Q_A \rightarrow 2^{Q_{\predauti{1}} \cup \ldots
+\cup Q_{\predauti{m}}}$ as follows: $m(p) = \{q \in Q_{\predauti{1}} \cup \ldots \cup Q_{\predauti{m}}\,|\,
+\exists A \times \predauti{i}: (p,q) \in Q_{A} \times Q_{\predauti{i}}\}$.
 Then we define the equivalence relation $\peqrel \subseteq Q \times Q$
 such that $(p_1,p_2) \in \peqrel \defarrow m(p_1) = m(p_2)$.
 Then it is possible to merge the states from $A$ according to this equivalence relation
@@ -2164,37 +2180,37 @@ As the last one is covered implementation of predicate abstraction in Section \r
 \label{subsec:bwimpl}
 
 The backward is possible to turn on by setting the macro {\tt FA\_BACKWARD\_RUN}
-in file \emph{config.h} to value $1$.
-If this macro is set to value $1$ then on a detected error
-the backward run is executed by class \emph{SymExec} that
-contains the methods for symbolic execution.
+in file \emph{config.h} to value~$1$.
+If this macro is set to value $1$ then when an error is detected 
+the backward run is executed by class \emph{SymExec}.
 
 The main method of backward run is called \emph{isSpuriousCE} that
-checks whether for a given forward trace is an error at a program point
-spurious or not and returns true or false according to it.
+checks whether for a given program trace is an error
+spurious or not.
+It returns true or false according to it.
 This method is implemented in class \emph{BackwardRun} what is wrapping
 class of backward run.
 
 As it was desribed backward run is performed by going through the given
-forward trace in the backward orded and executing reverse operation to each
+forward trace in the backward order and executing the reverse operation to each
 microcode instruction.
 The method \emph{reverseAndIsect} has been added to class \emph{AbstractInstruction}
 for this purpose.
 The class \emph{AbstractInstruction} is the parent class of the inheritance hiearchy of
 microcode instructions.
-So each microcode instruction has to implement this method if it its parent class does not
+So each microcode instruction has to implement this method if the parent class does not
 allready implement it.
-The method should changes the symbolic state in way that it reverse the semantic of
-the method \emph{execute} that is run in forward run.
+The~method should change the symbolic state in way that it reverses the semantic of
+the method \emph{execute} that is performed in forward run.
 Despite the name of the method, the instructions do not need to perform
-intersection of forest automata (which is done only the cases described in
+intersection of forest automata always (which is done only the cases described in
 previous section).
 The method \emph{reverseAndIsect} returns a new symbolic state that
 is used as the next symbolic state in the backward run.
 
 The method \emph{isSpuriousCE} returns {\tt false} whenever
-a symbolic state return by the method \emph{reverseAndIsect}
-contains a forest automaton with empty language.
+a symbolic state returned by the method \emph{reverseAndIsect}
+contains a forest automaton with an empty language.
 In such case, it also  creates the new predicates.
 When the method reaches the beginning of the forward
 trace, then the found error is real and the {\tt true}
@@ -2204,23 +2220,25 @@ is returned.
 \label{subsec:isectimpl}
 
 The method \emph{reverseAndIsect} of class \emph{FixpointBase}
-performs intersection of forest automata.
+performs the intersection of forest automata.
 This class is inherited by the classes implementing microcode
-instructions {\tt FI\_abs, FI\_fix} which both computes fixpoint.
+instructions {\tt FI\_abs, FI\_fix} which both computes the fixpoint.
 The intersection of forest automata is provided by class \emph{SymState}
-representing a symbolic state that contains forest automata
-but moreover contains information about variables in the current
+representing a symbolic state that contains forest automata.
+Moreover, it contains information about the variables in the current
 symbolic states what is needed by the algorithm for forest automata intersection
 from Section \ref{sec:isect}.
 
 The main method for symbolic state intersection is called \emph{Intersect}
-which makes an intersection between a symbolic state that calls the method and
-another symbolic state which is given as a paramter.
+which makes the intersection between the symbolic states.
+The intersection is done between the symbolic states calling
+this method and the symbolic state given as a parameter.
 The result of the intersection replaces the content of the calling object.
 
 Another operation implemented for purposes of the backward run is
-method \emph{SubstituteRefs} which performs the root references
-substitution as it is needed for reversing the instruction {\tt FI\_free}.
+method \emph{SubstituteRefs}.
+It performs the root references substitution as it is needed
+for reversing the instruction {\tt FI\_free}.
 The root represent to be substituted and reference for substitution are
 given in the parameters of this method.
 The method is again member of class \emph{SymState}.
@@ -2233,7 +2251,7 @@ which is a member of class \emph{Abstraction}.
 This method takes a set of tree automata representing the set of predicates
 as its parameter.
 The abstraction is performed over a forest automaton which is a member of
-class \emph{Abstraction}.
+class~\emph{Abstraction}.
 
 The choice of abstraction is done by setting value of macro
 {\tt FA\_USE\_PREDICATE\_ABSTRACTION} to value $1$.
@@ -2262,21 +2280,24 @@ also the original configuration of abstraction used in Forester)
 for the first run of symbolic execution.
 When a spurious error is detected in this run then the new
 predicates are created and the next runs of symbolic execution uses predicate abstraction.
+Moreover, this approach keeps the original Forester behavious
+because the first run of the analysis remain same.
+Only the behavior after the detection of a spurious error is changed.
 
 
 \chapter{Experimental Evaluation}
 \label{ch:eval}
 
-This chapter provides exeprimental evaluation of the results of this work.
-First, we compare the versions of Forester without and with \vata.
-Then we evaluate the backward run on the SV-COMP benchmark
+This chapter summarizes the exeprimental evaluation of the results of this work.
+First, we compare the~versions of Forester without and with \vata.
+Then we evaluate the~backward run on the SV-COMP benchmark
 and finally the version of Forester using predicate abstraction is compared to the
-original one with height abstraction and also discuss the newly analysis programs.
+original one with height abstraction and we also discuss the newly verified programs.
 
 All of the test cases have been evaluated on the computer with CPU Intel Core $2$ Duo ($2.13$ GHz)
 and $4$ GiB memory, using Debian Linux, testing version.
 We used g++, version, 4.9 for compiling Forester and gcc, version 4.8,
-as a compiler for the analyzed programs by Forester.
+for compiling the analysed programs.
 The measured time is the CPU time.
 The result times of the experiments are the averages of the five measurings.
 The evaluations over SV-COMP benchmark are done following the rules of
@@ -2284,11 +2305,11 @@ SV-COMP competition \cite{www:svcomp}.
 
 \section{Forester with VATA Evaluation}
 
-This section provides comparison of the version of Forester tool
+This section provides a comparison of the version of Forester tool
 that uses its own tree automata library and the version using \vata.
 Since the version without VATA is no longer compatible with the
 new version of Forester, we can evaluate the performance only
-on the programs that are able to analyze also with the older
+on the programs that are possible to analyze also with the older
 version of the tool without backward run and predicate abstraction.
 Therefore we use height abstraction with the height $1$
 what was the original configuration of Forester before the
@@ -2313,7 +2334,7 @@ modifications done as a part of this thesis.
 \end{table}
 
 The first performence tests were performed over the test set
-which servers also like a regress test suite for Forester.
+which servers like a regress test suite for Forester.
 The results of these tests are summarized in Table \ref{tab:vataregre}.
 There are two cases that were measured.
 The first one is case when Forester is compiled with the third level of optimization of the compiler.
@@ -2323,12 +2344,12 @@ then Foterster implementation of tree automata, we tried to verify these results
 by compiling Forester and VATA without optimizations and runnig the tests again.
 We found that with the turned off optimizations of the compiler
 the Forester version using VATA is more efficent.
-The are two main points that can cause a worse performance of Forester with VATA
+The are two main points that can cause the worse performance of Forester with VATA
 when the optimizations are used.
 The first one is fact that the original implementation of tree automata
 in Foreter uses simulation to reduce a size of tree automata.
 The reduction based on simulation in VATA is not fully correct yet
-so we decided to not use it.
+so we decided not to use it.
 But this does not explain why the original implementation is more efficient
 only when the advanced optimizations are used.
 The second point that can cause the slow down is
@@ -2363,7 +2384,7 @@ when Forester uses it own tree automata module.
 \end{table}
 
 We further decide to explore this problem by comparing
-both versions on programs which analysis is more time demanding.
+both versions on the programs which analysis is more time demanding.
 These programs contains manipulation of singly-linked lists with
 circular singly-linked list as their data, doubly-linked lists with
 circular doubly-linked list as their data, the skip-lists of the 2nd and
@@ -2371,31 +2392,32 @@ the 3rd level and also a snippet from Linux drivers.
 Not all of these programs are included in the Forester regress test set.
 
 The results comparing Forester with and without VATA library compiled
-without compiler optimizations are in Table \ref{tab:vatadef}.
+without the compiler optimizations are in Table \ref{tab:vatadef}.
 The version of Forester with VATA is again faster in this case, also
 on these complicated data structures.
-The only one exception is a verification of the skip-list of the third
+The only one exception is a verification of the skip-list of the~third
 level.
 We suppose that the original implementation takes the advantage of
 reduction of tree automata because the program manipulating the skip-list
 of the third level is the probably the most difficult case from the whole
-Forester testing benchmark and the tree automata with big number of states
+Forester testing benchmark.
+So the tree automata with the big number of states
 are created during it verification.
 
 The comparison of the Forester versions compiled with the compiler optimizations
 on the same programs are in Table \ref{tab:vataopt}.
 Here, the original implementation of Forester is again faster.
-The biggest difference is in time needed for verification of the skip-list of the third level
-what have probably the same causes as in the version without optimization.
+The biggest difference is in the time needed for the verification of the skip-list of the third level.
+It has probably the same causes as in the version without optimization.
 Putting the results together, we assume that the main performance
 loss for Forester using VATA comes from the unability of compiler
 to perform the advanced optimization.
-The fact that VATA does not do reduction of tree automata based on simulation relation
-has impact probably mainly in the demanding cases like a verification of skip-list is.
-However, the completion of the algorithm for redution of tree automata in VATA would be
-needed to be done in the future work.
-Otherwise the analysis programs with heap represented by forest automata with lot of states
-would be inneficient.
+The fact that VATA does not reduce of tree automata based on simulation relation
+has the impact probably mainly in the demanding cases like verification of skip-list is.
+However, the completion of the algorithm for reduction of tree automata in VATA would be
+needed to be done as the future work.
+Otherwise, the analysis programs with heap represented by forest automata
+with a lot of states would be inneficient.
 
 \begin{table}[buh]
 	\vskip6pt
@@ -2423,13 +2445,13 @@ would be inneficient.
 \end{table}
 
 Although Forester using VATA is slower in some cases
-the advantages coming from better
-modularity and maintability coming from seperate library
-for tree automata manipulation are still so important
+the advantages of the better modularity
+and maintability coming from the separate library
+for tree automata are still so important
 the the development will be further done with this version.
 On the other side, one of the goals of the future work should be
 the deeper investigation of the causes of the slow down.
-This could fully clarify the reasons why the slow down even happen.
+This could fully clarify the reasons why the slow down happen.
 
 
 \section{Backward Run Evaluation}
@@ -2454,33 +2476,33 @@ This could fully clarify the reasons why the slow down even happen.
 \end{table}
 
 Backward run implementation was evaluated at SV-COMP benchmark
-and also at test set distributed with Forester.
+and also at the test set distributed with Forester.
 The evaluation was done by analysing the programs that was correct
 but Forester found an (spurious) error in them.
 We also checked whether backward run correctly
 reports that the real errors are really real.
 This was done because Forester cannot verified
-that a found error is real before backward run implementation
-and therefore cannot the report them correctly in SV-COMP'15 competition
+that a found error is real before backward run implementation.
+Therefore it cannot report them correctly in SV-COMP'15 competition
 evaluation.
 
 Note that there is difference in reporting error between
 Forester test set and SV-COMP benchmark.
 All found errors, including a memory garbage detection, are reported
-and the analysis is stoped after the detection in Forester test set.
+and the analysis is stopped after the detection in Forester test set.
 On the other side, only the errors breaking a given specification
 cause stopping the analysis in context of SV-COMP benchmark.
-Particularly, the garbage in SV-COMP test cases often should not
-stop the analysis but the analysis should continue to
+Particularly, the~garbage in SV-COMP test cases should not
+stop the analysis but the analysis continues to
 detect another error like an invalid pointer dereference.
-We respect the specific rules for both test tests in these evaluation.
+We respect the specific rules for the both test sets in these evaluation.
 However, it is possible to configure whether
 Forester should stop after a garbage detection by
 macro {\tt FA\_CONTINUE\_WITH\_GARBAGE} in file \emph{config.h}.
 
-The implementation of backward run confirms the $10$ real errors in the programs
+The implementation of backward run confirms $10$ real errors in the programs
 in the memory safety category of SV-COMP benchmark and
-of the new $8$ real errors in the heap manipulation category.
+the new $8$ real errors in the heap manipulation category.
 Moreover, the~$3$ spurious counterexamples were detected in heap manipulation category.
 The results are summarized in Table \ref{tab:bwres}.
 The analyzed programs in SV-COMP benchmark includes 
@@ -2494,21 +2516,21 @@ It causes that the number of the found errors, spurious or real, is not as high 
 Forester could analyze all the programs in the benchmark.
 
 The results of evaluation at the existing Forester test set are following.
-There are $8$ cases when a spuriousness of found error was proved.
+There are $8$ cases when a spuriousness of the found error was proved.
 The confirming of the real errors does not make sense because
 it is expected that a test set contains only the cases with the known results.
 Therefore the correct detection of the real errors were verified
-also before the backward run implementation.
+also before of backward run implementation.
 
 The important contribution of backward run is guarantee of correctness when
 an error in a program is reported to the user.
 Unfortunately, we have to restrict the correctness the backward run
 only to the programs that use the supported C language constructions.
-E.g., Consider that a spurious error is detected because Forester lacks a support for
-evaluation of the arithmetic expressions or does not fully support
-a void pointers manipulation.
-Then the error will not be proved to be spurious by backward run due to the
-same reasons that caused the error detection.
+%E.g., Consider that a spurious error is detected because Forester lacks a support for
+%evaluation of the arithmetic expressions or does not fully support
+%a void pointers manipulation.
+%Then the error will not be proved to be spurious by backward run due to the
+%same reasons that caused the error detection.
 
 \section{Predicate Abstraction}
 \label{sec:paeval}
@@ -2532,24 +2554,24 @@ same reasons that caused the error detection.
 	\label{tab:pares}
 \end{table}
 
-This section provides evaluation of the Forester using predicate abstraction.
+This section provides an evaluation of the Forester with predicate abstraction.
 The predicate abstraction is used in the way described in Section \ref{sec:impl}.
 So the first run is done using height abstraction with height $1$ and when a spurious
 counterexample is found, the analysis creates the predicates and follows with
 the predicate abstraction.
 This method ensures that Forester successfully passes all the cases that it did
 before because the first run remains the same.
-First, the number of the new cases that Forester can analyse due to
-the predicate abstraction.
+First, the number of the~new cases that Forester can analyse due to
+the predicate abstraction is evaluated.
 Then the newly analysed cases are studied more deeply and
 the Forester performance is compared to Predator, winner in HeapManipulation
 and the best sound tool in MemorySafety category of SV-COMP'15.
 
-The results summarizing the evaluation of the predicate abtraction over SV-COMP'15
+The results summarizing the evaluation of the predicate abstraction over SV-COMP'15
 benchmark and Forester test suite is in Table \ref{tab:pares}.
-We distinguish between the programs the programs with a new detected error
+We distinguish between the programs with a new detected error
 and the programs proved to be correct.
-The most new errors is detected in HeapManipulation category of SV-COMP'15
+The most of new errors are detected in HeapManipulation category of SV-COMP'15
 benchmark where $9$ errors have been detected in the programs
 mentioned in the previous section.
 We also proved $2$ programs from the LDV project to be correct.
@@ -2557,46 +2579,46 @@ In the memory safety category the results are worse but this is partially caused
 by the fact that this category contains less test cases.
 Finally, we prove correctness of $4$ programs from Forester test set
 which cannot be proved without use of the predicate abstraction.
-The programs manipulates the data structures like doubly-linked list
-or trees (with parent pointers).
+These programs manipulate the data structures like doubly-linked list
+or trees.
 These programs does not needed creating boxes during boxes although
-some use of these data structures can lead to the use of boxes.
+some other use of these data structures can lead to the use of boxes.
 
-The main problem that complicated successfull analysis of
-more programs is again low maturity of the Forester tool.
+The main problem complicating the successfull analysis of
+more programs is again imaturity of the Forester tool.
 It does not support all the C language constructions
 or it fails due to an internal error because some unexpected
-state occurs during an analysis.
-This causes that lot of test cases remain unanalysed.
+state occurs during the analysis.
+This causes that a lot of test cases remain unanalysed.
 Another thing needing improvement is to develop the symbolic
-execution for purposes of the SV-COMP competition rules and benchmark
+execution for the purposes of the SV-COMP competition rules and benchmark
 where only an error breaking a given specification is reported
-by analyser.
+by the analyser.
 This is problematic mainly because a garbage is often created
 in a program from benchmark but the analysis should continue
 and check whether an error label is not reached.
-In this case an forest automaton needs to be modified
-by removing the garbage to continue the anlysis avoiding
+In this case a forest automaton needs to be modified
+to remove the garbage and the analysis should continue correctly avoiding
 an unexpected Forester state that causes an internal error.
-A design and an implementation of this would be nice future work.
+Resolving this problem is another goal of the future work.
 
-Now the particular programs analysis is given
-comparing performance of Forester and Predator.
+Now the particular programs analysis comparing performance
+of Forester and Predator is given.
 The programs described here are possible to analyse due to the
 backward run and predicate analysis implementation.
 Table \ref{tab:patimes} summarizes the results.
-Forester outperformed Predator in verication of a red black list,
-but moreover it is the only one sound tool able to verify these
+Forester outperforms Predator in verication of a red black lists.
+But moreover it is the only one sound tool able to verify these
 kind of data structures.
 The other test case is a singly-linked list with integer
-as data members.
+as the data members.
 The items of the analysed singly-linked list are ordered
 by the value of their data.
 So for examaple, a distance between head of the list and a 
-node having integer $1$ as a data member is smaller than
-the distance between a node having integer $2$ as a data member.
+node having integer $4$ as a data member is smaller than
+the distance between a node having integer $6$ as a data member.
 In case of verification of correct program, Predator outperforms Forester
-because Forester found few spurious counterexamples
+because Forester found a few spurious counterexamples
 before the shape invariant was computed.
 When there is an error in a program manipulating this
 data structure then Forester is lightly faster
@@ -2606,38 +2628,38 @@ Another case when Predator ran out of time
 is a tree which (without the parent pointers) ensures
 that each left successor node have allocated it
 right successor node.
-Forester is able to verify correctness of such a structure
+Forester is able to verify the correctness of such a structure
 but it is the most time demanding task of this set.
 Finally, the last tested program is one traversing
 a singly-linked list of even length and then
-freeing the list two nodes at time (what is safe because
+freeing the list by two nodes at time (what is safe because
 the number of nodes is even).
 Predator in this case reported a spurious error.
 Forester detects that the error is spurious but was
 unable to estabilish a predicate set avoiding this error.
 It created gradually predicate defining that list would not
-be $3, 5, \cdots$ long but was unable to generalize
+be $3, 5, \ldots$ long but it was unable to generalize
 the predicates to all odd numbers.
 
 It is necessary admit that predicate abstraction
 is not fully complete.
-It needs to be implemeted more efficiently to get better
+It needs to be implemeted more efficiently to get the better
 performance on the hard cases.
 The new predicates are not also created in the most
-precise way so some state may be not abstract
+precise way so some state may not be abstracted
 although it would be theoritically possible.
-Then predicate abstraction often causes an internal
+Predicate abstraction also often causes an internal
 Forester error when a garbage is created but the
 analysis continues because an absence of another
 kind of error should be proved.
-Continuing in analysis in such cases was not
-originally supported by Forester before its extension
-done as part of this thesis.
+%Continuing in analysis in such cases was not
+%originally supported by Forester before its extension
+%done as part of this thesis.
 
 \begin{table}[buh!]
 	\vskip6pt
 	\caption{Evaluation of predicate abstraction over SV-COMP benchmark
-		and the Forester test test.
+		and the Forester test set.
 		Timeout is set to 1000 second.
 	}
 	\centering
@@ -2650,7 +2672,7 @@ done as part of this thesis.
 		SLL with integers, correct  & $0.12$   &  $0.03$ \\
 		SLL with integers, error    & $0.02$   &  $0.03$ \\
 		Tree, correct               & $251.03$ &  $timeout$ \\
-		SLL of even length, correct & $timeout$ & $false positive$ \\
+		SLL of even length, correct & $timeout$ & $false\ positive$ \\
 		\bottomrule
 	\end{tabular}
 	\label{tab:patimes}
@@ -2663,10 +2685,11 @@ done as part of this thesis.
 The main goals of this thesis were (a) to implement version of Forester tool
 that uses the VATA library for tree automata representation and manipulation
 and (b) to extend verification procedure based on forest automata with
-backward run for detection of the spurious errors found in the analysed program.
+backward run for detection of the spurious errors found in the~analysed program.
 The theory of forest automata and related theory of tree automata has been studied
-and described in this thesis and the verification procedure
-based on forest automata has been also explored to fulfill the thesis goals.
+and described in this thesis.
+The verification procedure based on forest automata
+has been also explored to fulfill the thesis goals.
 
 The connection of Forester and \vata\ was designed and implemented
 after the analysis of the both tools.
@@ -2675,24 +2698,26 @@ Then the adapter pattern was used to create interace between Forester and VATA.
 The first goal has been already reached and the version of Forester
 using the VATA library successfully participated in competition SV-COMP 2015 \cite{www:svcomp}.
 
-Then backward run over symbolic states was designed for Forest automata based shape anlysis
-an the design was implemented to tool Fotester.
+Then backward run over symbolic states was designed for forest automata based shape anlysis
+an the design was implemented to tool Forester.
 Non-hierarchical forest automata intersection was implemented for
 the purposes of backward.
 The intersection of forest automata is not only necessary part of backward run
 but it is nice theoretical contribution of this work since it has not
 been yet proposed.
-Predicate abstraction over forest automata was also designed empoying the predicates
+Predicate abstraction over forest automata was also designed employing the predicates
 created by backward run.
-Predicate abstraction employs bottom up tree automata in the VATA
+Predicate abstraction using bottom up tree automata intersection in the VATA
 which was also implemented (but not designed) as the part of this work.
 
 Backward run and predicate abstraction were evaluated on SV-COMP benchmark and
 Forester test suite.
 These new techniques makes possible to process some programs that Forester was not able
 to analyze before.
-Morever, Forester is the only one sound tool able to verify red black lists (and similiar data structures)
+Morever, Forester is to our best knowledge the only one sound tool
+able to verify the red black lists (and similiar data structures)
 in fully automatical way after the extension with predicate abstraction and backward run.
+
 This work participated in the student conference \emph{Excel@FIT 2015} \cite{www:excel}.
 A paper about this work was accepted to a local proceedings of the conference
 and it was awarded with the second prize in the category "Scientific contribution".
@@ -2700,14 +2725,14 @@ and it was awarded with the second prize in the category "Scientific contributio
 However, Forester is still not able to analyse a lot of cases
 because the tool does not support used C language constructions
 or an analysis of a program lead to an internal verifier error.
-Predicate abstraction is not also yet fine-tuned.
-It needs to further improvements for better performance
-and also a conceptual extension that makes it able to continue also
-when a garbage is created (and for example an absence of invalid
+Predicate abstraction is not also yet fine tuned.
+It needs further improvements for better performance.
+A conceptual extension is needed to make Forester able to continue also
+when a garbage is created (e.g., the absence of invalid
 dereferences is checked in a program is verified).
-Then there are also conceptual extensions of the theory.
+Then there are also the conceptual extensions of the theory.
 The backward run and predicate analysis should be generalized
 to the hierarchical forest automata.
 An abstraction over the predicates to make possible to verify
-data structures like singly-link lists of even length is
+the data structures like singly-link lists of even length is
 another challange.
