@@ -110,7 +110,7 @@ Chapter \ref{ch:concl} summarizes this thesis.
 
 This chapter provides the theoretical foundations of this thesis.
 First, graphs, trees and forests are defined along the automata accepting them in Section~\ref{sec:graph}.
-Then the previously defined concepts are further extended to hierarchical ones in Section \ref{sec:fah}.
+Then the previously defined concepts are further extended to hierarchical forests and automata in Section \ref{sec:fah}.
 This section follows the definitions and a the structure used in \cite{techrep}.
 
 \section{Graphs, Trees and Forests}
@@ -131,32 +131,32 @@ The map $g$ maps each node $v\in V$ to:
 	\item a sequence of \emph{successors} $(v_1 \cdots v_n) \in V^n$ for $n \in \mathbb{N}$.
 		We denote successors by $S_g(v)$ and $v_i$ is denoted by $S^i_g(v)$.
 \end{enumerate}
-It holds that $\#(l_g(v)) = |S_g(v)|$.
-We will omit subscript $g$ when no ambiguity is possible.
+Symbol $l_g(v)$ is such that $\#(l_g(v)) = |S_g(v)|$.
+We will omit subscript $g$ when no ambiguity may arise possible.
 
 A \emph{leave} of $g$ is a node $v \in V$ such that $S_g(v) = \epsilon$.
 An \emph{edge} of $g$ is a pair $v \mapsto (a, v_1 \cdots v_n)$ where $v, v_1, \ldots, v_n \in V$,
 $a \in \Sigma$ such that $g(v) = (a, v_1 \cdots v_n)$.
-\emph{In-degree} of a node $v' \in V$ in the graph $g$ is the overall number of
-its occurrences in $g(v)$ for any $v \in V$.
+The \emph{in-degree} of a node $v' \in V$ in the graph $g$ is the sum of
+its occurrences in the tuples $t \in V^{*}$ get by $g(v)$ for all $v \in V$.
 We denote in-degree of a node $v \in V$ by $idg_g(v)$ and
 we omit again subscript $g$ whenever it is possible.
 More formally, in-degree is defined as
-$idg(v') = |\{v \mapsto (a, v_1 \cdots v_n) \,|\, v \mapsto (a, v_1 \cdots v_n)
-\emph{ is an edge such that } \exists i \in \{1,\ldots,n\}: v' = v_i\}|$.
+$idg(v') = |\{(v \mapsto (a, v_1 \cdots v_n),i)) \,|\, v \mapsto (a, v_1 \cdots v_n)
+\emph{ is an edge such that } i \in \{1,\ldots,n\}: v' = v_i\}|$.
 The \emph{joins} of $g$ are nodes $v \in V$ such that $idg(v') > 1$.
 
 A \emph{path} from $v\in V$ to $v' \in V$ is a sequence $p=v_0, i_1, v_1, \ldots, i_n, v_n$ where $v=v_0, v' = v_n$
 and $\forall j \in \{1,\ldots,n\}: v_j = S^{i_j}(v_{j-1})$ (informally, $v_j$ is the $i_j$-th successor of $v_{j-1}$).
 The empty path has $n=0$.
-The path $p$ has \emph{length} $n$ what we denote by $length(p) = n$.
-The path $p$ is acyclic if $\forall u_i,u_j \in p: i \neq j \Rightarrow u_i \neq u_j$.
-A \emph{cost} of an acyclic path is sequence $i_1, \ldots, i_n$.
+The path $p$ has \emph{length} $n$ denoted by $length(p) = n$.
+The path $p=u_0,i_1,u_1,\ldots,i_n,u_n$ is acyclic if $\forall u_i,u_j \in p: i \neq j \Rightarrow u_i \neq u_j$.
+The \emph{cost} of the acyclic path $p$ is the sequence $i_1, \ldots, i_n$.
 The path $p$ is \emph{cheaper} than another path $p'$ iff the cost of $p$ is lexicographically smaller than that of $p'$. 
 A node $u \in V$ is \emph{reachable} from a node $v \in V$ iff there is a path from $v$ to $u$ or $u=v$.
 A node $u \in V$ is a \emph{root} of $g$ iff all nodes $v \in V$ are reachable from $u$.
 We use the term $root$ also for a mapping $\funcdecl{root}{g}{V}$ which maps a graph to its root.
-When there is a root in a graph then the graph is called \emph{rooted}.
+A graph with the root is called \emph{rooted}.
 
 A \emph{tree} $t$ is a graph which is either empty, or it has exactly one root and $\forall v \in V: idg(v) \leq 1$ (informally,
 each node is a successor of at most one of the other nodes).
