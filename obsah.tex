@@ -2496,7 +2496,7 @@ This could fully clarify the reasons why the slow down happen.
 		Category & Real & Spurious \\
 		\midrule
 		HeapMnipulation & $8$ & $3$ \\
-		MemorySafety & $10$ & $0$ \\
+		MemorySafety & $6$ & $0$ \\
 		Forester test set & $-$ & $7$ \\
 		\bottomrule
 	\end{tabular}
@@ -2528,7 +2528,7 @@ However, it is possible to configure whether
 Forester should stop after a garbage detection by
 macro {\tt FA\_CONTINUE\_WITH\_GARBAGE} in file \emph{config.h}.
 
-The implementation of backward run confirms $10$ real errors in the programs
+The implementation of backward run confirms $6$ real errors in the programs
 in the memory safety category of SV-COMP benchmark and
 the new $8$ real errors in the heap manipulation category.
 Moreover, the~$3$ spurious counterexamples were detected in heap manipulation category.
@@ -2575,7 +2575,7 @@ only to the programs that use the supported C language constructions.
 		Category & New errors found & Newly proved programs  \\
 		\midrule
 		HeapMnipulation & $9$ & $2$ \\
-		MemorySafety & $1$ & $2$ \\
+		MemorySafety & $2$ & $1$ \\
 		Forester test set & $0$ & $4$  \\
 		\bottomrule
 	\end{tabular}
