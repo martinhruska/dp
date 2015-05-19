@@ -252,65 +252,72 @@ of the referenced trees.
 We extend graphs and forests with \emph{input} and \emph{output} nodes which are marked by so-called \emph{ports}.
 An \emph{input-output-graph} (io-graph) is a pair $(g,\phi)$ (for brevity denoted by $g_\phi$)
 where $g$ is a graph and $\phi=(\phi_1 \cdots \phi_n) \in dom(g)^+$ is a sequence of ports, $\phi_1$
-is an input port and $\phi_1 \cdots \phi_n$ is a sequence of output ports.
-The ports in $\phi$ are unique.
-If a root of $g_\phi$ is $\phi_1$ then $g_\phi$ is called \emph{accessible}.
+is an input port and $\phi_2 \cdots \phi_n$ is a sequence of output ports.
+The ports are unique in $\phi$.
+The graph $g_\phi$ is called \emph{accessible} if its root is the input port $\phi_1$.
 
-The \emph{cut-points} of a graph $g_\phi$ is the set of its ports
-and joins and we denote this set by $cps(g_\phi)$.
+The set of \emph{cut-points} $cps(g_\phi)$ of a graph $g_\phi$ consists of its ports
+and joins.
 Formally, $cps(g_\phi)=\{v \in V\,|\, v \in \phi \vee idg(v) > 1\}$.
 
 An \emph{io-forest} is a pair $f=(t_1 \cdots t_n, \pi)$ such that $n \geq 1$ and $\pi \in \{1,\ldots,n\}^n$
-is a sequence of port indices, where $\pi_1$ is an input port index and $\pi_2 \ldots \pi_{|\pi|}$ is a sequence
-of the output ports indices.
-As in the case of the ports the indices are unique.
-It is also possible to construct an io-graph $\otimes f$ from a forest $f$ such that
+is a sequence of port indices, where $\pi_1$ is an index of input port and $\pi_2 \ldots \pi_{|\pi|}$ is a sequence of
+the indicies of the output ports.
+As in the case of ports, the indices are unique.
+The io-graph $\otimes f$ is constructed from a forest $f$ such that
 $\otimes f = (\otimes t_1 \cdots t_n,root(t_{\pi_{1}}),\ldots,root(t_{\pi_{n}}))$.
-So the ports of $\otimes f$ are the roots of the~trees indexed by indices in $\pi$.
+The ports of $\otimes f$ are the roots of the~trees indexed by the indices in $\pi$.
 This means that a node of the graph pointed by $\pi_1$ is an input port of $\otimes f$.
-The nodes (that were roots of the trees) pointed by the other indices in $\pi$ are the output ports of $\otimes f$.
+The nodes (that were the roots of the trees) pointed by the output port indices in $\pi$ are the output ports of $\otimes f$.
 
 \bexmp
-Recall graph $t$ from Figure \ref{fig:graph_tree}.
-We can extend it to a io-graph $t_\phi$ where $t$ is unchanged and
-$\phi=(v_1,v_4,v_5)$ (of course, there are different ways how to define the ports).
-The io-graph $t_\phi$ has an input port $v_1$ and the output ports are $v_2,v_3$.
-Because $v_1$ is the root the tree $t_\phi$ is accessible.
+Recall the graph $t$ from Figure \ref{fig:graph_tree}.
+It can be extended to an io-graph $t_\phi$ by adding ports $\phi=(v_1,v_4,v_5)$.
+The resulting io-graph $t_\phi$ has the input port $v_1$ and the output ports $v_2,v_3$.
+Because $v_1$ is the root, the graph $t_\phi$ is accessible.
 The cut-points of $t_\phi$ are $v_1, v_4, v_5$.
 
-In Figure \ref{fig:forest} we shown the forest $f$.
-This forest could be extended to a io-forest $f_{io}=((t_1,t_2,t_3),\pi)$ 
+In Figure \ref{fig:forest}, we shown the forest $f$.
+This forest could be extended to an io-forest $f_{io}=((t_1,t_2,t_3),\pi)$ 
 by defining a sequence of the port indices $\pi$ which could be e.g., $(1,3)$.
-Then a graph $\otimes f_{io}$ is a pair $(\otimes (t_1,t_2,t_3)$, $(u_1,w_1))$.
+Then the graph $\otimes f_{io}$ is a pair $(\otimes (t_1,t_2,t_3)$, $(u_1,w_1))$.
 The graph $\otimes (t_1,t_2,t_3)$ is the same as in Figure~\ref{fig:forest_graph}.
-The input port $u_1$ is indeed the node $root(t_1)$
-and the output port $w_1$ is related to the output port index $3$.
+The input port $u_1$ is indeed $root(t_1)$
+and the output port $w_1$ because it is the root of the third tree in $f$
+and the index of the output port is $3$.
 \label{ex:iograph}
 \eexmp
 
 \subsection{Minimal and Canonical Forest}
 \label{subsec:mcforest}
 
-There are two properties of the forests, minimality and canonicity, that we will further employ.
-The properties make possible to represent an io-forest in unique way.
-That enables deterministic manipulating with io-forest.
-An io-forest $f_m=(t_1 \cdots t_n, \phi)$ representing a graph $\otimes f$ is \emph{minimal}
-iff the roots of trees $t_1,\ldots,t_n$ corresponds to the cut-points of $\otimes f$,
+There are two properties of the forests, minimality and canonicity, that we will further use.
+The properties make it possible to represent an io-forest in a unique way.
+%That enables deterministic manipulating with io-forest.
+An io-forest $f=(t_1 \cdots t_n, \phi)$ representing a graph $\otimes f$ is \emph{minimal}
+iff the roots of the trees $t_1,\ldots,t_n$ correspond to the cut-points of $\otimes f$,
 so there is a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n\} )\}$ and $cps(\otimes f)$.
-The minimal io-forest is unique up-to to permutations of $t_1,\ldots,t_n$.
+The minimal io-forest is hence a unique representation of $\otimes f$ up-to to permutations of $t_1,\ldots,t_n$.
 
-We need to defined ordering $\preceq_p$, so called \emph{canonical ordering}, over cut-points of $\otimes f$ to be able to define canonicity of the forest $f$.
-The canonical ordering $\preceq_p \subseteq cps(\otimes f) \times cps(\otimes f)$ is defined as follows: $c_1 \preceq_p c_2 \Leftrightarrow \emph{the cost of the cheapest path from }
-\phi_1 \emph{ (input port) to } c_1 \emph{ is}$ $\emph{cheaper}$ $\emph{ than the cost of the cheapest path from } \phi_1 \emph{ to } c_2$.
+To be able to define trully canonicity representation of the forest $f$
+we define an ordering $\preceq_p$, so called \emph{canonical ordering}, of the cut-points of $\otimes f$.
+The canonical ordering ${\preceq_p} \subseteq {cps(\otimes f) \times cps(\otimes f)}$
+is defined as follows: $c_1 \preceq_p c_2 \Leftrightarrow \emph{the cost of the cheapest path from }
+\phi_1 \emph{ (input port) to } c_1 \emph{ is}$ $\emph{smaller}$ $\emph{ than the cost of the smallest path from } \phi_1 \emph{ to } c_2$.
 The io-forest $f_c$ is \emph{canonical} iff it is minimal, the trees $t_1,\ldots, t_n$ are ordered by $\preceq_p$, and $\otimes f$ is accessible.
-The canonical io-forest is a unique representation of a accessible io-graph.
-The canonical io-forest can be obtained by depth-first traversal (DFT)\cite{taocp} of $\otimes f$.
-We need to assume that there is an ordering $\leq_\Sigma$ over labels $\Sigma$ of $\otimes f$ before description of DFT method to
-make DFT traversal deterministic and hence the ordering of the trees unique.
-We create a stack of nodes initialized with input and output ports ordered by $\preceq_p$ when the smallest node is on the top of the stack.
-Then the DFT is run over $\otimes f$ and we obtain canonical forest $f_c$ where trees are in the following order.
-The first ones are trees corresponding to the ports of $f$ ordered by $\preceq_p$ and the rest of the trees are in the order
-in which they were visited by DFT traversal.
+The canonical io-forest is then a unique representation of an accessible io-graph.
+The canonical io-forest can be obtained by a depth-first traversal (DFT)\cite{taocp} of $\otimes f$.
+To make DFT traversal deterministic and hence the ordering of the trees unique
+we need to assume that there is an ordering $\leq_\Sigma$ over labels $\Sigma$ of $\otimes f$.
+The DFT then uses a stack of nodes initialized with the input and output ports
+ordered by $\preceq_p$ with the smallest node on the top of the stack.
+The DFT is run over $\otimes f$.
+It visits the successors of a node in the order given by $\leq_{\Sigma}$ and
+the nodes in successors tuples are in their order in tuple.
+We obtain canonical forest $f_c$ where trees are in the following order.
+The first ones are trees corresponding to the ports of $f$ ordered by $\preceq_p$
+and the rest of the trees is in the canonical ordering of the trees
+which is defined by the order of the DFT traversal visit.
 
 
 \subsection{Tree Automata}
