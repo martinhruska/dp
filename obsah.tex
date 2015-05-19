@@ -1,12 +1,8 @@
 \chapter{Introduction}
 
-The importance of computers in our everyday life has largely increased over the past few decades.
-A~lot of us can only hardly imagine doing their jobs without a help of an appropriate computer program
-and we also spend a plenty of time using computers (e.g., personal computers or mobile devices) in leisure time.
-The~computer programs are also often used in critical applications like autopilot in an airplane.
-The growing number of applications of computer programs brings also the~need for their greater safety and security.
-
-It is not an easy task to guarantee that a software has the specified (safe) properties.
+The growing number of applications of computer programs in the past few decades brings
+the~need for their greater safety and security.
+It is not an easy task to guarantee that a software has the specified properties.
 The~programs often go through many states during the computations
 and it could be very time and space consuming or even impossible to check whether no undesirable behaviour
 may appear in any of the program runs.
@@ -15,14 +11,14 @@ on running the program in different contexts with different inputs
 and matching a program behavior and the outputs with the expected ones.
 This method can satisfy the most of the software quality requirements and often covers the most of the program behavior.
 On the~other side, it is only possible to find the~errors using testing, not to prove their absence \cite{dijkstra}.
-Finding some errors during testing does not mean that all errors are eliminated.
+Finding some of the errors during testing does not imply the elimination of all of them.
 
 The mentioned weakness of testing can be resolved by \emph{formal verification}.
 Formal verification aims at using rigorous mathematical methods to check whether a given system meets a given specification \cite{fav:lecture}.
 There are three main branches of formal verification.
-The first one is \emph{model checking} which systematically explores the states of a~system (e.g., a program) or its model to
-prove that the model satisfies the property.
-The second one is \emph{static analysis} which is done over a source code (or some modification of it) of a system
+The first one is \emph{model checking} which systematically explores the state space of a~system (e.g., a program) or its model to
+prove that it satisfies the verified property.
+The second one is \emph{static analysis} which is performed over a source code (or some modification of it) of a system
 without a need of its explicit execution and it rather explores a syntatic structure of the analysed program.
 One of the important and very widely used approaches in static analysis is called \emph{abstract interpretation} where the analysis is performed by
 applying abstract transformers corresponding to the original program semantics over an abstract domain.
@@ -31,19 +27,19 @@ Abstract interpretation is an example of technique that is consider
 to be the static analysis technique but it also has some attributes of
 the model checking techniques.
 The last approach is \emph{theorem proving}.
-It proves the program safety in the standard mathematical way --
+It proves the program safety in the standard mathematical way\,---\,
 starting from axioms and using inference rules to verify properties of the given system.
 Theorem proving can be partially automated.
 
-This work deals with a specific branch of static analysis called \emph{shape analysis} which is focused on verification of programs manipulating
+This work deals with a specific branch of static analysis called \emph{shape analysis} which focuses on verification of programs manipulating
 complex dynamic data structures (such as different kinds of lists and trees),typically allocated on the heap.
 Checked properties are for example absence of invalid pointer dereference,
 whether no invalid pointer is freed (no invalid free) or
 whether all alocated memory is freed during the program execution (no memory leaks).
 There are different approaches to shape analysis with different advantages.
-For example, the approach based on \emph{separation logic} \cite{seplog,seplog07} provides great scalability.
-On the other hand, automata based approaches, particularly \emph{abstract regular tree model checking} (ARTMC) \cite{artmc}, is
-superior in its flexibility and generality (but some state-of-the-art separation logic methods
+The approaches based on \emph{separation logic} \cite{seplog,seplog07} provide great scalability.
+On the other hand, automata based approaches, particularly \emph{abstract regular tree model checking} (ARTMC) \cite{artmc}, are
+superior in their flexibility and generality (but some state-of-the-art separation logic methods
 has comparable generality \cite{biabduction}).
 This work focuses on a verification procedure based on the concept of forest automata (FA) which
 combines benefits of the both mentioned approaches \cite{forester11}.
@@ -51,78 +47,81 @@ combines benefits of the both mentioned approaches \cite{forester11}.
 Forest automata have been introduced in \cite{forester11} and
 they are an extension of finite tree automata (TA).
 They are used as an abstract domain in a verification procedure which performs symbolic execution of the analyzed program.
-A~prototype of this verification procedure has been implemented in a tool called \emph{Forester} \cite{www:forester}.
-Forester verifies programs written in C and detects safety violations such as invalid dereferences, invalid frees,
+A~prototype of this verification procedure has been implemented as the \emph{Forester} tool	\cite{www:forester}.
+Forester verifies programs written in C and it can detect safety violations such as invalid dereferences, invalid frees,
 memory leaks, and also reachability of an error line.
 It is capable of verifying non-trivial data structures such as skip-lists of the~second and the~third level.
 However, the current implementation is far from perfect.
-For instance, Forester currently does not support the complete syntax of C and %TODO
+For instance, Forester currently does not fully support the complete syntax of C and %TODO
 it also does not check whether a found error is real or spurious.
 A~general goal of this work is to improve Forester in the areas described further.
 
 One of the problems of Forester is low modularity and maintainability of the code.
 The first goal of this thesis is to improve it by changing the~underlying implementation
-of finite tree automata in Forester to \vata\ -- a state-of-the-art library for TA manipulation \cite{libvata}.
-This should bring better maintainability and modularity than having
-a special TA library implementation within Forester as it is now.
-%The VATA library implements very efficiently the most of state-of-the-art algorithms for TA
-%and it is better to implement the algorithms efficiently with implementation optimizations
-%only at the one place (in VATA) then spending time with optimizing the implementation
-%of the same algorithms in Forester again.
+of finite tree automata in Forester to \vata\,---\,a state-of-the-art library for manipulation with TA \cite{libvata}.
+%This should bring better maintainability and modularity than having
+%a special TA library implementation within Forester as it is now.
+The VATA library implements very efficiently the most of state-of-the-art algorithms for TA
+and it is better to implement the algorithms efficiently with implementation optimizations
+only at the one place (in VATA) than putting effort to optimizing the implementation
+of the same algorithms in Forester again.
+This strenghs the \emph{maintainability} of Forester.
+Having the special encapsulated module for tree automata with a clear interface
+brings also the \emph{modularity} by descreasing the dependencies on the internals of
+the tree automata module.
 %The code with implementation optimization is also not easy maintainable in long term.
 %So it is again better to put this effort only once in the VATA library.
-But it is needed to refactor some parts of Forester code before any change of the tool.
-Then it would be possible to design and implement an interface between Forester and VATA.
+But it is needed to refactor some parts of Forester code before the changes.
+Then it would be possible to create an interface between Forester and VATA.
 
 Another weakness of Forester is lack of the analysis of detected errors.
 Since Forester uses abstraction to deal with unboudness of dynamic data structures
 it possible that a found error is spurious and its detection is caused by overapproximating abstraction.
 When this happens then the analysis of the detected error can determine
-whether the error is a real or a spurious one.
+whether the error is a real or not.
 The results of the counterexample analysis can be also used for refinement of abstraction.
 Then the analysis can be restarted with the refined abstraction.
-This gradual refinement is known as \emph{counterexample-guided abstraction refinement} (CEGAR) \cite{cegar}.
+This gradual refinement of abstraction is based on \emph{counterexample-guided abstraction refinement} (CEGAR) \cite{cegar}.
 %The verification procedure cannot verify correct programs with detected spurious error without this refinement.
 %It can also detect a spurious error instead of the real one because the verification procedure ends after the
 %first error detection without the analysis of the found error.
-So the second goal of this thesis is to design and implement the analysis of the counterexamples
-and the results use for refinement of abstraction (when a spurious error is found).
-The method for analysing counterexamples is \emph{backward run}
-and its results will be used for refinement of \emph{predicate abstraction}.
+The second goal of this thesis is to design and implement the analysis of the counterexamples
+and a refinement of abstraction (when a spurious error is found).
+The method for analysing counterexamples is in this case \emph{backward run}
+and its results will be further used for refinement of \emph{predicate abstraction}.
 Forester does not currently use the mentioned predicate abstraction but \emph{height abstraction}
 because predicate abstraction needs backward run for creating the new predicates for refinement.
 Height abstraction is less precise and less flexible compared to predicate abstraction.
-Implementing predicate abstraction enables analysis of even more complex data structures like red-black trees.
-Therefore, a~part of the second goal is an implementation of predicate abstraction using backward run in Forester.
+Implementing predicate abstraction enables the analysis of even more complex data structures like red-black trees.
 
-The outline of this master thesis is following.
+The outline of this master thesis is as follows.
 In Chapter \ref{ch:prel}, the preliminaries are given.
 The verification procedure based on FA is covered in Chapter \ref{ch:fav}.
 Chapter \ref{ch:tools} provides description of \vata\ and Forester
 and Chapter \ref{ch:fova} describes an implementation of the version of Forester tool using \vata.
 The design and the implementation of backward run and predicate abstraction
-for FA based verification is given in Chapter \ref{ch:backward}.
+is given in Chapter \ref{ch:backward}.
 Finally, Chapter \ref{ch:eval} contains an overview of experimental evaluation and 
 Chapter \ref{ch:concl} summarizes this thesis.
 
 \chapter{Preliminaries}
 \label{ch:prel}
 
-This chapter provides the theoretical foundations of this thesis.
+This chapter provides the theoretical foundations for this thesis.
 First, graphs, trees and forests are defined along the automata accepting them in Section~\ref{sec:graph}.
 Then the previously defined concepts are further extended to hierarchical forests and automata in Section \ref{sec:fah}.
-This section follows the definitions and a the structure used in \cite{techrep}.
+This section follows the definitions and the structure used in \cite{techrep}.
 
 \section{Graphs, Trees and Forests}
 \label{sec:graph}
 
-Assume a word $w = a_1 \cdots a_n$, we denote the $i$-th symbol of $w$ as $a_i$.
+Assume a alphabet $\Sigma$ and a word $w = a_1 \cdots a_n$, we denote the $i$-th symbol of $w$ from $\Sigma$ as $a_i$.
 We denote $dom(f)$ the~domain of a total mapping $\funcdecl{f}{A}{B}$ and its range is denoted by $rng(f)$.
 
 \subsection{Graphs and Trees}
 \label{subsec:graph}
 A \emph{ranked alphabet} is a finite set of symbols $\Sigma$ and a related mapping $\funcdecl{\#}{\Sigma}{\mathbb{N}}$
-assigns to a symbol its rank.
+assigning to a symbol its rank.
 A (directed, ordered, labelled) \emph{graph} is a total map $\funcdecl{g}{V}{\Sigma \times V^{*}}$ where $V$ is a finite set of nodes.
 The items of the set $\Sigma$ are in context of the graphs called \emph{labels}.
 The map $g$ maps each node $v\in V$ to:
@@ -132,18 +131,18 @@ The map $g$ maps each node $v\in V$ to:
 		We denote successors by $S_g(v)$ and $v_i$ is denoted by $S^i_g(v)$.
 \end{enumerate}
 Symbol $l_g(v)$ is such that $\#(l_g(v)) = |S_g(v)|$.
-We will omit subscript $g$ when no ambiguity may arise possible.
+We will omit the subscript $g$ when no ambiguity may arise possible.
 
-A \emph{leave} of $g$ is a node $v \in V$ such that $S_g(v) = \epsilon$.
+A \emph{leaf} of $g$ is a node $v \in V$ such that $S_g(v) = \epsilon$.
 An \emph{edge} of $g$ is a pair $v \mapsto (a, v_1 \cdots v_n)$ where $v, v_1, \ldots, v_n \in V$,
 $a \in \Sigma$ such that $g(v) = (a, v_1 \cdots v_n)$.
 The \emph{in-degree} of a node $v' \in V$ in the graph $g$ is the sum of
 its occurrences in the tuples $t \in V^{*}$ get by $g(v)$ for all $v \in V$.
-We denote in-degree of a node $v \in V$ by $idg_g(v)$ and
-we omit again subscript $g$ whenever it is possible.
+We denote the in-degree of a node $v \in V$ by $idg_g(v)$ and again
+we omit the subscript $g$ whenever it is possible.
 More formally, in-degree is defined as
 $idg(v') = |\{(v \mapsto (a, v_1 \cdots v_n),i)) \,|\, v \mapsto (a, v_1 \cdots v_n)
-\emph{ is an edge such that } i \in \{1,\ldots,n\}: v' = v_i\}|$.
+\text{ is an edge such that } i \in \{1,\ldots,n\}: v' = v_i\}|$.
 The \emph{joins} of $g$ are nodes $v \in V$ such that $idg(v') > 1$.
 
 A \emph{path} from $v\in V$ to $v' \in V$ is a sequence $p=v_0, i_1, v_1, \ldots, i_n, v_n$ where $v=v_0, v' = v_n$
@@ -152,9 +151,9 @@ The empty path has $n=0$.
 The path $p$ has \emph{length} $n$ denoted by $length(p) = n$.
 The path $p=u_0,i_1,u_1,\ldots,i_n,u_n$ is acyclic if $\forall u_i,u_j \in p: i \neq j \Rightarrow u_i \neq u_j$.
 The \emph{cost} of the acyclic path $p$ is the sequence $i_1, \ldots, i_n$.
-The path $p$ is \emph{cheaper} than another path $p'$ iff the cost of $p$ is lexicographically smaller than that of $p'$. 
-A node $u \in V$ is \emph{reachable} from a node $v \in V$ iff there is a path from $v$ to $u$ or $u=v$.
-A node $u \in V$ is a \emph{root} of $g$ iff all nodes $v \in V$ are reachable from $u$.
+The path $p$ is \emph{cheaper} than path $p'$ iff the cost of $p$ is lexicographically smaller than that of $p'$. 
+A node $u \in V$ is \emph{reachable} from a node $v \in V$ iff there exists a path from $v$ to $u$ or $u=v$.
+A node $u \in V$ is a \emph{root} of the graph $g$ iff all nodes $v \in V$ are reachable from $u$.
 We use the term $root$ also for a mapping $\funcdecl{root}{g}{V}$ which maps a graph to its root.
 A graph with the root is called \emph{rooted}.
 
@@ -189,7 +188,7 @@ No node has more then one incoming edge, hence $t$ is a tree.
 \subsection{Forests}
 \label{subsec:forests}
 
-Let us suppose without loss of generality that $\Sigma \cap \mathbb{N} = \emptyset$.
+Without the loss of generality suppose that $\Sigma \cap \mathbb{N} = \emptyset$.
 A $\Sigma$-labelled \emph{forest} is a sequence of trees $t_1 \cdots t_n$ over ($\Sigma \cup \{1,\ldots,n\}$)
 where $\forall i \in \{1,\ldots,n\}: \#i = 0$.
 We suppose that the sets of nodes of the trees $t_1, \ldots, t_n$ are disjoint.
@@ -197,8 +196,8 @@ We suppose that the sets of nodes of the trees $t_1, \ldots, t_n$ are disjoint.
 The forest $t_1 \cdots t_n$ represents the graph $\fagr$ that arises
 by interconnecting roots by the related root reference.
 For instance, a root reference $2$ in $t_1$ would be replaced by the root node of $t_2$.
-Let's formalize the idea of the construction of $\fagr$.
-The graph $\fagr$ contains an edge $v \mapsto (a,v_1 \cdots v_m)$ iff $\exists i \in \{1, \ldots, n\} \ \exists(v \mapsto (a, v_1' \cdots v_m')) \in edges(t_i)
+Let us formalize the idea of the construction of $\fagr$.
+The graph $\fagr$ contains an edge $v \mapsto (a,v_1 \cdots v_m)$ iff $\exists i \in \{1, \ldots, n\}:\ \exists(v \mapsto (a, v_1' \cdots v_m')) \in edges(t_i):
 \ \forall j \in \{1,\ldots,m\}: v_j = h(v_j')$ where $edges(t_i)$ is the set of all edges of the tree $t_i$ and
 \[ h(v_j') = \left\{
   \begin{array}{l l}
@@ -249,8 +248,8 @@ of the referenced trees.
 \subsection{Graphs and Forests with Ports}
 \label{subsec:gfp}
 
-We extend graphs and forests with \emph{input} and \emph{output} nodes which are marked by so-called \emph{ports}.
-An \emph{input-output-graph} (io-graph) is a pair $(g,\phi)$ (for brevity denoted by $g_\phi$)
+We extend the notion of graphs and forests with \emph{input} and \emph{output} nodes which are marked by so-called \emph{ports}.
+An \emph{input-output-graph} (io-graph) is a pair $(g,\phi)$ (for brevity denoted as $g_\phi$)
 where $g$ is a graph and $\phi=(\phi_1 \cdots \phi_n) \in dom(g)^+$ is a sequence of ports, $\phi_1$
 is an input port and $\phi_2 \cdots \phi_n$ is a sequence of output ports.
 The ports are unique in $\phi$.
@@ -296,14 +295,14 @@ The properties make it possible to represent an io-forest in a unique way.
 %That enables deterministic manipulating with io-forest.
 An io-forest $f=(t_1 \cdots t_n, \phi)$ representing a graph $\otimes f$ is \emph{minimal}
 iff the roots of the trees $t_1,\ldots,t_n$ correspond to the cut-points of $\otimes f$,
-so there is a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n\} )\}$ and $cps(\otimes f)$.
+so there exists a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n\} )\}$ and $cps(\otimes f)$.
 The minimal io-forest is hence a unique representation of $\otimes f$ up-to to permutations of $t_1,\ldots,t_n$.
 
 To be able to define trully canonicity representation of the forest $f$
 we define an ordering $\preceq_p$, so called \emph{canonical ordering}, of the cut-points of $\otimes f$.
 The canonical ordering ${\preceq_p} \subseteq {cps(\otimes f) \times cps(\otimes f)}$
-is defined as follows: $c_1 \preceq_p c_2 \Leftrightarrow \emph{the cost of the cheapest path from }
-\phi_1 \emph{ (input port) to } c_1 \emph{ is}$ $\emph{smaller}$ $\emph{ than the cost of the smallest path from } \phi_1 \emph{ to } c_2$.
+is defined as follows: $c_1 \preceq_p c_2 \Leftrightarrow \text{the cost of the cheapest path from }
+\phi_1$ (input port) to $c_1 \text{ is}$ $\emph{smaller}$ $\text{ than the cost of the smallest path from } \phi_1 \text{ to } c_2$.
 The io-forest $f_c$ is \emph{canonical} iff it is minimal, the trees $t_1,\ldots, t_n$ are ordered by $\preceq_p$, and $\otimes f$ is accessible.
 The canonical io-forest is then a unique representation of an accessible io-graph.
 The canonical io-forest can be obtained by a depth-first traversal (DFT)\cite{taocp} of $\otimes f$.
@@ -326,37 +325,36 @@ which is defined by the order of the DFT traversal visit.
 A (finite, non-deterministic, top-down) \emph{tree automaton} (TA) is a
 quadruple $A = (Q, \Sigma, \Delta, R)$ where
 \begin{itemize}
-	\item $Q$ is a finite set of \emph{states}
-	\item $\Sigma$ is a ranked alphabet
+	\item $Q$ is a finite set of \emph{states},
+	\item $\Sigma$ is a ranked alphabet,
 	\item $\Delta$ is a set of \emph{transition rules} where transitions have a form $(q,a,q_1 \cdots q_n)$ where $q,q_1,\ldots,q_n \in Q$, $a \in \Sigma$, $n \geq 0$ and $\#a = n$.
 		Alternatively, we write $q \xrightarrow{a} (q_1 \cdots q_n)$ to denote $(q,a,q_1 \cdots q_n) \in \Delta$.
-		When $n=0$ then the rule is called \emph{leaf rule}.
+		For $n=0$ we call the rule \emph{leaf rule},
 	\item $R \subseteq Q$ is a set of \emph{root states}.
 \end{itemize}
 
-We could symmetrically define also bottom-up tree automata as quadruple $B = (Q, \Sigma, \Delta, F)$ where
+We can symmetrically define also bottom-up tree automata as quadruple $B = (Q, \Sigma, \Delta, F)$ where
 \begin{itemize}
-	\item $Q$ is a finite set of states
-	\item $\Sigma$ is a ranked alphabet
-	\item $\Delta$ is a set of transition rules where transition has a form $(q_1 \cdots q_n,a,q)$ where $q,q_1,\ldots,q_n \in Q$, $a \in \Sigma$, $n \geq 0$ and $\#a = n$.
+	\item $Q$ is a finite set of states,
+	\item $\Sigma$ is a ranked alphabet,
+	\item $\Delta$ is a set of transition rules where transition has a form $(q_1 \cdots q_n,a,q)$ where $$q,q_1,\ldots,q_n \in Q$$, $a \in \Sigma$, $n \geq 0$ and $\#a = n$.
 		We can again write $(q_1 \cdots q_n) \xrightarrow{a} q$ to denote a $(q_1 \cdots q_n,a,q) \in \Delta$.
-		When $n=0$ then the rule is called \emph{leaf rule}.
+		For $n=0$ we call the rule \emph{leaf rule},
 	\item $F \subseteq Q$ is a set of \emph{final states}.
 \end{itemize}
 
-We will further consider top-down tree automata as default.
+We further consider top-down tree automata unless stated otherwise.
 
-Now the semantics of TA will be defined.
+The semantics of TA is following.
 A \emph{run} of $A$ over a tree $t$ is mapping $\funcdecl{\rho}{dom(t)}{Q}$ such that
 $\forall v \in dom(t)\ \exists (q \xrightarrow{a} (q_1 \cdots q_n)) \in \Delta:  q=\rho(v) \wedge  \forall i \in \{1, \ldots, |S(v)|\}: q_i=\rho(S(v)_i)$.
 We use $t \Rightarrow_{\rho} q$ to denote a run $\rho$ of $A$ over tree $t$ s.t. $\rho(root(t)) = q$ and we use $t \Rightarrow q$ to denote that there exists
 run $\rho$ over $t$ to $q$.
-Finally, we can define the language of $A$.
-The \emph{language} of a state $q\in Q$ is defined by $L(q) = \{t\,|\, t \Rightarrow q\}$.
-The \emph{language} of $A$ is defined by $L(A) = \bigcup_{q\in R} L(q)$.
+The \emph{language} of a state $q\in Q$ is defined as $L(q) = \{t\,|\, t \Rightarrow q\}$.
+The \emph{language} of $A$ is defined as $L(A) = \bigcup_{q\in R} L(q)$.
 
 \bexmp
-Let define a tree automata $A=(Q,\Sigma,\Delta, R)$
+Let us have a tree automaton $A=(Q,\Sigma,\Delta, R)$
 where $Q=\{q_1,q_2,q_3,q_4,q_5\}$, $\Sigma = \{a,b\}$,
 such that $\#(a) = 2, \#(b) =0$, $R=\{q_1\}$,
 and $\Delta=\{q_1 \xrightarrow{a} (q_2,q_3), q_2 \xrightarrow{b} (),
@@ -371,23 +369,23 @@ it also holds $t \in L(A)$.
 \subsection{Forest Automata}
 \label{subsec:fa}
 
-A \emph{Forest Automata} (FA) over $\Sigma$ is a pair $F=(A_1\cdots A_n, \pi)$
+A \emph{forest automaton} (FA) over alphabet $\Sigma$ is a pair $F=(A_1\cdots A_n, \pi)$
 where $A_1 \cdots A_n$ is a sequence of tree automata defined over the alphabet $\Sigma \cup \{1,\ldots,n\}$
-and $\pi = I_1 \cdots I_n$ where $I_1,\ldots, I_n \in \{1, \ldots, n\}$ is a sequence of port indices.
+and $\pi = I_1 \cdots I_n$, where $I_1,\ldots, I_n \in \{1, \ldots, n\}$ is a sequence of port indices.
 There are two kinds of languages related to FA.
-The first one is forest language obtained by Cartesian product of the languages of particular TA (and port indices) of FA
+The first one is a forest language obtained by Cartesian product of the languages of particular TA (and port indices) of FA
 and hence the forest language is a set of the io-forests.
-The second one is the graph language obtained by connecting the io-forests from the forest language to io-graphs.
+The other is the graph language obtained by connecting the io-forests from the forest language to io-graphs.
 Formally, the \emph{forest language} of the FA $F$ is the set of io-forests $L_f(F)= L(A_1) \times \ldots L(A_n) \times \{\pi\}$.
-Note that it is necessary to add to the Cartesian product also the sequence of indices to preserve structure of io-forests
-and hence to be able to construct graph language of $F$ in deterministic way.
+Note that it is necessary to add to the Cartesian product also the sequence of indices to preserve the structure of io-forests
+and hence to be able to construct graph language of $F$ in a deterministic way.
 The \emph{graph language} of $F$ is the set of io-graph $L(F) = \{\otimes f\,|\, f \in L_f(F)\}$.
 We say that $F$ respects \emph{canonicity} if $\forall f \in L_f(F): \emph{f is canonical}$.
 
-One of the most important operation over forest automata performed in analysis of a program is checking
+One of the most important operation over forest automata is checking
 language inclusion of two forest automata.
 This operation is performed to check whether a fixpoint in a program point is reached during symbolic execution.
-Checking inclusion of languages of forest automata respecting canonicity could be done \emph{component-wise},
+Checking inclusion of languages of forest automata respecting canonicity can be done \emph{component-wise},
 i.e. checking language inclusion of their tree automata one by one.
 
 \begin{lemma}
@@ -430,11 +428,11 @@ Hence the graph $\otimes f_{io} = (\otimes (t_1,t_2,t_3),(u_1,w_1))$
 \section{Forest Automata of Higher Level}
 \label{sec:fah}
 
-We are able to represent some data structures, like singly-linked lists or trees, by already defined forest automata
+We are able to represent some data structures, like singly-linked lists or trees, by already defined forest automata,
 but we need to define hierarchical forest automata to be able to represent
 another class of data structures (further described in \ref{subsec:boxes}), like doubly-linked lists or trees with root pointers.
 For creating the hierarchy of forest automata we need to introduce \emph{structured labels}.
-This labels could contain another forest automata.
+This labels can contain another forest automata.
 So when a label containing a non-hierarchical FA is used as a label
 in alphabet of FA $F'$ then $F'$ is FA of the first level.
 Then the hierarchy of FA is created by nesting the FA of lower level
@@ -447,7 +445,7 @@ Let $g$ be a graph defined over $2^\Gamma$ where $A$ denotes a label of $g$ and 
 The~graph $g$ has edges in the form $v \mapsto (\{a_1,\ldots,a_m\},v_1 \cdots v_n)$ where
 $a_1 \sqsubset a_2 \sqsubset \ldots \sqsubset a_m$ and $\sum_{a \in \{a_1,\ldots,a_n\}} \# a = n$.
 We denote such edge by $e$.
-Each edge $e$ consists \emph{sub-edges} that creates sequence
+Each edge $e$ consists of \emph{sub-edges} that creates sequence
 $e\langle 1\rangle = v \mapsto (a_1,v_1 \cdots v_{\#a_1}) \cdots e\langle n\rangle= v \mapsto (a_m,v_{n-\#a_m+1} \cdots v_m)$.
 We denote the $i$-th sub-edge of $e$ in $g$ by $e\langle i\rangle = v \mapsto (a_i,v_k \cdots v_l)$ where $i \in \{x \in \natnum | 1 \leq x \leq m\}$ or
 we can also denote it by indices from $\{x \in \natnum | k \leq x \leq l\}$.
@@ -460,37 +458,40 @@ A graph $g$ is \emph{unambiguously determined} by $SE(g)$ if $g$ has no isolated
 
 \subsection{Tree Automata over Structured Labels}
 
-Since we already extended the labels to structures ones we also define tree automata over these labels.
+Since we already extended the notion of labels to the structured ones so
+we also define tree automata over such labels.
 A (finite, non-deterministic, top-down) \emph{tree automata} (over structured labels) is quadruple $A=(Q,2^\Gamma, \Delta, R)$ where
 \begin{itemize}
-	\item $Q$ is a finite set of states.
-	\item $\Gamma$ is a ranked alphabet.
+	\item $Q$ is a finite set of states,
+	\item $\Gamma$ is a ranked alphabet,
 	\item $\Delta$ is a set of transition rules set with the rules in the form
 		$(q,\{a_1,\ldots,a_m\},q_1 \cdots q_n)$
 		where $q,q_1,\ldots,q_n \in Q$, $\{a_1,\ldots,a_m\} \in \Gamma$.
 	Each rule could be interpreted as a sequence of the \emph{rule-terms}
 	$d\langle 1\rangle = q \mapsto (a_1,q_1 \cdots q_{\#a_1}) \cdots d\langle n\rangle= q \mapsto (a_m,q_{n-\#a_m+1} \cdots q_n)$ and
-	we denote the $i$-th rule term of sequence again by $d\langle i\rangle$ where $i \in \{1,\ldots,m\}$.
+	we denote the $i$-th rule term of sequence again by $d\langle i\rangle$ where $i \in \{1,\ldots,m\}$,
 	\item $R\subseteq Q$ is a finite set of root states.
 \end{itemize}
 
 \subsection{Forest Automata of Higher Level}
 
-Finally, we can extend also FA to a version defined over the structured labels.
-Informally, a forest automaton of a higher level has another forest automata (of lower lever) as the symbols on its edges.
+Following the extension of TA, we define also FA over the structured labels.
+Informally, a forest automaton of a higher level can have another forest automata (of lower lever) as the symbols on its edges.
 This makes possible to build a hierarchy of forest automata.
-Let formalize this idea.
-We start from forest automata of \emph{level} 1.
-So let $\Gamma_1$ be a set of all forest automata over $2^\Gamma$ and let the elements of this set be called \emph{forest automata of level 1}.
-All forest automata of \emph{level $i$} form the set $\Gamma_i$.
+We explain the hierarchy using induction.
+Let start from the forest automata of \emph{level} 1.
+Forest automata of level 1 can have only the structured labels in alphabet but not forest automata.
+A set $\Gamma_1$ consists of all forest automata over $2^\Gamma$ so each \emph{forest automata of level 1} belongs to $\Gamma_1$.
+Then all forest automata of \emph{level $i$} form the set $\Gamma_i$.
 A forest automaton $F$ of level $i$ is defined over the ranked alphabet $2^{\Gamma \cup \Delta}$ where $\Delta$ is a subset of forest automata of
 level $i-1$ which are called \emph{boxes} of $F$.
-The \emph{rank} of an FA $F$ is the number of its output port indices.
 Finally, the set of all forest automata of all levels $\sum_{i \geq 0} \Gamma_i$ is denoted by $\Gamma^{*}$ and it is ordered by a total ordering $\sqsubset_{\Gamma_*}$.
+
+The \emph{rank} of an FA $F$ is the number of its output port indices.
 
 We define an operation \emph{sub-edge replacement}
 which help us to define semantics of forest automata of higher level.
-Informally, the sub-edge replacement removes a sub-edge and matches its origin
+Informally, the method removes a sub-edge and matches its origin
 and the outputs with a new graph serving like a substitution of the sub-edge.
 This operation will be further used for a replacement of sub-edge of FA
 with by a graph represented by FA of lower level.
