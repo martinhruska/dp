@@ -163,19 +163,18 @@ each node is a successor of at most one of the other nodes).
 
 \bexmp
 We illustrate some terms related to the graphs and trees.
-Consider a graph $t$ in Figure \ref{fig:graph_tree}.
-There is a set of nodes $V=\{v_1,v_2,v_3,v_4,v_5\}$ and
-an alphabet $\Sigma = \{a,b\}$ with a ranking function $\#$ such that $\#(a) = 2$ and $\#(b) = 0$.
-Then the graph $t$ is mapping $t(v_1) = (a, (v_2,v_3))$, $t(v_2) = (b, ())$,
-$t(v_3) = (a, (v_4, v_5))$, $t(v_4) = (b, ())$, $t(v_5) = (b, ())$.
-The leaves of $t$ are $v_2, v_4, v_5$.
-The edges correspond to the definition of $t$ so there is for example
-an edge $v_1 \mapsto (a,(v_2,v_3))$.
-There are many paths but to illustrate the concept of path we give
-definition of path from $v_1$ to $v_5$ which is $v_1, 2, v_3, 2, v_5$.
-Thus we can say that $v_5$ is reachable form $v_1$.
+Consider a graph $t$ in Figure \ref{fig:graph_tree}
+with $V=\{v_1,v_2,v_3,v_4,v_5\}$ and
+the alphabet $\Sigma = \{a,b\}$ with a ranking function $\#$ such that $\#(a) = 2$ and $\#(b) = 0$.
+Then the graph $t$ is the mapping $\{t(v_1) \mapsto (a, (v_2,v_3))$, $t(v_2) \mapsto (b, ())$,
+$t(v_3) \mapsto (a, (v_4, v_5))$, $t(v_4) \mapsto (b, ())$, $t(v_5) \mapsto (b, ())\}$.
+The node $v_2, v_4, v_5$ are leaves.
+An example of an edge is $v_1 \mapsto (a,(v_2,v_3))$.
+A path is for instance the sequence $v_1, 2, v_3, 2, v_5$
+what is the path from $v_1$ to $v_5$.
+Thus the node $v_5$ is reachable from the node $v_1$.
 Since all nodes are reachable from $v_1$ then $v_1$ is a root of $t$.
-Finally, no node in $s$ has more the one incoming edge hence $t$ is a tree.
+No node has more then one incoming edge, hence $t$ is a tree.
 
 	\begin{figure}[bth]
 		\begin{center}
@@ -193,34 +192,34 @@ Finally, no node in $s$ has more the one incoming edge hence $t$ is a tree.
 Let us suppose without loss of generality that $\Sigma \cap \mathbb{N} = \emptyset$.
 A $\Sigma$-labelled \emph{forest} is a sequence of trees $t_1 \cdots t_n$ over ($\Sigma \cup \{1,\ldots,n\}$)
 where $\forall i \in \{1,\ldots,n\}: \#i = 0$.
+We suppose that the sets of nodes of the trees $t_1, \ldots, t_n$ are disjoint.
 \emph{Root references} are leaves labelled by $i \in \mathbb{N}$.
-The forest $t_1 \cdots t_n$ (we suppose that the sets of nodes of the trees are disjoint) represents the graph $\fagr$ that could
-be constructed by interconnecting roots by the related root reference.
-E.g., a root reference $2$ in $t_1$ would be replaced by the root node of $t_2$.
-Let's formalize the idea of construction of $\fagr$.
+The forest $t_1 \cdots t_n$ represents the graph $\fagr$ that arises
+by interconnecting roots by the related root reference.
+For instance, a root reference $2$ in $t_1$ would be replaced by the root node of $t_2$.
+Let's formalize the idea of the construction of $\fagr$.
 The graph $\fagr$ contains an edge $v \mapsto (a,v_1 \cdots v_m)$ iff $\exists i \in \{1, \ldots, n\} \ \exists(v \mapsto (a, v_1' \cdots v_m')) \in edges(t_i)
 \ \forall j \in \{1,\ldots,m\}: v_j = h(v_j')$ where $edges(t_i)$ is the set of all edges of the tree $t_i$ and
 \[ h(v_j') = \left\{
   \begin{array}{l l}
   root(t_k) & \quad \text{if $v_j'$ is a root reference with $l(v_j') = k$}\\
-  v_j'   & \quad \text{otherwise}
+  v_j'   & \quad \text{otherwise.}
   \end{array} \right.\]
 
 \pagebreak
 \bexmp
-We illustrate the notion of forest in an example.
+We illustrate the notion of forest.
 Consider a forest $f$ in Figure \ref{fig:forest}.
-The forest $f$ consists three trees, $t_1$ with a root $u_1$,
-$t_2$ with a root $v_1$ and $t_3$ with a root $w_1$.
-The alphabet $\Sigma$ of the trees is same as in Example \ref{ex:graph} but $f$
+It consists of three trees: $t_1$ with the root $u_1$,
+$t_2$ with the root $v_1$, and $t_3$ with the root $w_1$.
+The alphabet $\Sigma$ of the trees is the same as in Example \ref{ex:graph} but $f$
 is defined over $\Sigma \cup \{\overline{2}, \overline{3}\}$
 where $\overline{2}, \overline{3}$ denotes the root references
 to the roots $u_5$ and $v_3$ of the second and the third tree.
 
-We can obtain a graph $\otimes t_1,t_2,t_3$ shown in Figure from $t_1, t_2, t_3$.
-The edges with root references are replaced by another edges leading to the roots
+We can obtain a graph $\otimes t_1,t_2,t_3$ shown in Figure \ref{fig:forest_grap} from $t_1, t_2, t_3$.
+The edges labelled by root references are replaced by the edges leading to the roots
 of the referenced trees.
-A~created graph is in Figure \ref{fig:forest_graph}.
 	\begin{figure}[bth]
 	\begin{center}
 		\scalebox{1}
@@ -239,8 +238,8 @@ A~created graph is in Figure \ref{fig:forest_graph}.
 	\begin{figure}[bth]
 	\begin{center}
 		\input{fig/prel/for_graph.tikz}
-		\caption{A graph $\otimes t_1,t_2,t_3$ obtained from a forest in Figure \ref{fig:forest}.
-		The green edges are the ones added to create the graph from forest.}
+		\caption{The graph $\otimes t_1,t_2,t_3$ obtained from the forest $f$ in Figure \ref{fig:forest}.
+		The green edges are the ones that were added to the graph created from the forest $f$.}
 	  \label{fig:forest_graph}
 	\end{center}
 	\end{figure}
@@ -250,9 +249,8 @@ A~created graph is in Figure \ref{fig:forest_graph}.
 \subsection{Graphs and Forests with Ports}
 \label{subsec:gfp}
 
-We extend graphs and forests with concept of \emph{ports} which should
-serve for marking input and output nodes.
-An \emph{input-output-graph} (io-graph) is a pair $(g,\phi)$ (in sense of brevity also denoted by $g_\phi$)
+We extend graphs and forests with \emph{input} and \emph{output} nodes which are marked by so-called \emph{ports}.
+An \emph{input-output-graph} (io-graph) is a pair $(g,\phi)$ (for brevity denoted by $g_\phi$)
 where $g$ is a graph and $\phi=(\phi_1 \cdots \phi_n) \in dom(g)^+$ is a sequence of ports, $\phi_1$
 is an input port and $\phi_1 \cdots \phi_n$ is a sequence of output ports.
 The ports in $\phi$ are unique.
