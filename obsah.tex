@@ -550,41 +550,41 @@ proofed in \cite{forester:techrep}.
 \label{ch:fav}
 
 Consider programs manipulating dynamic data structures.
-These programs change shape of a heap (and so reach another heap configuration)
+These programs can change the shape of a heap (and so reach another heap configuration)
 by performing operations like an allocation of the new memory nodes on the heap
 or removing the old ones.
 Since the dynamic data structures in these programs can be
-unbounded the number of the reachable heap configurations is infinite.
-However, it is possible to represent the infinite state space by forest automata in finite way.
+unbounded, the number of the potentionally reachable heap configurations is infinite.
+However, it is possible to represent this infinite state space by forest automata in a finite way.
 Then we can perform shape analysis over the forest automata representation of the reachable
 heap configurations to discover whether no undesirable behavior
-like a dereference of uninitialized pointer happens.
+like a dereference of uninitialized pointer can happen.
 
 This chapter provides an overview of the shape analysis based on forest automata introduced in \cite{forester12}.
 First, a heap representation using FA is described and then
-we provide overview of symbolic execution that employs the framework of abstract interpretation.
+we provide the overview of symbolic execution that employs the framework of abstract interpretation.
 
 \section{Heap Representation}
 \label{sec:hd}
 
-It is possible to view a \emph{heap} (more precisely, a single heap configuration)
-as a (directed) graph where each allocated heap cells corresponds to a node in the graph \cite{forester13}.
+It is possible to view a \emph{heap} (more precisely a single heap configuration)
+as a (directed) graph where each allocated heap cell corresponds to a node in the graph \cite{forester13}.
 The heap cells consists of \emph{pointer selectors} and \emph{data selectors}.
-A pointer selectors could point to another graph node or to the value \emph{null} or it could be \emph{undefined}.
+A pointer selectors can point to another graph node, to the \emph{null} value or it can be \emph{undefined}.
 A data selector picks a data from some finite data domain.
 %When we consider the pointer variables of a program it also holds that they can have pointer and data selectors.
-A heap can be represented by FA but it needs to be decomposed
-to the trees first.
-We need to split a heap graph to the trees to be able to represent in by forest automata.
+A heap can be then represented by FA but it needs to be decomposed
+to the single trees first.
+We need to split a heap graph to the trees to be able to represent it by forest automata.
 The splitting is done by the following method.
-We identify the heap cut-points (corresponding to the already defined term \emph{cut-points}).
-That are the heap cells pointed by a pointer variable or by more then one pointer selector of
+First, we identify the heap cut-points (corresponding to the already defined term \emph{cut-points}).
+That are the~heap cells pointed by a pointer variable or by more then one pointer selector of
 the other heap cells.
 The heap is then split to the trees whose roots nodes are the cut-points identified in the previous step.
 The pointer selectors that pointed to the cut-points are redirected to the corresponding root references which interconnect
 the particular tree components (and provides possibility to reconstruct the original graph again).
 Finally, the created tuple of the trees is called a forest.
-Please note, that the mentioned procedure corresponds to the terms defined in Chapter \ref{ch:prel}
+Note, that the mentioned procedure corresponds to the terms defined in Chapter \ref{ch:prel}
 so it is possible to obtain a canonical forest as it was described in Section \ref{subsec:mcforest}.
 
 Let us formalize the idea given above.
@@ -620,10 +620,10 @@ has really the rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ re
 \texttt{data} variable from \texttt{SLL} structure has the rank $0$.
 \eexmp
 
-The mentioned method describes how to decompose a heap graph to forest, concretely we use the io-forests.
+The mentioned method describes how to decompose the heap graph to forest, concretely to the io-forests.
 An io-forest can be accepted by a forest automaton as a member of its language.
 Moreover, a language of forest automaton is a set of such forests.
-So is is possible to represent a set of the reachable heap configurations at a point of the analysed program.
+So it is possible to represent a set of the reachable heap configurations at a point of the analysed program.
 Precisely, the forest automata of higher level respecting canonicity are used in the verification method
 because they have richer expressive power then the non-hierarchical forest automata.
 The forest automata of higher level also makes possible to represent
@@ -639,12 +639,12 @@ just the one input port $sf$ keeps a information about the stack frame.
 \section{Symbolic Execution}
 \label{sec:se}
 
-So far we described representation of the heap configurations using forest automata.
-Now we cover how the forest automata representation is computed for each point of the analysed program.
+So far we described the representation of the heap configurations using forest automata.
+Now we will cover how the forest automata representation is computed for each point of the analysed program.
 FA-based verification procedure is a standard \emph{abstract interpretation} \cite{cousot:77}.
 The concrete domain assigns to each program location a set of pairs
-$(\sigma,H)$ where a mapping $\sigma$ maps each variable
-to a node in $H$, to a $\texttt{null}$ or to an \emph{undefined} value, and $H$ is a single heap configuration.
+$(\sigma,H)$ where $\sigma$ is a mapping maps of variables
+to the nodes in $H$, to a $\texttt{null}$ or to an \emph{undefined} value, and $H$ is a single heap configuration.
 The abstract domain assigns to each program location a finite set of pairs
 $(\sigma, F)$ (called \emph{abstract configuration}) where $\sigma$ maps again each variable to a
 $\texttt{null}$ value or to undefined value or to an index of TA in $F$ and $F$ is a forest automata
@@ -654,63 +654,66 @@ one program location (since abstract domain maps a program location
 to the set of abstract configurations).
 FA are not closed under union so it is not possible to represent the sets of heaps by single FA.
 
-The verification starts from an initial abstract configuration that consists an FA for initial heap configuration representing io-graph
-$g_{\mathit{sf}}$ where $g$ consists from two nodes.
+The verification starts from an initial abstract configuration that consists of
+an FA for initial heap configuration representing io-graph
+$g_{\mathit{sf}}$ where $g$ consists of two nodes.
 The first one is $\texttt{null}$ and the second one is the empty stack frame $sf$ with $l_g(\mathit{sf}) = \emptyset$.
 The sequence of \emph{abstract transformers} related to the program statements is then iteratively applied to the abstract configurations.
-The process of applying abstract transformers over abstract domain is called \emph{symbolic execution}.
-As it was said, each abstract transformer correspond to a statement of the analyzed program.
+The process of applying abstract transformers over the~abstract domain is called \emph{symbolic execution}.
+%As it was said, each abstract transformer correspond to a statement of the analyzed program.
 It is possible to define a function $f_{\texttt{op}}(g_{st})$ related to an operation \texttt{op} from the intermediate code of the analysed program.
-This function models semantics of \texttt{op} in concrete domain in such way that $f_{\texttt{op}}(g_{\mathit{st}})$
+This function models semantics of \texttt{op} in the concrete domain in such way that $f_{\texttt{op}}(g_{\mathit{st}})$
 returns an io-graph representing the heap configuration obtained after the execution of
 the concrete operation \texttt{op} over concrete domain.
 The abstract transformers $\tau_{\texttt{op}}$ are defined for each concrete
-operation \texttt{op} reflecting semantics of $f(\texttt{op})$.
+operation \texttt{op} reflecting the semantics of $f(\texttt{op})$.
 The abstract transformer $\tau_{\texttt{op}}$ applied to a FA $S$
-representing the heap in abstract domain returns a result FA $S' = \tau_{\texttt{op}}(S)$
+representing the heap in abstract domain returns as a result FA $S' = \tau_{\texttt{op}}(S)$
 such that $\bigcup_{F' \in S'} \llbracket F' \rrbracket = \{ f_{\texttt{op}}(g_{sf}) \,|\, g_{sf} \in \llbracket F \rrbracket \wedge F \in S \}$.
-The abstract transformer is applied separately to each forest $F \in S$.
+The abstract transformer is then applied separately to each forest $F \in S$.
 
 The abstract transformers related to a program statement in a program location are applied iteratively until
 abstract configurations in every program location reaches fixpoint.
-Each iteration follows this procedure:
+Each iteration consists the following steps:
 \begin{enumerate}
 		\item The sets of abstract configurations at each program point are updated by applying
 			the abstract transformers following these steps:
 			\begin{enumerate}
-				\item Some boxes of FA in abstract configuration are unfold to uncover the accessed parts of heaps by abstract transformers.
+				\item Some boxes of FA in abstract configuration are unfolded to uncover the accessed parts of heaps by abstract transformers.
 					This step is called \emph{unfolding}.
-				\item The update of abstract configuration is done.
-				\item The new boxes are \emph{learnt} by method described nicely in \cite{forester13}
-					and these boxes are fold again.
-					This is repeated until it is not possible to find the new boxes.
-				\item FA in abstract configuration is made canonicity respecting.
+				\item The abstract configuration is updated.
+				\item The new boxes are \emph{learnt} by the method described in \cite{forester13}
+					and these boxes are folded again.
+					This is repeated until no new boxes are found.
+				\item FA in transformed to the canonicity respecting form.
 			\end{enumerate}
-		\item At junctions corresponding to the loops the union is followed by \emph{widening}.
-			This requires also checking language inclusion between sets
-			of FA to check whether a fixpoint has been reached.
-			It is also necessary to transform the FA to canonicity
+		\item At junctions corresponding to the loops the union of the possible heap configurations
+			of the particular branches is followed by \emph{widening}.
+			This requires checking language inclusion between sets
+			of FA to test whether a fixpoint has been reached.
+			It is necessary to transform the FA to canonicity
 			respecting form before inclusion checking.
 \end{enumerate}
 
-Widening currently consists of repeating the following steps to each $F$ in the abstract configurations of a junction point until the fixpoint is reached:
+Widening currently consists of repeating the following two steps to each $F$ in the abstract configurations of a junction point until the fixpoint is reached:
 \begin{enumerate}
-		\item Folding boxes of $F$.
-		\item Abstraction -- It is currently based on the framework of \emph{abstract regular (tree) model checking} \cite{artmc}.
-			During abstraction all states $q$, $q'$ are collapsed if it holds that
+		\item The boxes of $F$ are folded.
+		\item Abstraction\,---\,currently based on the framework of \emph{abstract regular (tree) model checking} \cite{artmc}.
+			During the abstraction all states $q$, $q'$ are collapsed if it holds that
 			$q$ and $q'$ accepts trees with the same sets of prefixes of height at most $k$.
+			This kind of abstraction is called \emph{height abstraction}.
 \end{enumerate}
 
 It was mentioned that we need canonicity respecting FA to be able checking inclusion of languages of FA.
-This is done by operation called \emph{normalization} further described in Subsection \ref{subsec:norm}.
-Subsection \ref{subsec:boxes} provides brief description of cases when the boxes are applied.
+This is achieved by operation called \emph{normalization} further described in Subsection \ref{subsec:norm}.
+Subsection \ref{subsec:boxes} provides the brief description of cases when the boxes are applied.
 Finally, the methods of abstraction over FA are described in \ref{subsec:abstraction}.
 
 \subsection{Normalization}
 \label{subsec:norm}
 
 Normalization is done over a FA $F = (A_1 \cdots A_N,\pi)$ and its result is canonicity respecting FA.
-Normalization consists the following steps:
+Normalization consists of the following steps:
 \begin{itemize}
 		\item We merge $TA$ of $F$ into a form where roots of accepted forests are cut-points only.
 			So when there is a TA $A$ whose roots of the accepted trees are
@@ -740,29 +743,29 @@ Normalization consists the following steps:
 
 It was already explained how the heap is decomposed to the forests.
 One part of the decomposition process is identifying the cut-points.
-But it could happen that there is infinitely many cut-points in the graphs representing the heaps.
-It is the case of e.g. doubly linked list where each node is a cut-point itself.
-This could be resolved by employing the boxes (box is a symbol of alphabet of forest automata
+However, there can be infinitely many cut-points in the graphs representing the heaps.
+For instance each node of doubly linked list is a cut-point itself.
+This can be resolved by employing the boxes (box is a symbol of alphabet of forest automata
 of higher level which is also forest automata as it was mentioned in Chapter \ref{ch:prel}).
 Since it is possible for FA to use other FA as symbols we can fold recurring sub-graphs to the boxes.
 They are further used as the labels
-and so reduce the number of cut-points (to a bounded count).
-When it is needed to manipulate a graph described by a FA hidden in the box, then the unfolding is done.
+and thus bound the number of cut-points.
+When we need to manipulate with a graph described by a FA hidden in the box, then the unfolding is done.
 The steps of verification procedure where folding and unfolding is needed has been mentioned in the beginning of this section
 and its formal definition is given in Chapter \ref{ch:prel}.
-The boxes can be learn during analysing of a program automatically by the method proposed in \cite{forester13} or
-it can be given to the analyzer manually by a user.
+The boxes can be learnt during the analysing of a program automatically by the method proposed in \cite{forester13} or
+it can be given to the analyzer manually by a user \cite{forester11}.
 
 \subsection{Abstraction over Forest Automata}
 \label{subsec:abstraction}
 
-We mentioned that forest automata are able to handle also infinite state spaces
-rising from a possible unboudness of the mentioned dynamic data structures.
-However, there is still the problem of state explosion that often makes
-nearly impossible to finish verification procedure of a system in the real time
+We mentioned that forest automata are able to handle the infinite state space
+rising from the possible unboudness of the mentioned dynamic data structures.
+However, there is still the problem of thte state explosion that often makes
+nearly impossible to finish the verification procedure of a system in the real time
 and moreover, not even termination of the verification procedure is guaranteed at all.
-Therefore the abstraction over the forest automata is introduced to increase probability of termination
-and to accelerate the method.
+Therefore the abstraction over the forest automata is introduced
+to increase the probability of the termination and to accelerate the method.
 The abstraction over forest automata is based on the framework of \emph{abstract regular tree model checking} \cite{artmc}.
 
 The abstraction accelerates the computation by merging states of forest automaton that are equivalent
@@ -775,7 +778,8 @@ It holds that $Q/_{\eqrel{M}} \subseteq Q$ and also that $L(M) \subseteq L(\alph
 Since the abstraction is defined for a single tree automaton
 it is performed component-wise over a forest automaton.
 
-The forest automata based verification currently employs \emph{height abstraction}.
+The forest automata based verification is currently implemented (in the Forester tool)
+employing \emph{height abstraction}.
 This abstraction merges the states with the equivalent
 languages upon to a given tree height.
 So the range of abstraction function is a set of the equivalence classes of the relation $\heqrel{M}$.
@@ -784,7 +788,7 @@ $\forall q_1,q_2 \in Q: q_1 \heqrel{M} q_2 \defarrow \langlen{M}{q_1} = \langlen
 $\langlen{M}{q}$ $=$ $\{ w \in \Sigma^n \,|\, |w| \leq n \wedge wv \in \langstate{M}{q} \wedge |v| \geq 0\}$
 and $n\in \mathbb{N}$ is height of the abstraction.
 
-The abstraction over forest automata overapproximate the set of the reachable
+The abstraction over forest automata overapproximates the set of the reachable
 configurations of a program (what is formally expressed by $L(M) \subseteq L(\alpha(M))$).
 This brings the mentioned acceleration of the verification procedure.
 On the other hand, it could led to a detection of a spurious counterexample which is not present
