@@ -1608,7 +1608,7 @@ It also creates only one particular place (adapter class) connecting Forester an
 including VATA into Forester classes.
 This prevents from creating too strong relations between Forester and VATA.
 
-\section{Forester Refactoring}
+\section{The Refactoring of Forester}
 \label{sec:forester_prep}
 
 The original implementation of tree automata library has also strong dependencies
@@ -1621,16 +1621,15 @@ This set of classes realizing original tree automata library will be further ref
 The refactoring is mainly based on reduction of a number of data types and data members declared
 to be \emph{public} (in sense of the C++ programming language).
 This is by exploiting the features provided by C++11 \cite{stroustrup13}
-which brings the methods (namely keyword \emph{auto})
-for auto deduction of the data types by compiler.
-That provides possibility to make some of data types of the original tree automata module \emph{private}.
+which allows auto deduction of the mentioned data types in compilation time (using keyword \emph{auto}).
+That enables us to make some of the data types of the original tree automata module \emph{private}.
 \emph{Iterator} is another concept often used in combination with auto deduction of types to reduce the number of export the internals of tree automata module.
-The combination of these two patterns are used for example when one needs
-to iterate over all transitions of tree automata or all transitions which
+The combination of these two patterns are used for example for
+iteration over of all transitions of tree automata or all transitions which
 have the same state as parent.
 These kinds of iterations are quite common in Forester.
-Another part of refactoring consists of simple replacing access of the class data members by the corresponding getters and setters method.
-Reducing of structural dependencies is also done by emphasis application of \emph{Law of Demeter} \cite{lod89} what practically
+Another part of the refactoring consists of simple replacing access of the class data members by the corresponding getters and setters method.
+Reducing the structural dependencies is also done by emphasis on application of \emph{Law of Demeter} \cite{lod89} which practically
 means that classes using TA explicitly should implement methods providing information about TA instead of providing instance of TA object itself.
 E.g., when one class wants to know whether a given state is final in an tree automaton of a forest automaton then FA implementation should
 implement a method providing this information instead of providing access to it private TA data member.
@@ -1656,10 +1655,10 @@ Adaptor also could add a new method that combines Adaptee methods to achieve wan
 
 \begin{figure}
 	\begin{center}
-		\includegraphics[scale=0.5]{fig/adapter.png}
+		\includegraphics[scale=0.4]{fig/adapter.png}
 	\end{center}
 	\caption{Adapter design pattern expressed in UML.
-	Picture is taken from \cite{wiki:adapter}}.
+	Picture is taken from \cite{wiki:adapter}.}
 	\label{fig:adapter}
 \end{figure}
 
