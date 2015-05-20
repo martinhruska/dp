@@ -427,83 +427,87 @@ Hence the graph $\otimes f_{io} = (\otimes (t_1,t_2,t_3),(u_1,w_1))$
 \section{Forest Automata of Higher Level}
 \label{sec:fah}
 
-We are able to represent some data structures, like singly-linked lists or trees, by already defined forest automata,
-but we need to define hierarchical forest automata to be able to represent
-another class of data structures (further described in \ref{subsec:boxes}), like doubly-linked lists or trees with root pointers.
-For creating the hierarchy of forest automata we need to introduce \emph{structured labels}.
-This labels can contain another forest automata.
-So when a label containing a non-hierarchical FA is used as a label
-in alphabet of FA $F'$ then $F'$ is FA of the first level.
-Then the hierarchy of FA is created by nesting the FA of lower level
-to the labels of FA of higher level.
+The FA defined above can represent data structures, like singly-linked lists or trees,
+by already defined forest automata.
+The hierarchical FA introduced in this section extend expressive power of basic FA.
+They are able to represent the new classes of data structures (further described in \ref{subsec:boxes})
+like doubly-linked lists or trees with root pointers.
+An alphabet of such forest automaton contains
+so-called structured labels (described in Section \ref{subsec:structlab})
+and another FA (described in Section \ref{subsec:hfa}).
+
+%	For creating the hierarchy of forest automata we need to introduce \emph{structured labels}.
+%	This labels can contain another forest automata.
+%	So when a label containing a non-hierarchical FA is used as a label
+%	in alphabet of FA $F'$ then $F'$ is FA of the first level.
+%	Then the hierarchy of FA is created by nesting the FA of lower level
+%	to the labels of FA of higher level.
 
 \subsection{Structured Labels}
-
-$\Gamma$ is a ranked alphabet of \emph{sub-labels} with defined total ordering $\sqsubset$.
+\label{subsec:structlab}
+To easy definition of FA of higher level we introduce
+\emph{structured labels}.
+Let $\Gamma$ be a ranked alphabet of sub-labels with defined total ordering $\sqsubset$ which is called \emph{sub-labels ordering}.
 Let $g$ be a graph defined over $2^\Gamma$ where $A$ denotes a label of $g$ and $\forall A \subseteq \Gamma: \#A = \sum_{a\in A} \#a$.
-The~graph $g$ has edges in the form $v \mapsto (\{a_1,\ldots,a_m\},v_1 \cdots v_n)$ where
-$a_1 \sqsubset a_2 \sqsubset \ldots \sqsubset a_m$ and $\sum_{a \in \{a_1,\ldots,a_n\}} \# a = n$.
+The~graph $g$ has edges in the form $v \mapsto (A,v_1 \cdots v_n)$ where
+$A \subseteq \Gamma$ and $\#A = n$.
 We denote such edge by $e$.
 Each edge $e$ consists of \emph{sub-edges} that creates sequence
 $e\langle 1\rangle = v \mapsto (a_1,v_1 \cdots v_{\#a_1}) \cdots e\langle n\rangle= v \mapsto (a_m,v_{n-\#a_m+1} \cdots v_m)$.
-We denote the $i$-th sub-edge of $e$ in $g$ by $e\langle i\rangle = v \mapsto (a_i,v_k \cdots v_l)$ where $i \in \{x \in \natnum | 1 \leq x \leq m\}$ or
-we can also denote it by indices from $\{x \in \natnum | k \leq x \leq l\}$.
-We use $SE(g)$ to denote all sub-edges of graph $g$.
+We denote the $i$-th sub-edge of $e$ in $g$ by $e\langle i\rangle = v \mapsto (a_i,v_k \cdots v_l)$ where $i: 1 \leq i \leq m\}$.
+We use $SE(g)$ to denote all sub-edges of the graph $g$.
 A node $v$ of a graph is \emph{isolated} if it is not part of any sub-edge.
 Formally, a node $v$ is isolated
-iff $\nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l): v = v' \wedge \nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l)\ \exists v'' \in \{v_k,\ldots, v_l\}: v = v''$.
+iff $\nexists\, e\langle i\rangle = v \mapsto (a_i,v_k \cdots v_l) \wedge \nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l): v \in \{v_k,\ldots, v_l\}$.
 If you read this really carefully, you got a beer on me. % EGG
 A graph $g$ is \emph{unambiguously determined} by $SE(g)$ if $g$ has no isolated nodes.
 
 \subsection{Tree Automata over Structured Labels}
 
-Since we already extended the notion of labels to the structured ones so
-we also define tree automata over such labels.
-A (finite, non-deterministic, top-down) \emph{tree automata} (over structured labels) is quadruple $A=(Q,2^\Gamma, \Delta, R)$ where
-\begin{itemize}
-	\item $Q$ is a finite set of states,
-	\item $\Gamma$ is a ranked alphabet,
-	\item $\Delta$ is a set of transition rules set with the rules in the form
+Since we have already extended the notion of labels to the structured ones,
+we also extend tree automata to the ones over such labels.
+A TA over structured labels is quadruple $A=(Q,2^\Gamma, \Delta, R)$
+where $Q$, $\Gamma$ and $R$ has the same meaning as in the case of basic TA and
+	$\Delta$ is a set of transition rules set with the rules in the form
 		$(q,\{a_1,\ldots,a_m\},q_1 \cdots q_n)$
 		where $q,q_1,\ldots,q_n \in Q$, $\{a_1,\ldots,a_m\} \in \Gamma$.
 	Each rule could be interpreted as a sequence of the \emph{rule-terms}
 	$d\langle 1\rangle = q \mapsto (a_1,q_1 \cdots q_{\#a_1}) \cdots d\langle n\rangle= q \mapsto (a_m,q_{n-\#a_m+1} \cdots q_n)$ and
 	we denote the $i$-th rule term of sequence again by $d\langle i\rangle$ where $i \in \{1,\ldots,m\}$,
-	\item $R\subseteq Q$ is a finite set of root states.
-\end{itemize}
 
 \subsection{Forest Automata of Higher Level}
-
+\label{subsec:hfa}
 Following the extension of TA, we define also FA over the structured labels.
 Informally, a forest automaton of a higher level can have another forest automata (of lower lever) as the symbols on its edges.
-This makes possible to build a hierarchy of forest automata.
+This makes it possible to build a hierarchy of forest automata.
 We explain the hierarchy using induction.
 Let start from the forest automata of \emph{level} 1.
-Forest automata of level 1 can have only the structured labels in alphabet but not forest automata.
-A set $\Gamma_1$ consists of all forest automata over $2^\Gamma$ so each \emph{forest automata of level 1} belongs to $\Gamma_1$.
+Forest automata of level 1 can have only the structured labels from $2^\Gamma$ in alphabet but not forest automata.
+They forms the set $\Gamma_1$.
 Then all forest automata of \emph{level $i$} form the set $\Gamma_i$.
-A forest automaton $F$ of level $i$ is defined over the ranked alphabet $2^{\Gamma \cup \Delta}$ where $\Delta$ is a subset of forest automata of
-level $i-1$ which are called \emph{boxes} of $F$.
-Finally, the set of all forest automata of all levels $\sum_{i \geq 0} \Gamma_i$ is denoted by $\Gamma^{*}$ and it is ordered by a total ordering $\sqsubset_{\Gamma_*}$.
+A forest automaton $F$ of level $i+i$ is defined over the ranked alphabet $2^{\Gamma \cup \Delta}$ where $\Delta$ is a subset of forest automata of
+level $i$ which are called \emph{boxes} of $F$.
+Finally, the set of all forest automata of all levels $\sum_{i \geq 0} \Gamma_i$ is denoted by $\Gamma^{*}$ and
+it is ordered by a total ordering $\sqsubset_{\Gamma_*}$ coming the sub-labels ordering $\sqsubset$.
 
-The \emph{rank} of an FA $F$ is the number of its output port indices.
-
+%The \emph{rank} of an FA $F$ is the number of its output port indices.
 We define an operation \emph{sub-edge replacement}
-which help us to define semantics of forest automata of higher level.
-Informally, the method removes a sub-edge and matches its origin
-and the outputs with a new graph serving like a substitution of the sub-edge.
+which helps us to define semantics of forest automata of higher level.
+Informally, the method removes a sub-edge and matches nodes at its
+left-handed and right-handed side with a new graph serving
+like a substitution of the sub-edge by a graph.
 This operation will be further used for a replacement of sub-edge of FA
 with by a graph represented by FA of lower level.
 
 Formally, let $g$ be a graph with an edge $e \in edges(g)$ and sub-edge $e\langle i\rangle = v_1 \rightarrow (a,v_2 \cdots v_n)$.
 Let $g_{\phi}'$ be an io-graph such that $|\phi| = n$.
-We assume that $dom(g) \cap dom(g') = \emptyset$.
+We assume that ${dom(g)}\, \cap\, {dom(g')} = \emptyset$.
 The sub-edge $e\langle i\rangle$ could be replaced by $g'$ if $\forall j \in \{1,\ldots,n\}: l_{g}(v_j) \cap
 l_{g'}(\phi_j) = \emptyset$
 (this conditions checks whether there is no successor of $v_j$ and $\phi_j$ reachable over the same
 label from the both nodes).
 The result of replacement (if it is possible to do it) is denoted as $g\subst{g'_\phi}{e\langle i\rangle}$.
-The result is the graph $g_n$ in a sequence $g_0 \cdots g_n$ of graphs which are defined as follows: 
+It is the graph $g_n$ in a sequence $g_0 \cdots g_n$ of graphs which are defined as follows: 
 \begin{itemize}
 	\item $SE(g_0) = SE(g) \cup SE(g') \setminus \{e\langle i\rangle\}$.
 	\item $\forall j \in \{1, \ldots, n\}: \emph{the graph } g_j \emph{ is obtained from } g_{j-1} \emph{ by following procedure }$
@@ -518,10 +522,10 @@ We apply the concept of sub-edge replacement to the forest automata of higher le
 and introduce following two procedures over FA.
 \begin{itemize}
 	\item \emph{Unfolding} of a graph $g$ is replacement of its sub-edge with a symbol, which is
-		a FA $F'$, by a graph from $L(F')$.
+		an FA~$F'$, by a graph from $L(F')$.
 		Formally, sub-edge $e\langle i \rangle$ of the graph $g$ has a symbol $a$ and this symbol is a FA $F'$ (so this symbol is a box)
 		and $g'_\phi \in L(a)$ then $h = g \subst{g'_\phi}{e\langle i \rangle}$ is an unfolding of $g$.
-		We denote unfolding $h$ of $g$ by $g \prec h$.
+		We use $g \prec h$ to denote that $h$ is unfolding of $g$.
 	\item \emph{Folding} is a replacement of $g'_\phi$ by $e \langle i \rangle$ in $h$ obtaining $g$.
 		So we can say that $g'_\phi$ is folded to $e \langle i \rangle$. 
 \end{itemize}
@@ -529,19 +533,22 @@ and introduce following two procedures over FA.
 A transitive reflective closure of $\prec$ is denoted by $\prec^*$.
 A set of all graphs obtained by repeated application of unfolding from
 a graph $g$ over ranked alphabet $\Gamma$ is called \emph{$\Gamma$-semantics}. 
-\emph{$\Gamma$-semantics} is formally defined as a set of graphs $g'$ such that $g \prec^* g'$.
+Formally defined, it is the set of graphs $g'$ such that $g \prec^* g'$.
 We denote it as $\llbracket g \rrbracket_\Gamma$ or just simply $\llbracket g \rrbracket$ when it is
 clear which alphabet we speak about.
-Finally, \emph{$\Gamma$-semantics} is defined for a FA $F$ of higher level as follows
+Finally, \emph{$\Gamma$-semantics} is defined for a FA $F$ of higher level as
 $\llbracket F \rrbracket = \bigcup_{g_\phi \in L(F)} (\llbracket g \rrbracket \times \{\phi\})$.
-Please note that the meaning of $L(F)$ and $L_f(F)$ has not been changed
-so the both sets (languages) can contain just graphs (or forests) over structured labels.
+Note that the meaning of $L(F)$ and $L_f(F)$ has not been changed
+so the both sets (languages) contain graphs (or forests) over $\Gamma$.
 
 When we recall the definition of canonicity respecting FA we will find that it is applicable also for FA of higher level.
-A FA $F$ is canonicity respecting if $\forall f \in L_f(F): \emph{f is canonical}$ and since definition of canonical $f$
-is not affected by extending labels to the structured ones the meaning of canonicity is the same as for basic FA.
-The language inclusion checking is again possible in the component-wise way like in the case of basic FA what is
-proofed in \cite{forester:techrep}.
+A FA $F$ is canonicity respecting if $\forall f \in L_f(F): \emph{f is canonical}$.
+Since definition of canonical FA is not affected by extending the labels to the structured ones the meaning of canonicity is the same as for basic FA.
+The language inclusion checking is again possible in the component-wise way like in the case of basic FA, as it is
+prooved in \cite{forester:techrep}.
+However, the testing language inclusion with the same algorithm used for the nonhiearchical FA
+is sound but incomplete because the structured labels are compared as symbols and their semantics
+is not considered.
 
 %TODO sets of FA. are they really needed anywhere?
 
