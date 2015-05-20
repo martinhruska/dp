@@ -328,16 +328,16 @@ quadruple $A = (Q, \Sigma, \Delta, R)$ where
 	\item $Q$ is a finite set of \emph{states},
 	\item $\Sigma$ is a ranked alphabet,
 	\item $\Delta$ is a set of \emph{transition rules} where transitions have a form $(q,a,q_1 \cdots q_n)$ where $q,q_1,\ldots,q_n \in Q$, $a \in \Sigma$, $n \geq 0$ and $\#a = n$.
-		Alternatively, we write $q \xrightarrow{a} (q_1 \cdots q_n)$ to denote $(q,a,q_1 \cdots q_n) \in \Delta$.
-		For $n=0$ we call the rule \emph{leaf rule},
+		Alternatively, we write $q \xrightarrow{a} (q_1 \cdots q_n)$ to denote that $(q,a,q_1 \cdots q_n) \in \Delta$.
+		The rule is called \emph{leaf rule} when $n=0$,
 	\item $R \subseteq Q$ is a set of \emph{root states}.
 \end{itemize}
 
-We can symmetrically define also bottom-up tree automata as quadruple $B = (Q, \Sigma, \Delta, F)$ where
+We can symmetrically define bottom-up tree automata as a quadruple $B = (Q, \Sigma, \Delta, F)$ where
 \begin{itemize}
 	\item $Q$ is a finite set of states,
 	\item $\Sigma$ is a ranked alphabet,
-	\item $\Delta$ is a set of transition rules where transition has a form $(q_1 \cdots q_n,a,q)$ where $$q,q_1,\ldots,q_n \in Q$$, $a \in \Sigma$, $n \geq 0$ and $\#a = n$.
+	\item $\Delta$ is a set of transition rules where transition has a form $(q_1 \cdots q_n,a,q)$ where \linebreak $q,$$q_1,\ldots,q_n$ $\in Q$, $a \in \Sigma$, $n \geq 0$ and $\#a = n$.
 		We can again write $(q_1 \cdots q_n) \xrightarrow{a} q$ to denote a $(q_1 \cdots q_n,a,q) \in \Delta$.
 		For $n=0$ we call the rule \emph{leaf rule},
 	\item $F \subseteq Q$ is a set of \emph{final states}.
@@ -345,22 +345,23 @@ We can symmetrically define also bottom-up tree automata as quadruple $B = (Q, \
 
 We further consider top-down tree automata unless stated otherwise.
 
-The semantics of TA is following.
+Their semantics of TA is defined following as follows.
 A \emph{run} of $A$ over a tree $t$ is mapping $\funcdecl{\rho}{dom(t)}{Q}$ such that
-$\forall v \in dom(t)\ \exists (q \xrightarrow{a} (q_1 \cdots q_n)) \in \Delta:  q=\rho(v) \wedge  \forall i \in \{1, \ldots, |S(v)|\}: q_i=\rho(S(v)_i)$.
-We use $t \Rightarrow_{\rho} q$ to denote a run $\rho$ of $A$ over tree $t$ s.t. $\rho(root(t)) = q$ and we use $t \Rightarrow q$ to denote that there exists
-run $\rho$ over $t$ to $q$.
-The \emph{language} of a state $q\in Q$ is defined as $L(q) = \{t\,|\, t \Rightarrow q\}$.
-The \emph{language} of $A$ is defined as $L(A) = \bigcup_{q\in R} L(q)$.
+$\forall v \in dom(t)\ \exists q \xrightarrow{a} (q_1 \cdots q_n) \in \Delta:  q=\rho(v) \wedge  \forall i \in \{1, \ldots, |S(v)|\}: q_i=\rho(S(v)_i)$.
+We use $t \Rightarrow_{\rho} q$ to denote that $\rho$ is a run of $A$
+over a tree $t$ s.t. $\rho(root(t)) = q$ and we use $t \Rightarrow q$ to denote that
+exists $t \Rightarrow_{\rho} q$. % there exists run $\rho$ over $t$ to $q$.
+The \emph{language} of a state $q\in Q$ is defined as $L(q) = \{t\,|\, t \Rightarrow q\}$
+and the \emph{language} of $A$ is defined as $L(A) = \bigcup_{q\in R} L(q)$.
 
 \bexmp
-Let us have a tree automaton $A=(Q,\Sigma,\Delta, R)$
+Consider a TA $A=(Q,\Sigma,\Delta, R)$
 where $Q=\{q_1,q_2,q_3,q_4,q_5\}$, $\Sigma = \{a,b\}$,
 such that $\#(a) = 2, \#(b) =0$, $R=\{q_1\}$,
 and $\Delta=\{q_1 \xrightarrow{a} (q_2,q_3), q_2 \xrightarrow{b} (),
 q_3 \xrightarrow{b} (q_4,q_5), q_4 \xrightarrow{b} (), q_4 \xrightarrow{b} ()\}$.
-Then a run $\rho$ of $A$ over the tree $t$ from Figure \ref{fig:graph_tree}
-is defined as follows: $\forall i \in \{1,\ldots,5\}: \rho(v_i) = q_i$.
+Then the map $\rho$ such that $\forall i \in \{1,\ldots,5\}: \rho(v_i) = q_i$
+is a run $A$ over the tree $t$ from Figure \ref{fig:graph_tree}.
 Since $\rho(root(t)) = \rho(v_1) = q_1$ then $t \in L(q_1)$ and because $q \in R$
 it also holds $t \in L(A)$.
 \label{ex:ta}
@@ -376,21 +377,21 @@ There are two kinds of languages related to FA.
 The first one is a forest language obtained by Cartesian product of the languages of particular TA (and port indices) of FA
 and hence the forest language is a set of the io-forests.
 The other is the graph language obtained by connecting the io-forests from the forest language to io-graphs.
-Formally, the \emph{forest language} of the FA $F$ is the set of io-forests $L_f(F)= L(A_1) \times \ldots L(A_n) \times \{\pi\}$.
+Formally, the \emph{forest language} of the FA $F$ is the set of io-forests $L_f(F)= L(A_1) \times \ldots \times L(A_n) \times \{\pi\}$.
 Note that it is necessary to add to the Cartesian product also the sequence of indices to preserve the structure of io-forests
-and hence to be able to construct graph language of $F$ in a deterministic way.
-The \emph{graph language} of $F$ is the set of io-graph $L(F) = \{\otimes f\,|\, f \in L_f(F)\}$.
+and hence to be able to construct graph language of $F$.%in a deterministic way.
+The \emph{graph language} of $F$ is the set of io-graphs $L(F) = \{\otimes f\,|\, f \in L_f(F)\}$.
 We say that $F$ respects \emph{canonicity} if $\forall f \in L_f(F): \emph{f is canonical}$.
 
-One of the most important operation over forest automata is checking
-language inclusion of two forest automata.
-This operation is performed to check whether a fixpoint in a program point is reached during symbolic execution.
-Checking inclusion of languages of forest automata respecting canonicity can be done \emph{component-wise},
+One of the most important operations over forest automata used in the program analysis
+is checking graph language inclusion of two forest automata.
+This operation is performed to check whether symbolic execution reaches a fixpoint.
+Checking inclusion of languages of forest automata that respect canonicity can be done \emph{component-wise},
 i.e. checking language inclusion of their tree automata one by one.
 
 \begin{lemma}
 	Let $F^1 = (A_1^1\cdots A_{n_{1}}^1, \pi^1)$ and $F^2 = (A_1^2\cdots A_{n_{2}}^2, \pi^2)$
-	be two FA respecting canonicity.
+	be two canonicity respecting FA.
 	Then $L(F^1) \subseteq L(F^2)$ iff
 	\begin{itemize}
 			\item $n_1$ = $n_2$
@@ -398,31 +399,29 @@ i.e. checking language inclusion of their tree automata one by one.
 			\item $\forall i \in \{1,\ldots,n_1\}: L(A_i^1) \subseteq L(A_i^2)$
 	\end{itemize}
 \end{lemma}
-\begin{proof}
-	Proof can be found in \cite{forester:techrep}.
-\end{proof}
+Proof can be found in \cite{forester:techrep}.
 
 \bexmp
-We consider the io-forest $f_{io}=((t_1,t_2,t_3), (1,3))$ from Example \ref{ex:iograph}.
+Consider the io-forest $f_{io}=((t_1,t_2,t_3), (1,3))$ from Example \ref{ex:iograph}.
 The tree $t_1$ (which is the same as the tree $t$) belongs to the language of TA $A$
 defined in Example \ref{ex:ta}.
-We further define a TA $B=(Q_B,\Sigma, \Delta_B, R_B)$ where $Q_B=\{p_1,p_2,p_3\}$,
+We further have a TA $B=(Q_B,\Sigma, \Delta_B, R_B)$ where $Q_B=\{p_1,p_2,p_3\}$,
 $\Sigma$ is same as in Example \ref{ex:ta},
 $\Delta=\{p_1 \xrightarrow{a} (p_2,p_3),
 p_2 \xrightarrow{b} (),
 p_3 \xrightarrow{b} ()\}$
 and $R=\{p_1\}$.
-TA $B$ contains $t_2$ in its language.
-Finally, we define a TA $C=(Q_C,\Sigma, \Delta_C, R_C)$ where $Q_C=\{r_1\}$,
+The TA $B$ contains $t_2$ in its language.
+Finally, consider a TA $C=(Q_C,\Sigma, \Delta_C, R_C)$ where $Q_C=\{r_1\}$,
 $\Sigma$ is again the same as before,
 $\Delta= \{r_1 \xrightarrow{b} ()\}$
 and $R=\{r_1\}$.
 A set $L(C)$ contains $t_3$.
-Putting all defined automata together we can construct a forest automata $F=((A,B,C),(1,3))$.
+Putting all automata together we can construct the forest automaton $F=((A,B,C),(1,3))$.
 The io-forest $f_{io}$ is in the forest language $L_f(F)$ of $F$ because it belongs
 to $L(A) \times L(B) \times L(C) \times \{(1,3)\}$.
 Hence the graph $\otimes f_{io} = (\otimes (t_1,t_2,t_3),(u_1,w_1))$
-(also defined in Example \ref{ex:iograph}) is in the graph language $L(F)$.
+(shown in Example \ref{ex:iograph}) is in the graph language $L(F)$.
 \eexmp
 
 \section{Forest Automata of Higher Level}
