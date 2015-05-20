@@ -1634,23 +1634,23 @@ means that classes using TA explicitly should implement methods providing inform
 E.g., when one class wants to know whether a given state is final in an tree automaton of a forest automaton then FA implementation should
 implement a method providing this information instead of providing access to it private TA data member.
 That helps us to make a smaller interface for TA module.
-However, also after this refactoring Forester source code is still far from accomplishing the mentioned good practices (and also those not mentioned)
-access the whole source code.
+%However, also after this refactoring Forester source code is still far from accomplishing the mentioned good practices (and also those not mentioned)
+%access the whole source code.
 
 \section{Adapter Design Pattern}
 \label{sec:adapter}
 
-\emph{Adapter} is structural design patter \cite{gamma95} used for creating interface between classes incompatible classes.
+\emph{Adapter} is a structural design patter \cite{gamma95} used for creating interface between incompatible classes.
 Adapter in notion of UML is shown in Figure \ref{fig:adapter}.
-Adapter consists from a class \emph{Adaptee} which is the class that we want to make compatible with
+Adapter consists of a class \emph{Adaptee} which is the class that we want to make compatible with
 another class \emph{Client}.
-Client wants to use the methods of Adaptee.
-Class \emph{Adaptor} is the one providing connection between Client and Adaptee.
-There are two ways how to implement Adaptor.
+Client uses the methods of Adaptee.
+The \emph{Adaptor} class is the one providing the connection between Client and Adaptee.
+There are two ways how to implement the Adaptor.
 The first one is to implement Adaptor as an inherited class from Adaptee
 and to employ the concept of inheritance to redirect
 method calls to its parent (with some possible preprocessing).
-The second possible implementation is composing Adaptee to Adaptor and using Adaptor like an interface to Adaptee.
+The other implementation is composing Adaptee to Adaptor and using Adaptor like an interface to Adaptee.
 Adaptor also could add a new method that combines Adaptee methods to achieve wanted operations.
 
 \begin{figure}
@@ -1662,72 +1662,74 @@ Adaptor also could add a new method that combines Adaptee methods to achieve wan
 	\label{fig:adapter}
 \end{figure}
 
-Let us show what the mentioned roles are in our case.
-Adaptee is the API of \vata, specifically it is the class \emph{ExplicitTreeAut} implementing representation of a tree automaton in explicit encoding.
-Client is in our case not just one class but it is a set of the Forester classes using TA library.
-Adaptor is a newly implemented class \emph{VATAAdapter} which description is in the following section.
+Let us apply this to our case.
+Adaptee is the API of \vata, specifically it is the class \emph{ExplicitTreeAut}
+implementing the representation of tree automata in explicit encoding.
+Client is not only one class but the set of the Forester classes using TA library.
+Adaptor is a newly implemented class \emph{VATAAdapter} described in the following section.
 
 \section{Implementation}
 \label{sec:fova_impl}
 
-The main part of the adapter patter is in our case newly implemented class \emph{VATAAdapter} playing role of Adaptor.
-We decided to use the implementation approach to Adaptor preferring composition over inheritance,
-because it is more suitable for our purposes since we often needs to rename methods.
-E.g., a name of a method in Forester differs from name of a method in VATA performing the same operation.
+The main part of our implementation of the adapter pattern is
+the new class \emph{VATAAdapter} having role of Adaptor.
+We decided to use such approach to Adaptor preferring the composition over the inheritance,
+as it is more suitable for our purposes since we often needs to rename methods.
+E.g., a name of a method in Forester differs from the name of a method in VATA performing the same operation.
 A conversion of a data type of parameter of tree automata operation is also sometimes needed, e.g. from vector to set. 
 
 The class \emph{VATAAdapter} instantiates class \emph{ExplicitTreeAut} from VATA as its private data member
 and redirects to this instance method calls from Forester (the names of methods of VATAAdapter are the same as they were
 in the original TA library).
 \emph{VATAAdapter} also sometimes performs mentioned conversion of the data types.
-There are also the methods implemented by adapter not presented
-in VATA like method \emph{unfoldAtRoot} performing some kind of an unfolding.
+There are also the methods implemented by adapter not present
+in VATA like the method \emph{unfoldAtRoot} performing unfolding.
 (I bet you will not read an implementation part, so here is one mug if you do.) % EGG
-The methods of this kind are very Forester specific.
-So it is not sensible to add them to a general purpose library like VATA is
+These methods are very Forester specific
+and So it is not sensible to add them to a general purpose library like VATA is
 and it is better to implement them in interface like class VATAAdapter is.
 
 We originally supposed that it would be possible to keep the original TA module along VATA adapter
 to be able to easily switch between them.
-However it has proved that this would bring high overhead in some situations.
-E.g., a~conversion of some data types would be needed in this case
+However it has proved this would bring high overhead in situations like e.g.,
+a~conversion of some data types would be needed in this case
 what is overhead compared to implementation where the data types compatible
 with VATA are used directly in the Forester code.
-Hence we decided to remove the original tree automata module and further support only version of Forester with \vata.
+Hence we decided to remove the original tree automata module and
+from this point Forester supports the VATA library only.
 
 \chapter{Developing Backward Run and Predicate Abstraction for Forest Automata Based Verification}
 \label{ch:backward}
 
-As we already mentioned when an error in analysed program is detected
-it is necessary to check whether the error is real one or spurious.
-A spurious error can be created by an overapproximating abstraction over automata.
+When an error in analysed program is detected
+it is necessary to check whether it is real or spurious error.
+A spurious error can be caused by an overapproximating abstraction over automata.
 The analysis of spuriousness is done by \emph{backward run} which has not
 yet been designed and implemented for forest automata based shape analysis.
-When it is proved that the error is spurious we refine abstraction to avoid
-reaching the error again.
+When we proved that the error is spurious the abstraction is refined to avoid
+reaching this error again.
 The analysis is then restarted with the refined abstraction.
-This principle of gradually refinement of abstraction is based on CEGAR framework \cite{cegar}.
+This principle of gradual refinement of abstraction is based on the CEGAR framework \cite{cegar}.
 
-In this work, we propose application of predicate abstraction \cite{artmc} for forest automata.
-Predicate abstraction has more fining tuning then currently used height abstraction.
+In this work, we further propose design of backward run and predicate abstraction \cite{artmc} for forest automata.
+Predicate abstraction has more fine tuning than currently used height abstraction.
 Predicate abstraction can be refined by \emph{predicates} obtained from backward run.
-It guarantees that the spurious error will not be reached again.
-However, we restrict ourselves only on basic forest automata, not the hierarchical ones.
+It guarantees the spurious error will not be reached again.
+We restrict ourselves only to basic forest automata, not the hierarchical ones.
 
-The structure of this chapter is following.
-The first Section \ref{sec:br} describes backward and predicate abstraction run generally.
-Section \ref{sec:isect} describes algorithm for intersection of non-hierarchical forest automata
-Then Section \ref{sec:brdesign} contains design of backward run
-and Section \ref{sec:padesign} describes design of predicate abstraction for forest automata.
-Section \ref{sec:impl} covers implementation of both.
-Finally, an implementation of both concepts is described at Section \ref{sec:impl}.
+The structure of this chapter is as follows.
+The first Section \ref{sec:br} describes backward and the predicate abstraction run is general.
+Section \ref{sec:isect} describes the algorithm for the intersection of non-hierarchical forest automata.
+Section \ref{sec:brdesign} contains the design of backward run
+and Section \ref{sec:padesign} describes the design of predicate abstraction for forest automata.
+Section \ref{sec:impl} covers the implementation.
 
 \section{Backward Run and Predicate Abstraction}
 \label{sec:br}
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[scale=0.9]{fig/artmc.png}
+	\includegraphics[scale=0.7]{fig/artmc.png}
 	\caption{
 		Figure is taken from \cite{artmc}.
 		Figures illustrates principle of forward and backward run and
@@ -1738,14 +1740,14 @@ Finally, an implementation of both concepts is described at Section \ref{sec:imp
 We described in Section \ref{ch:fav} that the abstract transformers $\abstr$
 related to the concrete program operations are gradually applied to forest automata
 starting from a forest automaton modelling an empty heap.
-This gradual application of abstract transformers in the same order
+This gradual application of abstract transformers in the same order of
 the concrete program operations is called \emph{forward run}.
 Formally, a forest automaton representing the memory state 
 at program point $n$ is obtained by
 $\abstr^n(\abstr^{n-1}(\ldots \abstr^{1}(F^{empt}) \ldots))$ in forward run
 where $\abstr^i$ is an abstract transformer related to the concrete
 program operation at the $i$-th point of program and $F^{empt}$ is
-a forest automata modelling an empty (initial) heap.
+a forest automaton modelling an (initial) empty heap.
 Moreover, normalization, box folding and abstraction is performed
 as a part of the abstract transformers at some program locations as
 it was described in Chapter \ref{ch:fav}.
@@ -1754,9 +1756,10 @@ Consider that a program error is detected at the $n$-th program location
 during the forward run.
 The verification of non-spuriousness of the error is done by gradual applying
 \emph{reverse abstract transformers} $\rabstr$ over forest automata.
-It starts from the point where the error was found.
-Then checking whether an intersection of the languages of forest automata from forward run
-and backward run is non-empty at each program point.
+It starts from the error line and then checks whether an intersection of
+the languages of forest automata from forward and backward run is non-empty
+at each program line.
+When the intersection is non-empty the backward run continues using the intersection automaton.
 This process is called backward run.
 Formally, we compute forest automata by application $\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F^{n}) \ldots))$
 from the $n$-th point back to the beginning.
@@ -1764,13 +1767,13 @@ We check whether $\forall 0 \leq i \leq n: L(\rabstr^1(\ldots \rabstr^{i}(F^{i})
 L(\abstr^i(\ldots \abstr^{1}(F^{empt}) \ldots)) \neq \emptyset$,
 When the intersection is empty the found error is reported as spurious.
 
-This principle is illustrated by Figure \ref{fig:bwrun}.
+This principle is illustrated in Figure \ref{fig:bwrun}.
 Figure shows a forest automata language before (green area)
 and after (yellow area) abstraction at a program location where abstraction is performed.
-One oval consisting green and yellow part represents a language of a forest automaton
+One are consisting of a green and a yellow part represents a language of a forest automaton
 in a symbolic state of symbolic execution.
-Figure also shows how a forest automaton (and it language) is gradually changed
-by abstract transformers what is illustrated by lines connecting the ovals.
+Figure also shows how forest automaton (and it language) is gradually changed
+by abstract transformers illustrated by lines connecting the ovals.
 A~found error is shown as a red area in the last oval.
 The backward run starts from this error and it finds
 that an error is spurious because an intersection (the orange areas) of
@@ -1778,10 +1781,8 @@ forest automata language from backward (the blue ovals) and forward
 (the green and yellow area) run is empty at level of the symbolic state
 with the language $L(M_{k-1})$.
 
-So far we describe principle of backward run so we cover
-predicate abstraction now.
-Predicate abstraction is not yet used in forest automata based verification
-because it looses it advantages over height abstraction without
+Predicate abstraction has not yet been used in forest automata based verification
+because it would lose its advantages over height abstraction without
 a backward run which detects the predicates to refine predicate abstraction
 in the case of a spurious counterexample detection.
 
