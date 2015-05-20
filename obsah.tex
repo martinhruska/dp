@@ -808,59 +808,59 @@ and it application to forest automata is one of the merits of this master thesis
 \chapter{The VATA Library and Forester}
 \label{ch:tools}
 
-As it was mentioned in the introduction, FA based verification is implemented by a tool
-called Forester.
-Since FA are closely related to TA as it was shown in Chapter \ref{ch:prel} so
+We mentioned in the introduction, FA based verification is implemented
+by the tool Forester.
+Since FA are closely related to TA, as it was shown in Chapter \ref{ch:prel},
 Forester also depends on an implementation of TA.
 It currently has its own implementation of TA providing the operations over TA needed during verification procedure.
 However it is quite impractical to maintain a special TA library inside of Forester
 and it would be more practical to employ some existing efficient TA library.
 The VATA library is a very efficient library which provides implementation
-of the standard operations over TA like union or intersection etc.
-It mainly aims to implementations of the state-of-the-art algorithms \cite{tacas10}
+of the standard operations over TA like union or intersection, etc.
+It mainly aims to implement the state-of-the-art algorithms \cite{tacas10}
 for language inclusion checking which efficiency
 is also crucial for performance of Forester.
 It arises from these facts to connect Forester with the VATA library
 employing VATA like a backend TA library for Forester.
 
-This chapter provides a description of the VATA library followed by a description of Forester.
+This chapter provides a brief description of the VATA library and the Forester tool.
 
 \section{The VATA Library}
 \label{sec:VATA}
 
-\Vata\ is an open source library for nondeterministic tree automata.
+\Vata\ is an open source library for nondeterministic tree automata implemented in C++.
 Its main application is in the field of formal verification.
 VATA is licensed under GPL, version 3, and it can be obtained from its official website \cite{www:libvata}.
-Implementation programming language is C++.
-It is the only library to our knowledge implementing state-of-the-art algorithms for checking inclusion of NTA languages
+It is the only library to our knowledge implementing
+the state-of-the-art algorithms for checking inclusion of NTA languages
 what makes it suitable for use as a Forester backend library.
-However, \vata\ does not only provide implementation of the algorithms for NTA
+Moreover, \vata\ does not only provide implementation of the algorithms for NTA
 but also the highly efficient implementation of the algorithms for checking language inclusion of
 nondeterministic finite automata \cite{bt:hruska}.
 
 \subsection{Design}
 \Vata\ currently provides the methods for representation of NTA
 in explicit encoding and also in semi-symbolic (top-down and bottom-up)
-encoding using \emph{MTBDD}.
+encoding using \emph{multi-terminal binary decision diagrams (MTBDD)}.
 But it has been designed to be easy extended by other encodings (for others automata).
-The~library provides API for creating and manipulating NTA and also command line interface (cli) build around
+The~library provides API for creating and manipulating NTA and also the command line interface (cli) build around
 the API for experimenting with tree automata defined in a text format directly from command line.
 The main concept of the design of the library is given in Figure \ref{fig:vata}.
 As you can see there are the three main parts in the library design:
 \begin{enumerate}
-	\item \emph{Parsers} -- Parsing an input automaton from a text file.
+	\item \emph{Parsers}\,---\,Parsing an input automaton from a text file.
 		Timbuk \cite{timbuk} is currently the only one supported format for parsing the input automata.
-	\item \emph{Serializers} -- Serializing an automaton to a text file.
+	\item \emph{Serializers}\,---\,Serializing an automaton to a text file.
 		Timbuk format is again the only one supported format.
-	\item \emph{Automata encodings} -- The particular encodings of NTA.
-		An encoding should consists a core module implementing NTA representation
+	\item \emph{Automata encodings}\,----\,The particular encodings of NTA.
+		An encoding should consists of a core module implementing NTA representation
 		and also the operations over NTA in this encoding.
 \end{enumerate}
 
 \begin{figure}[bt]
 \begin{center}
 \input{fig/lib_design.tikz}
-		\caption{The main concept of \vata. Figure is taken from \cite{libvata}}.
+		\caption{The main concept of \vata. Figure is taken from \cite{libvata}.}
 		\label{fig:vata}
 \end{center}
 \end{figure}
@@ -871,23 +871,26 @@ The wrapping program chooses an internal encoding of NTA to which is automaton s
 from intermediate encoding (note that it is also
 possible to create automaton in the chosen encoding directly using API provided by VATA).
 Then the automaton is processed by applying the operations implemented by a module of the chosen encoding.
-Finally, the automaton could be serialized to an output format.
-When one wants to add her own encoding then she needs to implement only a core of encoding (with API for creating automaton itself)
+Finally, the automaton can be serialized to an output format.
+When one wants to add her own the encoding
+then she needs to implement only a core of encoding (with API for creating automaton itself)
 and needed operations over TA and can employ already implemented parses and serializers in \vata.
 
 \subsection{Implemented NTA Encodings}
 
-It was mentioned that there are currently implemented two representation of TA and both are described in the following subsection.
+It was mentioned that there are currently implemented two representation of TA and we will are describe both
+of them in the following subsection.
 
-Using \emph{explicit encoding} NTA transition relation is represented by a hierarchy of the hash tables as it is shown in Figure \ref{fig:explnta}.
+Using the \emph{explicit encoding} of NTA transition relation is represented by a hierarchy
+of the hash tables as it is shown in Figure \ref{fig:explnta}.
 The first level of the hash tables hierarchy (\emph{top-level look-up tables}) maps each state $q$ to 
 the second level of the hash tables hierarchy (\emph{transition cluster}).
 There are stored all symbols presented in the transition with state $q$ at the left-handed side.
-Each symbol $a$ in a transition cluster is mapped to a pointer to a set in the third level of hierarchy (\emph{sets of pointers to tuples}).
+Each symbol $a$ in a transition cluster is mapped to a pointer to a set in the third level of hierarchy (\emph{sets of pointers to tuple}).
 The set contains pointers to the tuples which are at the right-handed side in
 a transition with $q$ at the left-handed side and with $a$ as symbol.
 The tuples are stored at a special set where every tuples is stored only once.
-Note that it is also possible to share part of transition relation between different automata.
+Note that it is also possible to share the part of the transition relation between different automata.
 This brings the higher efficiency in space complexity of implementation.
 Module for explicit encoding also stores explicitly a set of the final states of a NFA.
 On the other side, it does not explicitly store a set of all states because it can be obtained from the transition relation.
@@ -922,11 +925,13 @@ On the other side, it does not explicitly store a set of all states because it c
 \end{figure}
 \endgroup
 
-Another already implemented encoding is \emph{semi-symbolic} one based on VATA own implementation of MTBDD package.
+The other already implemented encoding is a \emph{semi-symbolic} one
+based on VATA own implementation of the MTBDD package.
 This encoding is efficient mainly for TA with the large alphabets.
-Because semi-symbolic encoding and MTBDD are not in the aim of this thesis they are not be described in detail
-but it is possible to find a deeper description in \cite{mt:lengal}.
-The main principle of semi-symbolic encoding is shown in Figure \ref{fig:symnta}.
+Since semi-symbolic encoding and MTBDD are not in the aim of this thesis
+they are not going to be described in detail
+and we refer rather to \cite{mt:lengal}.
+The main principle of the semi-symbolic encoding is shown in Figure \ref{fig:symnta}.
 First of all it is necessary to distinguish between (a) top-down and (b) bottom-up variants of this encoding.
 The first one maps each state $q$ of a NTA using MTBDD to the sets of the tuples of states such that that it is possible
 to make transition from $q$ under a symbol $a$ to a tuple in appropriate set (each set of tuples is dedicated
@@ -949,31 +954,33 @@ The full enumeration of the supported operations for the particular encodings is
 \section{Forester}
 \label{sec:FA}
 
-Forester is an open source tool for verification of programs manipulating
+Forester is an open source tool written in C++ for verification of programs manipulating
 complex dynamic data structures.
-It currently supports the programs in C language.
+It currently supports the programs in the C language.
 Forester is distributed as a \emph{GCC} plugin under GPL license, version 3,
 and it can be obtained from its official website \cite{www:forester}.
-The tool is written in C++.
 
 \subsection{Design}
 
-Forester is implemented as a GCC plugin but it does not analyze directly intermediate code of GCC called GIMPLE but it
-uses Code Listener infrastructure \cite{cl11} to provide fronted over GIMPLE.
+Forester is implemented as a GCC plugin however it does not analyze directly intermediate code of GCC called GIMPLE.
+It uses the Code Listener infrastructure \cite{cl11}
+that provides fronted over the GIMPLE format.
 
-Please see Figure \ref{fig:fa_exec} to get a high level overview of the process performed by Forester. 
-Forester starts an analysis of a program by translation of intermediate
+The high level overview of the process performed by
+Forester is shown in Figure \ref{fig:fa_exec}. 
+Forester starts the analysis of a program by translation of the intermediate
 code representation provided by Code Listener to its own microcode.
 The microcode represents each program statement by one
 or a few instructions associated with the abstract transformers.
-Symbolic execution is then executed over this Forester microcode.
+Symbolic execution is then executed over this microcode.
 Abstract domain represented by FA (which are also the core part of a symbolic state) is gradually transformed by the abstract transformers
 represented by the microcode instructions during the symbolic execution.
 When Forester detects an error the symbolic execution is aborted and
 the analyzed program is claimed as incorrect one.
-When symbolic execution is done then Forester checks whether there is no left garbage
-(of course, garbage is gradually checked also during the symbolic execution).
-If it is not then a shape invariant has been found and the analyzed program is determined as correct.
+During the symbolic execution Forester gradually checks whether there is no left garbage.
+The presence of garbage is also checked at the end of symbolic execution.
+If the program is garbage free and free then a shape invariant has been found
+and the analyzed program is determined as correct.
 
 \begin{figure}[bt]
 	\begin{center}
@@ -983,37 +990,40 @@ If it is not then a shape invariant has been found and the analyzed program is d
 	\label{fig:fa_exec}
 \end{figure}
 
-A deeper description of conceptual design of Forester (which is shown in Figure~\ref{fig:fa_design})
-and the relations between its modules is going to be given now.
-Please note that implementation of Forester is not explicitly separated to the stand-alone compilation modules so the notion of the modules
+We further deeper describe the conceptual design of Forester (which is shown in Figure~\ref{fig:fa_design})
+and the relations between its modules.
+Note that implementation of Forester is not explicitly separated to the stand-alone compilation modules so the notion of the modules
 used in following text is more abstract to provide reader basic summary of the Forester design.
 One module could be e.g. a set of closely related classes with a similar purpose.
 As it was mentioned above, the Code Listener representation of GCC intermediate code is mainly used by Forester \emph{Compiler} module.
 Compiler then converts Code Listener instructions to Forester own \emph{Microcode Instructions}
 and creates their list over which the \emph{Symbolic Execution} is performed.
 Symbolic execution then executes the microcode instructions (abstract transformers)
-which manipulates \emph{Symbolic State} and of course
-also \emph{Forest Automata} included in the symbolic states.
-Symbolic execution also needs \emph{Symbol Context} which is created for each function (and also for global space).
-It keeps information about the variables used in the function,
-about the function arguments or about the stack frame layout.
-A symbolic state provides information about the state of the heap which is represented
-by a FA and it also keeps the information about
+which manipulates \emph{Symbolic State} and
+\emph{Forest Automata} included in the symbolic states.
+Symbolic execution requires \emph{Symbol Context} which is created for each function and also for global space.
+It keeps information about the variables used in the current scope,
+the function arguments and the stack frame layout.
+A symbolic state provides information about the state of the heap represented
+by the FA and it also keeps the information about
 the corresponding microcode instructions.
-\emph{Forest Automata} module provides the methods for manipulation FA needed during a verification procedure.
-The operations like normalization or abstraction over FA are not part of the module containing FA implementation but are provided
-like the classes which take FA as the parameters.
-So these operation could be understood as another module \emph{Operation over Forest Automata}.
-Finally, Forester currently has its own implementation of \emph{Tree Automata}.
-It is very lightweighted implementation containing the optimized
+\emph{Forest Automata} module provides the methods
+for manipulation with FA during the verification procedure.
+The operations such as normalization or abstraction over FA are not the part of the module
+containing FA implementation but are provided as the classes taking FA as parameters.
+So these operations can be understood as another module \emph{Operations over Forest Automata}.
+Forester currently has its own implementation of \emph{Tree Automata}.
+It is very lightweighted and containinc the optimized
 operations directly for the Forester purposes.
-One of them is operation for language inclusion checking using simulation relation
-which efficiency is also crucial for Forester performance.
-The advantage of this implementation is its simplicity and
-the efficiency raising from the optimizing the implementation specially to the Forester.
+One of them is operation for the language inclusion checking using the simulation relation
+and the efficiency is also crucial for the performance.
+The advantage of this implementation is its simplicity and the efficiency raising
+from the optimization the implementation to suit the Forester needs.
 On the other side, it is not easy to maintain such a optimized implementation.
-Especially, when one considers that there is still progress in the field of design of the efficient algorithms
-and an improvement of an algorithm brings often much higher efficiency then an implementation optimization.
+Especially, when one considers that there is still progress
+in the field of design of the efficient algorithms and any improvement of
+an algorithm brings often much higher efficiency
+then smaller implementation optimization.
 
 \begin{figure}[bt]
 	\begin{center}
@@ -1023,22 +1033,22 @@ and an improvement of an algorithm brings often much higher efficiency then an i
 	\label{fig:fa_design}
 \end{figure}
 
-Please note, this is just the conceptual high level view of the Forester design.
+Note, this is just the conceptual high level view of the Forester design.
 A real implementation is much more complicated (e.g. Forest automata are implemented by two classes: \emph{FA} and \emph{FAE})
 and full of the technical details.
 A full description of the implementation is also not the aim of this text.
 
-It was already mentioned that substitution of Forester TA implementation by
-VATA could bring some advantages.
-We summarize them here again.
-The first one is that it is much easier to maintain one library where
-the state-of-the-art algorithms are implemented and optimized.
-Since VATA and Forester is developed by the same developers it also easy to add
+It was already mentioned that the substitution of the underlying TA implementation with the
+VATA library could bring some improvements.
+The first one is the easier maintainance of the library where
+the state-of-the-art algorithms are implemented and optimized
+in comparison with the hardwired implementation.
+Since VATA and Forester are developed by the same developers it also easy to add
 to VATA the operations needed by Forester.
-Having narrow interface between TA library and the rest of Forester
+The narrow interface between TA library and the rest of Forester
 also improves code quality of Forester in the sense of modularity, maintainability and code organization.
-These benefits lead us to implement a version of Forester using VATA.
-It is further described in Section \ref{ch:fova}.
+These benefits led us to implement the version of Forester using VATA
+further described in Section \ref{ch:fova}.
 
 
 \subsection{Implementation of Forest Automata Concepts}
@@ -1047,7 +1057,7 @@ It is further described in Section \ref{ch:fova}.
 This subsection describes an implementation of the forest automata 
 based verification procedure in Forester.
 The core of the forest automata module is class {\tt FA}.
-The implementation corresponds to the definitions given in Chapter \ref{ch:prel}.
+The implementation corresponds with the definitions given in Chapter \ref{ch:prel}.
 Class FA has a data member representing a vector of tree automata $(t_1 \cdots t_n)$.
 It also has a data member keeping a reference to an automaton representing the global variables
 and a reference to the automata representing the local variables of the actually executed function. %TODO define ABP
@@ -1062,18 +1072,18 @@ A value $V$ related to the type of the node is also stored as a data member of t
 
 As it was already mentioned, the forest automata are further used in the representation of a symbolic state.
 An implementation of the representation of a symbolic state is in class {\tt SymState}.
-The class keeps a reference to a Forester microcode instruction $I$ to which the~symbolic state corresponds.
-It has a data member that is a pointer to a forest automaton $F$ (an instance of class {\tt FAE})
-representing the actual memory state in the symbolic state.
+This class keeps a reference to a Forester microcode instruction $I$ to which the~symbolic state corresponds.
+It has a data member that is a pointer to a forest automaton~$F$ (an instance of class {\tt FAE})
+representing the actual memory shape in the symbolic state.
 Another data member of class SymState is a set of registers $\regsset$.
 We denote set $\regsset$ by $\regs$. 
-The register are local or global ones.
+The register can be local or global.
 There are two global registers.
-The first one contain a reference to the forest automata modelling
+The first one contains a reference to the forest automata modelling
 the global state, e.g., the block of global variables in the symbolic state.
-The second one then represents the allocated memory of the actually executed function.
+The other then represents the allocated memory of the actually executed function.
 The local registers serve as temporary memory used in
-the microcode instructions for data manipulation.
+the microcode instructions for the data manipulation.
 Putting together the data members of class {\tt SymState},
 we can define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
 
@@ -1084,10 +1094,10 @@ $S \in \natnum$ is a size of data,
 $V$ is a value of type $T$,
 $MB=(D_1 \cdots D_n)$ represents nested data if they are present (this is the case when $D$ represents a data structure)
 and $D_i$ is another instance of data.
-$T$ could be one of the following data types: pointer, reference to a TA, integer, boolean,
+$T$ can be one of the following data types: pointer, reference to a TA, integer, boolean,
 structure or generally some other data type.
-$T$ could be also undefined or it could state that type is unknown.
-We describe in detail one of the types -- the root reference.
+$T$ can be also undefined or a state with the type that is unknown.
+We describe in detail one of the types\,---\,the root reference.
 Its values are defined as $RR=({\tt Root},{\tt Displ})$
 where ${\tt Root} \in \natnum$ is an index of a tree automaton in $F$
 and ${\tt Displ} \in \natnum$ is an index of a selector in a structured label of
@@ -1102,7 +1112,7 @@ and removing the symbolic states from a queue.
 It implementation is in class \emph{SymExec}.
 When a symbolic state is taken from the queue a microcode instruction contained in
 the symbolic state is executed.
-Some instructions during its execution appends a new symbolic state to the queue.
+Some of the instructions during its execution appends a new symbolic state to the queue.
 Symbolic execution finishes when the queue is empty.
 The microcode instructions executed during the symbolic execution are described in the following section.
 
