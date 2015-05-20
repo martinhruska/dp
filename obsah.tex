@@ -1815,62 +1815,61 @@ Mozna neco o terminaci.
 
 \section{Intersection of Forest Automata Languages}
 \label{sec:isect}
-It is needed to perform the forest automata languages intersection
-during the backward run as it was described in the previous section.
+The most fundamental operations over forest automata in backward run is
+intersection of forest automata languages.
 We design and implement the algorithm for intersection
-of languages of non-hierarchical forest automata because it has not been develop yet.
+of languages of non-hierarchical forest automata since it has not been develop yet.
 The algorithm is given at Algorithm \ref{alg:isect}.
 
-The input of the algorithm are two non-hierarchical forest automata $\F_{\A}$
+The input of the algorithm is two non-hierarchical forest automata $\F_{\A}$
 and $\F_{\B}$ and the output is a forest automaton $\F_{\CC}$ such that
 $\lang(\F_{\A}) \cap \lang(\F_{\B}) = \lang(\F_{\CC})$.
 
-The algorithm starts with initialization auxiliary data structures and
-resulting automaton at lines $3-5$.
-Then it iterates over all pointer variables (in symbolic state) of the analysed program
-that are visible at the point of program where the intersection is performed.
+The algorithm starts with the initialization of auxiliary data structures and
+resulting automaton at lines $3$-$5$.
+Then it iterates over all of the pointer variables (in a symbolic state) of the analysed program
+that are visible at the point the intersection.
 Then it calls the function \emph{intersect} over the states of FA pointed
 by the variables.
 
 The function intersect takes as the input these states and
-it also needs information defining to which TA of FA the state belongs.
+and the references to the roots of TA of FA to which the state belongs.
 The function also manipulates the structures created in the beginning of the
 whole algorithm.
-It gradually creates the part of the resulting intersection forest automata that starts
+It gradually constructs the part of the resulting intersection forest automata that starts
 from the input states.
-The result of this function is index of TA created by the~function in the resulting FA.
-It process so-called product states during it computation.
-A product state is basically a pair $(r,s)$ where $r$ is a state of $\F_{\A}$
+The states of the resulting automaton are so-called \emph{product states}\,---\,pairs $(r,s)$ where $r$ is a state of $\F_{\A}$
 and $s$ is a state of $\F_{\B}$.
+The result of this function is the index of TA created by the~function in the resulting FA.
 
 The function creates a product state from the input states $lhs$ and $rhs$ and
 adds it to the set of already processed product states if it is not already processed.
 Otherwise it returns index of such product state in the result automaton.
-This is done at line $1-3$.
+This is done at line $1$-$3$.
 Then the counter of processed product states is increased and
 the stack \emph{workset} is initialized to serve like auxiliary data
 structure where the product states are stored to be processed later at line $4-8$.
 
-The function creates a new TA with the product state $lhs$ and $rhs$ as the root
+The function creates a new TA with the product state of $lhs$ and $rhs$ as the root
 and with an empty transition relation at line $8$.
-Then the product states from the workset are gradually processed at the~cycle beginning
+The product states from the workset are gradually processed at the~cycle beginning
 at line $9$.
 We denote $(r,s)$ the actually processed product state.
 There are several cases how the product state is managed.
 The first case is when both $r$ and $s$ are the references
 to the other tree automata.
-Then the function intersect is called recursively on the referenced
+The function intersect is called recursively on the referenced
 root states and creates a new TA with index $cp$.
 Finally the product state $(r,s)$ is added to the resulting FA
 as a root reference to a TA indexed $cp$.
-This case is at lines $13-14$.
+This case is at lines $13$-$14$.
 Another similar cases are when $r$ or $s$ is a root reference and the second one is not.
 The function intersect is called with the referenced root state as one parameter
 and the second parameter is the state of product state that is not a root reference.
 The result of this function call is a index $cp$ of newly created TA.
 Then the product state $(r,s)$ is added to the resulting FA as the root reference
 to a component indexed by $cp$.
-These cases are in algorithm processed at line $16-18$ and $20-22$.
+These cases are in algorithm processed at line $16$-$18$ and $20$-$22$.
 The last one case is when both $r$ and $s$ are not root references
 but the standard states of FA.
 Then it is iterated over all $a \in \Sigma$ with $\#(a) = n$
@@ -1880,7 +1879,7 @@ $(r_1 \cdots r_n) \in \post{a}{r}$, $(s_1 \cdots s_n) \in \post{a}{s}$ and
 $\post{a}{q} = \{(q_1 \cdots q_n) \in Q^n\,|\, q \xrightarrow{a} (q_1 \cdots q_n) \in \Delta\}$.
 Finally, when the product state $(r_i,s_i)$ where $1 \leq i \leq n$ is a new one
 then it is added to the state set $Q$ and appended to the workset to be further processed.
-This last case corresponds to lines $24-30$ in the algorithm.
+This last case corresponds to lines $24$-$30$ in the algorithm.
 
 \input{alg_isect.tex}
 
@@ -1888,10 +1887,9 @@ This last case corresponds to lines $24-30$ in the algorithm.
 \label{sec:brdesign}
 
 We described backward run generally in the beginning of this chapter.
-Now, a more technical and algorithmically description takes a place.
-We recall the definitions given in Section \ref{subsec:microinstr}.
+Now, we will describe it in more technical view recalling the definitions given in Section \ref{subsec:microinstr}.
 
-It was mentioned that the tool Forester implements the abstract
+It was mentioned that the Forester tool implements the abstract
 transformers as the instructions of its microcode.
 The input C program is translated to the list $T=\isfwdp{1}, \isfwdp{2},\ldots, \isfwdp{n}$
 of the microcode instructions.
@@ -1901,16 +1899,16 @@ The part of symbolic state are also forest automata representing
 the reachable heap configurations in a given symbolic state.
 
 The forward run is done by going through $T$ in the forward order.
-The trace of symbolic states $\ftraceseq$ is get by the forward run.
-We denote the trace by $\ftrace$ and we call it \emph{forward trace}.
+The trace of symbolic states $\ftraceseq$ is obtained by the forward run.
+We denote the trace by $\ftrace$ and we recall it the \emph{forward trace}.
 The~state $\sfwdp{i}$ is the input of the instruction $\isfwdp{i+1}$
 where $ 0 \leq i \leq n$ and the $\sfwdp{i+1}$ is the resulting symbolic state
 of the instruction.
 
 The extension with backward run is quite straightforward.
-When an error is detected in a symbolic state $\sfwd{i}$
-then the backward run starts from this symbolic state.
-The backward run is done by going through $T$ in the reverse order
+When an error is detected in a symbolic state $\sfwd$
+the backward run starts from this symbolic state.
+The backward run is performed through $T$ in the reverse order
 and an execution of the reverse instruction $\isbwdp{i}$ to each $\isfwdp{i}$
 over $\sbwdp{i+1}$ obtaining $\sbwdp{i}$.
 We obtain the \emph{backward trace} $\btraceseq$ by the backward run.
@@ -1918,17 +1916,17 @@ We denote the trace by $\btrace$.
 
 It is not necessary to compute FA with the language
 $L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B)$ to get the successor
-symbolic state in backward run (and also to detect spurious counterexample
+of symbolic state in backward run (and also to detect spurious counterexample
 by checking whether $L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B) = \emptyset$)
 after the execution of each instruction in the backward run.
 Indeed, it is sufficient to compute intersect FA only for
 the microcode instructions {\tt FI\_abs(), FI\_fix()}
-because only these instructions performs an abstraction,
-so they can cause a spurious error.
-The other instruction are precise and elementary enough
-that they could be reversed without needing to make intersection.
+as only these instructions performs an abstraction
+and so they can cause a spurious error.
+The other instructions are precise and elementary enough
+that they could be reversed without need of intersection.
 
-The method of execution of the backward is already described so
+The method of execution of the backward run was already described
 the next sections provides the description of the inverse microcode instructions.
 We describe each instruction informally first and then the instruction is defined in the notion
 of the function $\grev: \grevinter$.
@@ -1964,11 +1962,11 @@ added to the backward trace $\btrace$.
 
 \begin{itemize}
 	\item {\tt FI\_node\_create($r_s$, $r_d$)}
-		Instruction performs reverse operation to the C function \code{malloc}.
-		Instruction gets value from the source register $r_s$ in $\sfwd$.
+		Instruction performs the reverse operation to the C function \code{malloc}.
+		The instruction gets a value from the source register $r_s$ in $\sfwd$.
 		If the value is a reference or a null pointer then the new
 		state is just copy of $\sbwd$.
-		Otherwise if the value type is void pointer then the new symbolic
+		Otherwise the value type is void pointer then the new symbolic
 		state has the same values in the registers as the state $\sbwd$ has.
 		But the value of the register $r_d$ is substituted by the value $r'_{d}$ in $\sfwd$
 		because the register $r_d$ in $\sbwd$ contains reference to a TA $t$
@@ -1985,7 +1983,7 @@ added to the backward trace $\btrace$.
 			and invalidating all references to it.
 
 	\item {\tt FI\_node\_free}
-		Instruction reverses the effect of freeing memory.
+		Instruction reverses the effect of freeing the memory.
 		The removed TA representing a heap pointed by a freed pointer
 		is referenced by the root reference $RR$ in the register $r_d$.
 		This TA is copied from FA in $\sfwd$ to FA in $\sbwd$ into the
@@ -2020,8 +2018,8 @@ added to the backward trace $\btrace$.
 
 	
 	\item {\tt FI\_stores}
-		This instruction has same reverse operation like the previous one but
-		it reverses storing a structure to a FA.
+		This instruction has the same semantics as the previous one but for
+		storing a structure to a FA.
 
 	\item {\tt FI\_abs(), FI\_fix()}
 		The reversion is done by creating a new symbolic state identical to the state $\sbwd$.
@@ -2046,7 +2044,7 @@ added to the backward trace $\btrace$.
 	\item {\tt FI\_pop\_greg($r_g$)}
 		Instruction creates a new state identical to the $\sbwd$,
 		then the register $r_g$ from $\sbwd$ is moved to the
-		forest automaton of the new state (what actually reverts pop)
+		forest automaton of the new state (what actually reverts the pop)
 		and finally the original value of $r_g$ in $\sfwd$ is stored
 		to the corresponding register in the new state.
 	
@@ -2089,7 +2087,7 @@ added to the backward trace $\btrace$.
 
 \subsubsection{Register Assignment Instructions}
 The following instructions do simply an assignment to the register.
-So reversing them consist creating a symbolic state $S'$ with
+So reversing them consist of creating a symbolic state $S'$ with
 the same registers as the symbolic state $\sbwd$ has
 and a substitution of the original destination register $r_d$ of $S'$
 by the value of the same register in the state $\sfwd$ (denoted by $r'_d$).
