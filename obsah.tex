@@ -790,13 +790,16 @@ it can be given to the analyzer manually by a user \cite{forester11}.
 \subsection{Abstraction over Forest Automata}
 \label{subsec:abstraction}
 
-We mentioned that forest automata are able to handle the infinite state space
-rising from the possible unboudness of the mentioned dynamic data structures.
-However, there is still the problem of the state explosion that often makes
-nearly impossible to finish the verification procedure of a system in the real time
-and moreover, not even termination of the verification procedure is guaranteed at all.
-Therefore the abstraction over the forest automata is introduced
-to increase the probability of the termination and to accelerate the method.
+Forest automata are able to handle the infinite state space
+rising from the possible unboudness of the mentioned dynamic data structures
+by representing them in a finite way.
+The finite representation is possible due to abstraction over forest automata.
+The abstraction merges some states and so creates the cycles
+in transitions what make forest automaton able to represent infinite state space.
+%However, there is still the problem of the state explosion that often makes
+%nearly impossible to finish the verification procedure of a system in the real time
+%and moreover, not even termination of the verification procedure is guaranteed at all.
+Moreover, the abstraction increases the probability of the termination and accelerates the method.
 The abstraction over forest automata is based on the framework of \emph{abstract regular tree model checking} \cite{artmc}.
 
 The abstraction accelerates the computation by merging states of forest automaton that are equivalent
