@@ -546,8 +546,8 @@ When we recall the definition of canonicity respecting FA we will find that it i
 A FA $F$ is canonicity respecting if $\forall f \in L_f(F): \emph{f is canonical}$.
 Since definition of canonical FA is not affected by extending the labels to the structured ones the meaning of canonicity is the same as for basic FA.
 The language inclusion checking is again possible in the component-wise way like in the case of basic FA, as it is
-prooved in \cite{forester:techrep}.
-However, the testing language inclusion with the same algorithm used for the nonhiearchical FA
+proved in \cite{forester:techrep}.
+However, the testing language inclusion with the same algorithm used for the non-hiearchical FA
 is sound but incomplete because the structured labels are compared as symbols and their semantics
 is not considered.
 
@@ -589,8 +589,8 @@ Forest automata are able to represent of the reachable heap graphs
 by their graph languages.
 The data structures with heap graphs with unbounded number of cut-points
 (e.g., doubly-linked lists) are represented by hierarchical forest automata.
-In general, the hiearchical forest automata are able to represent more
-data structures down to their higher experessive power.
+In general, the hierarchical forest automata are able to represent more
+data structures down to their higher expressive power.
 
 
 %When we consider the pointer variables of a program it also holds that they can have pointer and data selectors.
@@ -646,7 +646,7 @@ on the heap with value $13$ in \texttt{data} variable and pointer to a cell name
 in the \texttt{next} variable.
 The memory cell can be represented by a node $s$ with following label $l_g(s) = \{next_g(s_{next}),(data_g,13)()\}$.
 The pointer selector $next_g \in PSel$ representing the pointer variable \texttt{next} from the \texttt{SLL} structure
-has really the rank $1$ and the one sucessing state is $s_{next}$.
+has really the rank $1$ and the one successor state is $s_{next}$.
 The sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing
 \texttt{data} variable from \texttt{SLL} structure has the rank $0$
 and has no successor what is denoted by $()$.
@@ -755,7 +755,7 @@ Normalization consists of the following steps:
 			TA $B_A = (Q_A \cup Q_B, \Gamma, \Delta_{A+B}, R_B)$ is created.
 			The set of transition rules $\Delta_{A+B}$ is $\Delta_A \cup \Delta_B$ where
 			the transitions $q \rightarrow  \overline{a} (q_1 \cdots q_i \cdots q_n) \in \Delta_B$ are
-			substitued by $q \rightarrow  \overline{a} (q_1 \cdots q_a \cdots q_n) \in \Delta_B$,
+			substituted by $q \rightarrow  \overline{a} (q_1 \cdots q_a \cdots q_n) \in \Delta_B$,
 			where $q_i$ is a root reference to $A$ and $q_a$ is the root of $A$. 
 		\item $TA$ of $F$ are reordered by canonical ordering of cut-points.
 		\item We obtain $F$ in form in which the roots of trees from the forest language 
@@ -819,14 +819,14 @@ languages upon to a given tree height.
 The range of abstraction function is the set of the equivalence classes of the relation $\heqrel{M}$.
 The relation $\heqrel{M}$ is therefore defined as follows:
 $\forall q_1,q_2 \in Q: q_1 \heqrel{M} q_2 \defarrow \langlen{M}{q_1} = \langlen{M}{q_2}$ where
-$\langlen{M}{q}$ is a language containg sub-trees obtained from trees of $L(M,q)$
-by their restriction upto height $\leq n$.
+$\langlen{M}{q}$ is a language containing sub-trees obtained from trees of $L(M,q)$
+by their restriction up-to height $\leq n$.
 
 The abstraction over forest automata overapproximates the set of the reachable
 configurations of a program (formally, $L(M) \subseteq L(\abs(M))$).
 This it could led to a detection of a spurious counterexample which is not present
 in an original program but it is caused by a heap configuration created by abstraction.
-In \cite{cegar}, the \emph{counterexample-guided abstaction refinement} (CEGAR)
+In \cite{cegar}, the \emph{counterexample-guided abstraction refinement} (CEGAR)
 for avoiding a spurious counterexample was proposed.
 It consist two steps.
 The first is detection of spuriousness of an error found by the analysis.
