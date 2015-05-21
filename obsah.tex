@@ -641,12 +641,15 @@ a next item and also integer data variable, written in C:
     \end{verbatim}
 \end{minipage}
 \end{center}
-Then a allocated cell of this singly-linked list on the heap with value $13$ in \texttt{data} variable and pointer to a cell named $s_{next}$
-in the \texttt{next} variable could be represented
-by a node $s$ with following label $l_g(s) = \{next_g(s_{next}),(data_g,13)()\}$.
-As you can see, the pointer selector $next_g \in PSel$ represents the pointer variable \texttt{next} from the \texttt{SLL} structure
-has really the rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing
-\texttt{data} variable from \texttt{SLL} structure has the rank $0$.
+Consider an io-graph $g$ representing a heap and an allocated cell of this singly-linked list
+on the heap with value $13$ in \texttt{data} variable and pointer to a cell named $s_{next}$
+in the \texttt{next} variable.
+The memory cell can be represented by a node $s$ with following label $l_g(s) = \{next_g(s_{next}),(data_g,13)()\}$.
+The pointer selector $next_g \in PSel$ representing the pointer variable \texttt{next} from the \texttt{SLL} structure
+has really the rank $1$ and the one sucessing state is $s_{next}$.
+The sub-label $(data_g,13) \in DSel\times \mathbb{D}$ representing
+\texttt{data} variable from \texttt{SLL} structure has the rank $0$
+and has no successor what is denoted by $()$.
 \eexmp
 
 %	The mentioned method describes how to decompose the heap graph to forest, concretely to the io-forests.
