@@ -587,6 +587,11 @@ The io-graph can be accepted by a forest automaton as
 a member of its graph language.
 Forest automata are able to represent of the reachable heap graphs
 by their graph languages.
+The data structures with heap graphs with unbounded number of cut-points
+(e.g., doubly-linked lists) are represented by hierarchical forest automata.
+In general, the hiearchical forest automata are able to represent more
+data structures down to their higher experessive power.
+
 
 %When we consider the pointer variables of a program it also holds that they can have pointer and data selectors.
 %	A heap can be then represented by FA but it needs to be decomposed
@@ -609,10 +614,18 @@ A single heap configuration is a io-graph $g_{st}$ over the ranked alphabet of t
 with the sub-labels from the ranked alphabet $\Gamma = PSel \cup (DSel \times \mathbb{D})$ having the
 ranking function that assigns $1$ to the pointer selectors and $0$ to the data selectors.
 The values of data selectors are stored in the structured labels as the sub-labels from $DSel \times \mathbb{D}$.
-A node $v$ of a graph representing a heap reflects by its label the internal structure of
-the related allocated memory cell in the heap so it holds that $l_g(v) \in 2^\Gamma$.
-A null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) = \emptyset$
-and undefined selectors of a node $v$ have not corresponding  sub-labels in $l_g(\texttt{v})$.
+The internal structure of a memory cell in the heap
+is reflected by the structured label $l_g(v)$ of a node $v$ representing the memory cell. 
+A null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) = \emptyset$.
+The undefined selectors of a memory node $v$ have no special syntax so they are
+not presented in the structured label $l_g(v)$.
+
+Not only the allocated memory on the heap is modeled by forest automata
+in the verification procedure but also a \emph{stack frame} of the actually
+analyzed function of the original program is represented by forest automata.
+Particularly, the io-graphs and forest automata have from their definitions exactly one (index of) input port and
+just the one input port $\mathit{sf}$ keeps the information about the stack frame.
+
 
 \bexmp
 We illustrate described principle of heap representation with an example taken from \cite{techrep}.
@@ -636,21 +649,15 @@ has really the rank $1$ and sub-label $(data_g,13) \in DSel\times \mathbb{D}$ re
 \texttt{data} variable from \texttt{SLL} structure has the rank $0$.
 \eexmp
 
-The mentioned method describes how to decompose the heap graph to forest, concretely to the io-forests.
-An io-forest can be accepted by a forest automaton as a member of its language.
-Moreover, a language of forest automaton is a set of such forests.
-So it is possible to represent a set of the reachable heap configurations at a point of the analysed program.
-Precisely, the forest automata of higher level respecting canonicity are used in the verification method
-because they have richer expressive power then the non-hierarchical forest automata.
-The forest automata of higher level also makes possible to represent
-a data structures with an unbounded number of the cut-points by folding the cut-points
-into the boxes what is described later.
-
-Not only the allocated memory on the heap is modeled by forest automata
-in the verification procedure but also a \emph{stack frame} of the actually
-analyzed function of the original program is represented by forest automata.
-Particularly, the io-forests and forest automata have from their definitions exactly one (index of) input port and
-just the one input port $sf$ keeps a information about the stack frame.
+%	The mentioned method describes how to decompose the heap graph to forest, concretely to the io-forests.
+%	An io-forest can be accepted by a forest automaton as a member of its language.
+%	Moreover, a language of forest automaton is a set of such forests.
+%	So it is possible to represent a set of the reachable heap configurations at a point of the analysed program.
+%	Precisely, the forest automata of higher level respecting canonicity are used in the verification method
+%	because they have richer expressive power then the non-hierarchical forest automata.
+%	The forest automata of higher level also makes possible to represent
+%	a data structures with an unbounded number of the cut-points by folding the cut-points
+%	into the boxes what is described later.
 
 \section{Symbolic Execution}
 \label{sec:se}
