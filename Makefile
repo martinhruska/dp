@@ -4,6 +4,8 @@
 #===========================================
 # asi budete chtit prejmenovat:
 CO=projekt
+VLNA=vlna
+VLNA_OPTS=-l -m -n
 
 all: $(CO).pdf
 
@@ -13,12 +15,14 @@ $(CO).ps: $(CO).dvi
 	dvips $(CO)
 
 $(CO).pdf: clean
+	$(VLNA) $(VLNA_OPTS) obsah.tex
 	pdflatex $(CO)
 	bibtex $(CO)
 	pdflatex $(CO)
 	pdflatex $(CO)
 
 $(CO).dvi: $(CO).tex $(CO).bib
+	$(VLNA) $(VLNA_OPTS) obsah.tex
 	latex $(CO)
 	bibtex $(CO)
 	latex $(CO)
