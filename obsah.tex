@@ -888,22 +888,20 @@ This chapter provides a brief description of the VATA library and the Forester t
 \Vata\ is an open source library for nondeterministic tree automata implemented in C++.
 Its main application is in the field of formal verification.
 VATA is licensed under GPL, version 3, and it can be obtained from its official website \cite{www:libvata}.
-It is the only library to our knowledge implementing
-the state-of-the-art algorithms for checking inclusion of NTA languages
-what makes it suitable for use as a Forester backend library.
-Moreover, \vata\ does not only provide implementation of the algorithms for NTA
-but also the highly efficient implementation of the algorithms for checking language inclusion of
-nondeterministic finite automata \cite{bt:hruska}.
+To the our best knowledge, it is the only library implementing
+the state-of-the-art algorithms for checking inclusion of NTA languages,
+which makes it the only suitable choice for use as the backend library of Forester.
+%Moreover, \vata\ provides also the highly efficient implementation of the algorithms for checking language inclusion of
+%nondeterministic finite automata \cite{bt:hruska}.
 
 \subsection{Design}
-\Vata\ currently provides the methods for representation of NTA
-in explicit encoding and also in semi-symbolic (top-down and bottom-up)
-encoding using \emph{multi-terminal binary decision diagrams (MTBDD)}.
-But it has been designed to be easy extended by other encodings (for others automata).
+\Vata\ currently provides explicit encoding and also semi-symbolic (top-down and bottom-up)
+encoding using \emph{multi-terminal binary decision diagrams (MTBDD)} of NTA.
+It has been designed to be easily extensible by other encodings.
 The~library provides API for creating and manipulating NTA and also the command line interface (cli) build around
 the API for experimenting with tree automata defined in a text format directly from command line.
 The main concept of the design of the library is given in Figure \ref{fig:vata}.
-As you can see there are the three main parts in the library design:
+There are the three main parts in the library design:
 \begin{enumerate}
 	\item \emph{Parsers}\,---\,Parsing an input automaton from a text file.
 		Timbuk \cite{timbuk} is currently the only one supported format for parsing the input automata.
