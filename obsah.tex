@@ -1044,17 +1044,18 @@ or several \emph{Microcode Instructions} associated with the abstract transforme
 \emph{Symbolic execution} run the microcode instructions (abstract transformers)
 which manipulates \emph{Symbolic State} and
 \emph{Forest Automata} included in the symbolic states.
+When Forester detects an error the symbolic execution is aborted and
+the analyzed program is claimed incorrect.
+During the symbolic execution, Forester checks whether there is no left garbage.
+If the program is garbage free and without errors then a shape invariant has been found
+and the analyzed program is determined as correct.
+
 Symbolic execution requires \emph{Symbol Context} which is created for each function and also for global space.
 It keeps information about the variables used in the current scope,
 the function arguments and the stack frame layout.
 A symbolic state provides information about the state of the heap, represented
 by FA, and it also keeps the information about
 the corresponding microcode instructions.
-When Forester detects an error the symbolic execution is aborted and
-the analyzed program is claimed incorrect.
-During the symbolic execution, Forester checks whether there is no left garbage.
-If the program is garbage free and without errors then a shape invariant has been found
-and the analyzed program is determined as correct.
 
 \emph{Forest Automata} module provides the methods
 for manipulation FA during the verification procedure.
