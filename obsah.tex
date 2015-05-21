@@ -665,16 +665,21 @@ and has no successor what is denoted by $()$.
 \section{Symbolic Execution}
 \label{sec:se}
 
-So far we described the representation of the heap configurations using forest automata.
-Now we will cover how the forest automata representation is computed for each point of the analysed program.
-FA-based verification procedure is a standard \emph{abstract interpretation} \cite{cousot:77}.
-The concrete domain assigns to each program location a set of pairs
-$(\sigma,H)$ where $\sigma$ is a mapping maps of variables
-to the nodes in $H$, to a $\texttt{null}$ or to an \emph{undefined} value, and $H$ is a single heap configuration.
-The abstract domain assigns to each program location a finite set of pairs
-$(\sigma, F)$ (called \emph{abstract configuration}) where $\sigma$ maps again each variable to a
-$\texttt{null}$ value or to undefined value or to an index of TA in $F$ and $F$ is a forest automata
-of higher level respecting canonicity representing a set of heaps configurations.
+So far we described the representation of heap configurations using forest automata.
+Now we will describe how the forest automata representation is computed for each point of the analysed program.
+FA-based verification procedure is a standard \emph{abstract interpretation}~\cite{cousot:77}.
+The concrete domain is a set of heap graphs.
+To each program location can be assigned a set of pairs
+$(\sigma,H)$ where
+$H$ is a single heap configuration and
+$\sigma$ is a mapping that maps variables
+to the nodes in $H$, to $\texttt{null}$ or to an \emph{undefined} value.
+The abstract domain is a set of forest automata.
+The verification procedure computes for each program location
+a finite set of pairs $(\sigma, F)$ (called \emph{abstract configuration}) where
+$F$ is a forest automata of higher level respecting canonicity and
+$\sigma$ maps again each variable to
+$\texttt{null}$ or to undefined value or to an index of TA in $F$.
 Note that a set of FA is needed in the abstract domain to represent
 one program location (since abstract domain maps a program location
 to the set of abstract configurations).
