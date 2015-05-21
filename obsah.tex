@@ -850,20 +850,35 @@ abstraction.
 \chapter{The VATA Library and Forester}
 \label{ch:tools}
 
-We mentioned in the introduction, FA based verification is implemented
+As we mentioned in the introduction, FA based verification is implemented
 by the tool Forester.
 Since FA are closely related to TA, as it was shown in Chapter \ref{ch:prel},
 Forester also depends on an implementation of TA.
-It currently has its own implementation of TA providing the operations over TA needed during verification procedure.
-However it is quite impractical to maintain a special TA library inside of Forester
-and it would be more practical to employ some existing efficient TA library.
-The VATA library is a very efficient library which provides implementation
+It currently has its own implementation of TA providing the operations needed during verification procedure.
+However it is quite impractical to maintain a special TA library inside of Forester.
+This library has the strong dependencies with the rest of codes.
+The other classes depend to the library data types,
+manipulates its data types and so on.
+The changes in this library are very difficult due to these dependencies.
+Encapsulating of the library to a module with an clearly defined interface
+can improve the overall quality of Forester code.
+It is also not practicle to maintain and further develop such one purpose library.
+It is not general to be used anywhere else.
+But the development in algorithms for TA, especially for checking inclusion of TA
+languages, goes on and an implementation of the new algorithms is necessary
+for greater efficiency.
+A~new algorithm can also bring greater efficiency than
+an implementation optimization of an existing algorithm.
+Therefore the replacement of library by a general purpose one
+can bring the advantages such as maintainability and modularity.
+
+With respect to the mentioned facts we decided to replace
+the mentioned Forester TA implementation by \vata.
+The VATA library is a very efficient, general purpose, library which provides implementation
 of the standard operations over TA like union or intersection, etc.
 It mainly aims to implement the state-of-the-art algorithms \cite{tacas10}
 for language inclusion checking which efficiency
 is also crucial for performance of Forester.
-It arises from these facts to connect Forester with the VATA library
-employing VATA like a backend TA library for Forester.
 
 This chapter provides a brief description of the VATA library and the Forester tool.
 
