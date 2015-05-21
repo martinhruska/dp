@@ -802,42 +802,50 @@ in transitions what make forest automaton able to represent infinite state space
 Moreover, the abstraction increases the probability of the termination and accelerates the method.
 The abstraction over forest automata is based on the framework of \emph{abstract regular tree model checking} \cite{artmc}.
 
-The abstraction accelerates the computation by merging states of forest automaton that are equivalent
+The abstraction merges states of forest automaton that are equivalent
 according to a given equivalence relation over the states of forest automaton.
+Since the abstraction is defined for a single tree automaton
+it is performed component-wise over a forest automaton.
 Formally, the abstraction $\alpha$ over a tree automaton $M=(Q, \Sigma, \Delta, R)$ is
 a function $\alpha: Q \rightarrow Q/_{\eqrel{M}}$ such that $\alpha(q) = \eqclass{q}{M}$
 where $\eqrel{M} \subseteq Q \times Q$ is an equivalence relation.
 We denote $\alpha(M)$ the tree automaton obtained by applying $\alpha$ to $Q$.
-It holds that $Q/_{\eqrel{M}} \subseteq Q$ and also that $L(M) \subseteq L(\alpha(M))$.
-Since the abstraction is defined for a single tree automaton
-it is performed component-wise over a forest automaton.
+It holds that $|Q/_{\eqrel{M}}| \leq |Q|$ and also that $L(M) \subseteq L(\alpha(M))$.
 
 The forest automata based verification is currently implemented (in the Forester tool)
 employing \emph{height abstraction}.
 This abstraction merges the states with the equivalent
 languages upon to a given tree height.
-So the range of abstraction function is a set of the equivalence classes of the relation $\heqrel{M}$.
-The relation $\heqrel{M}$ is defined as follows:
+The range of abstraction function is the set of the equivalence classes of the relation $\heqrel{M}$.
+The relation $\heqrel{M}$ is therefore defined as follows:
 $\forall q_1,q_2 \in Q: q_1 \heqrel{M} q_2 \defarrow \langlen{M}{q_1} = \langlen{M}{q_2}$ where
-$\langlen{M}{q}$ $=$ $\{ w \in \Sigma^n \,|\, |w| \leq n \wedge wv \in \langstate{M}{q} \wedge |v| \geq 0\}$
-and $n\in \mathbb{N}$ is height of the abstraction.
+$\langlen{M}{q}$ is a language containg sub-trees obtained from trees of $L(M,q)$
+by their restriction upto height $\leq n$.
 
 The abstraction over forest automata overapproximates the set of the reachable
-configurations of a program (what is formally expressed by $L(M) \subseteq L(\alpha(M))$).
-This brings the mentioned acceleration of the verification procedure.
-On the other hand, it could led to a detection of a spurious counterexample which is not present
-in the original program but it caused by a heap configuration created by abstraction.
-In \cite{cegar} a technique for avoiding a spurious counterexample was proposed.
-It is based on restarting the program analysis when a spurious error is found.
-But the new run of the analysis  a refined abstraction $\alpha'$
-what is abstraction such that $L(\alpha'(M)) \subseteq L(\alpha(M))$.
-The refined abstraction may prevent reaching the detected spurious counterexample again.
+configurations of a program (formally, $L(M) \subseteq L(\abs(M))$).
+This it could led to a detection of a spurious counterexample which is not present
+in an original program but it is caused by a heap configuration created by abstraction.
+In \cite{cegar}, the \emph{counterexample-guided abstaction refinement} (CEGAR)
+for avoiding a spurious counterexample was proposed.
+It consist two steps.
+The first is detection of spuriousness of an error found by the analysis.
+When it is proved that the error is spurious then
+the second step is refinement of the abstraction $\abs$
+to abstraction $\abs'$ such that $L(\abs'(M)) \subseteq L(\abs(M))$.
+The program analysis is restart using the refined abstraction $\abs'$
+what may prevent reaching the detected spurious counterexample again.
+
 In the case of height abstraction this refinement is done by increasing the height $n$.
 However the refinement does not guarantee that the detected spurious counterexample will not
 be detected again the next run.
-Moreover, no refinement has been implemented in the Forester tool yet.
-This would be resolved by using predicate abstraction which is described later in Chapter \ref{ch:backward}
-and it application to forest automata is one of the merits of this master thesis.
+Moreover, no automatic refinement and also not even spurious counterexample detection
+have been implemented in the Forester tool yet.
+This will be resolved by implementing backward run and
+predicate abstraction what is described later in Chapter \ref{ch:backward}.
+Predicate abstraction is refined by predicates learnt from backward run
+what prevents reaching the spurious error again and so provides finer refinement then height
+abstraction.
 
 \chapter{The VATA Library and Forester}
 \label{ch:tools}
