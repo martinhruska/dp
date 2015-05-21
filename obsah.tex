@@ -1021,22 +1021,6 @@ analyze intermediate code of GCC called GIMPLE.
 It uses the Code Listener infrastructure \cite{cl11}
 that provides a fronted over the GIMPLE format.
 
-The high level overview of the analysis performed by
-Forester is shown in Figure \ref{fig:fa_exec}. 
-Forester starts the analysis of a program by translation of the intermediate
-code representation provided by Code Listener to its own microcode.
-The microcode represents each program statement by one
-or several instructions associated with the abstract transformers.
-The symbolic execution is then run over this microcode.
-The abstract domain of FA 
-(which are also the core part of a symbolic state)
-is gradually transformed by execution of the microcode instruction.
-When Forester detects an error the symbolic execution is aborted and
-the analyzed program is claimed incorrect.
-During the symbolic execution, Forester checks whether there is no left garbage.
-If the program is garbage free and without errors then a shape invariant has been found
-and the analyzed program is determined as correct.
-
 \begin{figure}[bt]
 	\begin{center}
 		\input{fig/fa_exec.tikz}
@@ -1050,9 +1034,13 @@ and the relations between its modules.
 The implementation of Forester is not explicitly separated into stand-alone compilation modules.
 The notion of the modules used in the following text is rather an abstract one, serving to reader basic summary of the Forester design.
 A module typically is e.g., a set of closely related classes with a similar purpose.
-As it was mentioned above, the Code Listener representation of GCC intermediate code is mainly used by Forester \emph{Compiler} module.
-Compiler then converts Code Listener instructions to Forester own \emph{Microcode Instructions}
-and creates their list over which the \emph{Symbolic Execution} is performed.
+Forester starts the analysis by translation of the intermediate
+code of GCC in representation provided by Code Listener to its own microcode.
+This is done mainly by Forester \emph{Compiler} module.
+The microcode instructions of Forester are implemented by module \emph{Microcode Instructions}.
+Each program statement is represent by one
+or several \emph{Microcode Instructions} associated with the abstract transformers.
+\emph{Compiler} creates a list of \emph{Microcode Instructions} over which the \emph{Symbolic Execution} is performed.
 Symbolic execution then executes the microcode instructions (abstract transformers)
 which manipulates \emph{Symbolic State} and
 \emph{Forest Automata} included in the symbolic states.
@@ -1062,6 +1050,12 @@ the function arguments and the stack frame layout.
 A symbolic state provides information about the state of the heap, represented
 by FA, and it also keeps the information about
 the corresponding microcode instructions.
+When Forester detects an error the symbolic execution is aborted and
+the analyzed program is claimed incorrect.
+During the symbolic execution, Forester checks whether there is no left garbage.
+If the program is garbage free and without errors then a shape invariant has been found
+and the analyzed program is determined as correct.
+
 \emph{Forest Automata} module provides the methods
 for manipulation FA during the verification procedure.
 The~operations such as normalization or abstraction over FA are not the part of the module
@@ -1182,6 +1176,7 @@ to the corresponding Forester microcode instructions, then we define the instruc
 more formally and we give a complete list of them.
 
 Consider the following data structure that is an implementation of singly-linked list.
+\newpage
 	\begin{quote}
 	\begin{verbatim}
 	struct T {
