@@ -680,45 +680,49 @@ a finite set of pairs $(\sigma, F)$ (called \emph{abstract configuration}) where
 $F$ is a forest automata of higher level respecting canonicity and
 $\sigma$ maps again each variable to
 $\texttt{null}$ or to undefined value or to an index of TA in $F$.
-Note that a set of FA is needed in the abstract domain to represent
-one program location (since abstract domain maps a program location
-to the set of abstract configurations).
-FA are not closed under union so it is not possible to represent the sets of heaps by single FA.
+Since FA are not closed under union, it is not possible to represent the sets of heaps by single FA.
+Therefore a set of FA is needed to represent the set of all reachable heap
+configurations at one program location.
+
+Let us describe the notion of abstract transformers.
+The function $\concrop{st}$ is related to an operation \texttt{op} of the analysed program.
+This function models semantics of \texttt{op} in the concrete domain in such way that $\concrop{st}$
+transforms an io-graph representing the heap configuration before and after the execution of
+the concrete operation \texttt{op}.
+The abstract transformers $\tau_{\texttt{op}}$ are defined for each concrete
+operation \texttt{op} reflecting the semantics of~$\concrop{st}$.
+They transform a FA $S$ representing the heap in abstract domain to a resulting FA $S' = \tau_{\texttt{op}}(S)$
+such that $\bigcup_{F' \in S'} \llbracket F' \rrbracket = \{\concrop \mid g_{sf} \in \llbracket F \rrbracket \wedge F \in S \}$.
+%The abstract transformer is applied separately to each forest $F \in S$.
+
 
 The verification starts from an initial abstract configuration that consists of
-an FA for initial heap configuration representing io-graph
+an FA for initial heap configuration representing an io-graph
 $g_{\mathit{sf}}$ where $g$ consists of two nodes.
-The first one is $\texttt{null}$ and the second one is the empty stack frame $sf$ with $l_g(\mathit{sf}) = \emptyset$.
+The first one is $\texttt{null}$ and the second one is the empty stack frame
+$\mathit{sf}$ with $l_g(\mathit{sf}) = \emptyset$.
 The sequence of \emph{abstract transformers} related to the program statements is then iteratively applied to the abstract configurations.
 The process of applying abstract transformers over the~abstract domain is called \emph{symbolic execution}.
 %As it was said, each abstract transformer correspond to a statement of the analyzed program.
-It is possible to define a function $f_{\texttt{op}}(g_{st})$ related to an operation \texttt{op} from the intermediate code of the analysed program.
-This function models semantics of \texttt{op} in the concrete domain in such way that $f_{\texttt{op}}(g_{\mathit{st}})$
-returns an io-graph representing the heap configuration obtained after the execution of
-the concrete operation \texttt{op} over concrete domain.
-The abstract transformers $\tau_{\texttt{op}}$ are defined for each concrete
-operation \texttt{op} reflecting the semantics of $f(\texttt{op})$.
-The abstract transformer $\tau_{\texttt{op}}$ applied to a FA $S$
-representing the heap in abstract domain returns as a result FA $S' = \tau_{\texttt{op}}(S)$
-such that $\bigcup_{F' \in S'} \llbracket F' \rrbracket = \{ f_{\texttt{op}}(g_{sf}) \,|\, g_{sf} \in \llbracket F \rrbracket \wedge F \in S \}$.
-The abstract transformer is then applied separately to each forest $F \in S$.
 
-The abstract transformers related to a program statement in a program location are applied iteratively until
-abstract configurations in every program location reaches fixpoint.
+The abstract transformers related to a program location are applied iteratively until
+abstract configurations reach fixpoint.
 Each iteration consists the following steps:
 \begin{enumerate}
 		\item The sets of abstract configurations at each program point are updated by applying
 			the abstract transformers following these steps:
 			\begin{enumerate}
-				\item Some boxes of FA in abstract configuration are unfolded to uncover the accessed parts of heaps by abstract transformers.
+				\item Some boxes of FA in abstract configuration are unfolded to materialize
+					the accessed parts of heaps by abstract transformers.
 					This step is called \emph{unfolding}.
-				\item The abstract configuration is updated.
-				\item The new boxes are \emph{learnt} by the method described in \cite{forester13}
-					and these boxes are folded again.
+				\item The abstract configuration is updated by the abstract transformer.
+				\item New boxes are \emph{learnt} by the method described in \cite{forester13}
+					and boxes are applied again.
 					This is repeated until no new boxes are found.
-				\item FA in transformed to the canonicity respecting form.
+				\item FA are transformed to the canonicity respecting form.
 			\end{enumerate}
-		\item At junctions corresponding to the loops the union of the possible heap configurations
+		\item At junctions corresponding to the beginning of the loops
+			the union of the possible heap configurations
 			of the particular branches is followed by \emph{widening}.
 			This requires checking language inclusion between sets
 			of FA to test whether a fixpoint has been reached.
@@ -730,60 +734,56 @@ Widening currently consists of repeating the following two steps to each $F$ in 
 \begin{enumerate}
 		\item The boxes of $F$ are folded.
 		\item Abstraction\,---\,currently based on the framework of \emph{abstract regular (tree) model checking} \cite{artmc}.
-			During the abstraction all states $q$, $q'$ are collapsed if it holds that
-			$q$ and $q'$ accepts trees with the same sets of prefixes of height at most $k$.
-			This kind of abstraction is called \emph{height abstraction}.
 \end{enumerate}
 
-It was mentioned that we need canonicity respecting FA to be able checking inclusion of languages of FA.
-This is achieved by operation called \emph{normalization} further described in Subsection \ref{subsec:norm}.
-Subsection \ref{subsec:boxes} provides the brief description of cases when the boxes are applied.
+We will further describe some parts of the verification procedure in detail.
+\emph{Normalization} transforming FA to canonicity respecting FA is described in Subsection \ref{subsec:norm}.
+Subsection \ref{subsec:boxes} describes how the boxes are used in the verification procedure.
 Finally, the methods of abstraction over FA are described in \ref{subsec:abstraction}.
 
 \subsection{Normalization}
 \label{subsec:norm}
 
-Normalization is done over a FA $F = (A_1 \cdots A_N,\pi)$ and its result is canonicity respecting FA.
+Normalization performs transformation over a FA $F = (A_1 \cdots A_N,\pi)$ and its result is canonicity respecting FA.
 Normalization consists of the following steps:
 \begin{itemize}
-		\item We merge $TA$ of $F$ into a form where roots of accepted forests are cut-points only.
-			So when there is a TA $A$ whose roots of the accepted trees are
-			not the cut-points in $L(F)$ and there is a TA $B$ that contains references
-			to the root references to $A$, then $A$ is connected
-			to $B$ at the places where $B$ has references to the root of $A$ so a new
+		\item We merge $TA$ of $F$ into a form where the roots of forests accepted by $F$ are cut-points only.
+			Consider there is a TA $A$ which accepts trees with roots
+			that are not cut-points of the related graph from $L(F)$ and a TA $B$ that contains
+			the root references to $A$.
+			$A$ is then connected to $B$ at the referenced places and so a new
 			TA $B_A = (Q_A \cup Q_B, \Gamma, \Delta_{A+B}, R_B)$ is created.
-			Transition rules set $\Delta_{A+B}$ is $\Delta_A \cup \Delta_B$ with
-			the substituted transition $q \rightarrow  \overline{a} (q_1 \cdots q_i \cdots q_n) \in \Delta_B$
-			by $q \rightarrow  \overline{a} (q_1 \cdots q_a \cdots q_n) \in \Delta_B$,
+			The set of transition rules $\Delta_{A+B}$ is $\Delta_A \cup \Delta_B$ where
+			the transitions $q \rightarrow  \overline{a} (q_1 \cdots q_i \cdots q_n) \in \Delta_B$ are
+			substitued by $q \rightarrow  \overline{a} (q_1 \cdots q_a \cdots q_n) \in \Delta_B$,
 			where $q_i$ is a root reference to $A$ and $q_a$ is the root of $A$. 
 		\item $TA$ of $F$ are reordered by canonical ordering of cut-points.
-		\item We obtain form of $F$ in which the roots of trees of forests from language of the transformed
-			forest automaton corresponds to the cut-points respecting the unique ordering.
+		\item We obtain $F$ in form in which the roots of trees from the forest language 
+			correspond to the cut-points respecting the canonical unique ordering.
 			It meas that $\forall i \in \{1,\ldots,n\}$ and for all accepted forests $f=(t_1,\ldots,t_n)$ holds
 			one of the following conditions:
 			\begin{itemize}
 				\item The root of $t_i$ is the $j$-th cut-point in the canonical ordering of the cut-points
 					of the graph of the accepted forest $\Rightarrow$
 					It is the $j$-th cut-point in the canonical ordering of all accepted forests.
-				\item Otherwise, root of $f_i$ is not a cut-point of any accepted forests.
+				\item Otherwise, the root of $f_i$ is not a cut-point of any accepted forest.
 			\end{itemize}
 \end{itemize}
 
 \subsection{Boxes}
 \label{subsec:boxes}
 
-It was already explained how the heap is decomposed to the forests.
-One part of the decomposition process is identifying the cut-points.
-However, there can be infinitely many cut-points in the graphs representing the heaps.
-For instance each node of doubly linked list is a cut-point itself.
+There can be infinitely many cut-points in the graphs representing the heaps.
+For instance each node of doubly linked list is a cut-point.
+These heaps cannot be represented by the plain forest automata
+since the tree decomposition of such graph is not possible.
 This can be resolved by employing the boxes (box is a symbol of alphabet of forest automata
-of higher level which is also forest automata as it was mentioned in Chapter \ref{ch:prel}).
-Since it is possible for FA to use other FA as symbols we can fold recurring sub-graphs to the boxes.
-They are further used as the labels
-and thus bound the number of cut-points.
-When we need to manipulate with a graph described by a FA hidden in the box, then the unfolding is done.
-The steps of verification procedure where folding and unfolding is needed has been mentioned in the beginning of this section
-and its formal definition is given in Chapter \ref{ch:prel}.
+of higher level which is also forest automata as it was defined in Chapter \ref{ch:prel}).
+Since it is possible for FA to use other FA as symbols
+the repeating sub-graphs of the heap are folded to the boxes.
+They are further used as labels and thus bound cut-points.
+When an abstract transformer needs to access a graph described by a FA hidden in the box, then the unfolding is done.
+
 The boxes can be learnt during the analysing of a program automatically by the method proposed in \cite{forester13} or
 it can be given to the analyzer manually by a user \cite{forester11}.
 
