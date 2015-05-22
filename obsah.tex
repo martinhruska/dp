@@ -508,7 +508,7 @@ l_{g'}(\phi_j) = \emptyset$
 (this conditions checks whether there is no successor of $v_j$ and $\phi_j$ reachable over the same
 label from the both nodes).
 The result of replacement (if it is possible to do it) is denoted as $g\subst{g'_\phi}{e\langle i\rangle}$.
-It is the graph $g_n$ in a sequence $g_0 \cdots g_n$ of graphs which are defined as follows: 
+It is the graph $g_n$ in the sequence $g_0 \cdots g_n$ of graphs which are defined as follows: 
 \begin{itemize}
 	\item $SE(g_0) = SE(g) \cup SE(g') \setminus \{e\langle i\rangle\}$.
 	\item $\forall j \in \{1, \ldots, n\}: \emph{the graph } g_j \emph{ is obtained from } g_{j-1} \emph{ by following procedure }$
@@ -1111,7 +1111,7 @@ The core of the forest automata module is class {\tt FA}.
 The implementation corresponds with the definitions given in Chapter \ref{ch:prel}.
 Class FA has a data member representing a vector of tree automata $(t_1 \cdots t_n)$.
 It also has a data member keeping a reference to an automaton representing the global variables
-and a reference to the automata representing the local variables of the actually executed function. %TODO define ABP
+and a reference to the automata representing the local variables of the actually executed function. %TODO define \abp
 The basic operations over an FA (like adding or removing a TA from an FA) are encapsulated in class FA.
 The another class providing operations over FA is class {\tt FAE}. 
 
@@ -1175,8 +1175,7 @@ which correspond to the abstract transformers in abstraction interpretation.
 First, we introduce some examples how the C statements are translated
 to the corresponding Forester microcode instructions, then we define the instructions
 more formally and we give a complete list of them.
-
-Consider the following data structure that is an implementation of singly-linked list.
+Consider the following data structure that is an implementation of singly-linked list
 \newpage
 	\begin{quote}
 	\begin{verbatim}
@@ -1188,25 +1187,28 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{verbatim}
 	\end{quote}
 	
-	Consider also two variables \code{struct T *x, *y} used in the next examples.
-	Note that all constants used in the examples are dependent on a concrete Forester
+	and the declared variables \code{struct T *x, *y} used in the following examples.
+	All constants used in the examples are dependent on a concrete Forester
 	run and they are chosen randomly in this text.
 	The syntax of the instructions in the examples is following:
-	$$ op\ r_0,\ r_1,\ r_2$$
+	$$ op(r_0,\ r_1,\ r_2)$$
 	where $op$ is a name of a instruction,
-	$r_0, r_1, r_2$ are operands such that $r_0$ is a destination register,
+	$r_0, r_1, r_2$ are operands such that $r_0$ is a destination register and
 	$r_1$ and $r_2$ are the source registers.
-	The instructions do not require all three registers as the parameters.
+	But only some of the instructions require all three parameters,
+	the other instructions take just two or less parameters.
 	%Indeed, the most of them have just two.
-	A~constant may be also used as an operand instead of the registers as a parameter.
+	A~constant may be also used in place of a register.
 	When $[r+c]$ is used as an operand then the instruction dereferences a root reference in register $r$.
-	In this case, the instruction accesses directly a selector with the displacement $c$ in a label of the transition with
-	root at the left-handed side.
-	We will further consider the selector in a label of transition with
+	More precisely, the instruction accesses directly a selector
+	with the displacement $c$ in a label of the transition with the root referenced by $r$ at the left-handed side.
+	The displacement states a position of the selector in the label of a transition
+	and it is given by the sum of sizes of the preceding selectors.
+	We will further consider the selector in the label of a transition with
 	the referenced root at left-handed side if it is not stated otherwise.
-	In the following text the registers $r_1,\ldots,r_n$ are local ones.
-	$GLOB$ and $ABP$ are global registers such that $GLOB$ register contains reference to a FA representing
-	global variables and $ABP$ register contains reference to a FA representing local memory.
+	In the following text, the registers $r_1,\ldots,r_n$ are local ones.
+	$\glb$ and $\abp$ are global registers such that $\glb$ register contains reference to the FA representing
+	global variables and $\abp$ register contains reference to the FA representing local memory.
 
 \bexmp
 	The statement \codix{x = (struct T*) malloc(sizeof(struct T));} is translated
@@ -1216,49 +1218,51 @@ Consider the following data structure that is an implementation of singly-linked
 	1: mov_reg r0, (int)4
 	2: alloc r0, r0
 	3: node_create r0, r0, next[0:4:+0]
-	4: mov_reg r1, ABP + 0
+	4: mov_reg r1, \abp + 0
 	5: mov_reg [r1 + 12], r0    
 	6: check
 	\end{verbatim}
 	\end{quote}
 
-	Firstly the size of the new allocated data (in this case the size is $4$)
-	is stored in the register $0$ at line~$1$.
-	Then the new instance of structure {\tt Data} is created and stored to register $0$ at line $2$.
-	A~new TA $t$ is created at line $3$.
-	The TA $t$ has one transition from the root with a label that consists one pointer selector {\tt next} whose
-	displacement in the label is $0$ and the size is $4$.
+	First, the size of the newly allocated data (in this case the size is $4$)
+	is stored in the register $0$ on line~$1$.
+	Then the new instance of the structure {\tt Data} is created and stored to register $0$ on line $2$.
+	A~new TA $t$ is created on line $3$.
+	The TA $t$ has one transition from the root with a label that consists of
+	one pointer selector {\tt next} whose displacement in the label
+	is $0$ and the size of the allocated node is $4$.
 	The displacement defines the order of the selector in the label.
 	The instruction \codix{node} stores a root reference to $t$ to register $0$.
 	Finally lines $4$ a $5$ add a root reference pointing to $t$ to a FA representing
 	a memory state of the actually executed function (which is in this case the function {\tt main}).
 	In this case a selector related to the pointer x has displacement $12$ in the label of TA
 	representing the function memory state.
-	The instruction at line $6$ then checks whether no garbage was created by the previous instructions.
+	The instruction on line $6$ then checks whether no garbage was created by the previous instructions.
 \eexmp
 
 \bexmp
 	The statement \codix{y = x->next;} is symbolically executed by the following instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov_reg r0, [ABP + 12]
+	1: mov_reg r0, [\abp + 12]
 	2: acc_sel [r0+0]
 	3: mov_reg r0, [r0 + 0]
-	4: mov_reg r1, ABP + 0
+	4: mov_reg r1, \abp + 0
 	5: mov_reg [r1 + 16], r0    
 	6: check
 	\end{verbatim}
 	\end{quote}
 
 	The first instruction stores a root reference to a TA representing heap pointed by the pointer \codix{x} to register $0$.
-	In this case, a node with a root reference is pointed by the selector with the displacement $12$ in a label in TA referenced by register $ABP$.
-	The second instruction performs an isolation of the selector with displacement $0$ in the TA referenced by register $0$.
-	This creates a~new TA if \codix{x->next} points to an allocated memory (because a new
-	cut-point is created when pointer \codix{y} also points to this memory).
-	Otherwise the instruction does not do anything.
-	The~instruction at line $3$ loads to register $0$ a root reference from a selector of TA referenced by register~$0$.
-	The instruction at line $4$ moves a reference to TA that represents a local memory state to register~$1$.
-	Finally, the instruction at line $5$ copies the root reference from register $0$ to
+	In this case, a node with a root reference is pointed by the selector with the displacement $12$ in a label in TA referenced by register $\abp$.
+	The second instruction performs isolation of the selector with displacement $0$ in the TA referenced by register $0$.
+	This creates a~new TA if \codix{x->next} points to an allocated memory, otherwise the instruction does not do anything.
+	Because the pointer \codix{y} will point also to the this memory after the execution of statement,
+	the new cut-point will be created created at this node
+	so the special TA representing the heap reachable from \codix{y} will be needed.
+	The~instruction on line $3$ loads to register $0$ a root reference from a selector of TA referenced by register~$0$.
+	The instruction on line $4$ moves a reference to TA that represents a local memory state to register~$1$.
+	Finally, the instruction on line $5$ copies the root reference from register $0$ to
 	a TA node pointed by pointer \codix{y} selector.
 	The last instruction checks whether no garbage is present.
 \eexmp
@@ -1267,16 +1271,17 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{free(x);} is performed by these instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov_reg r0, [ABP + 12]
+	1: mov_reg r0, [\abp + 12]
 	2: acca_sel [r0]
 	3: free r0
 	4: check
 	\end{verbatim}
 	\end{quote}
 
-	The first instruction loads to register $0$ a root reference to TA representing heap pointed by \codix{x}.
+	The first instruction loads to register $0$ a root reference to TA
+	representing the heap reachable from \codix{x}.
 	The reference to this TA is stored in a selector with displacement $12$
-	in TA referenced by register \codix{ABP}.
+	in TA referenced by register \codix{$\abp$}.
 	The second command isolates all selectors of the TA referenced by register~$0$.
 	The isolation of the selectors to the particular TA is done to enable
 	freeing right the memory represented by the TA.
@@ -1290,10 +1295,10 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{x->data = y->data;} is performed by these instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov_reg r3, [ABP + 16]
+	1: mov_reg r3, [\abp + 16]
 	2: acc_sel [r3 + 4]
 	3: mov_reg r3, [r3 + 4]
-	4: mov_reg r1, [ABP + 12]
+	4: mov_reg r1, [\abp + 12]
 	5: acc_sel [r1 + 4]
 	6: mov_reg [r1 + 4], r3
 	7: check
@@ -1301,13 +1306,13 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{quote}
 
 	The first instruction loads to register $3$ a root reference pointed by a selector (related to pointer \codix{x})
-	with displacement $16$ in TA referenced by register \codix{ABP} (what is TA modeling actually executed function).
+	with displacement $16$ in TA referenced by register \codix{$\abp$} (what is TA modeling actually executed function).
 	Then the data selector \codix{x->data} (which has displacement $4$ in label in TA reference by register $3$)
 	is isolated.
-	A~data value from this selector	is loaded to register $r$ by the instructions at line $2$ and $3$.
-	The instructions at line $4$ and $5$ prepare data selector \codix{y->data} in the same way
+	A~data value from this selector	is loaded to register $r$ by the instructions on line $2$ and $3$.
+	The instructions on line $4$ and $5$ prepare data selector \codix{y->data} in the same way
 	as the selector \codix{x->data} has been prepared.
-	Finally at line $6$ the data value in register $3$ is copied to TA node pointed by
+	Finally on line $6$ the data value in register $3$ is copied to TA node pointed by
 	the selector \codix{y->data}.
 	The last operation is again checking whether no garbage left.
 \eexmp
@@ -1316,14 +1321,14 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{x == y} translates Forester into this list of the instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov_reg r0, [ABP + 12]
-	2: mov_reg	r1, [ABP + 16]
+	1: mov_reg r0, [\abp + 12]
+	2: mov_reg	r1, [\abp + 16]
 	3: eq r5, r0, r1
 	\end{verbatim}
 	\end{quote}
 
-	The instruction at line $1$ loads a root reference pointed by a selector
-	with displacement $12$ in TA referenced by register \codix{ABP}
+	The instruction on line $1$ loads a root reference pointed by a selector
+	with displacement $12$ in TA referenced by register \codix{$\abp$}
 	related to a pointer $x$ to register $0$.
 	The second instruction does the same thing as the previous one but for a pointer $y$
 	and register $1$.
@@ -1505,24 +1510,24 @@ The second part consists of the rest.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_{gd}}{r_{ls}}}{I_n}$.
 	
-	\item {\tt get\_ABP($r_d$,$GLOB$, $o$)} loads a root reference from the register $ABP$ to
+	\item {\tt get\_$\abp$($r_d$,$\glb$, $o$)} loads a root reference from the register $\abp$ to
 		the destination register $r_d$. The instruction also adds the offset $o$ to a displacement
 		in the root reference.
 
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{
 			\rreftuple{\droot}{\ddispl + o}}}
-			{I_n}$ where $\rrefreg{r_{ABP}}$ is the register containing root
+			{I_n}$ where $\rrefreg{r_{\abp}}$ is the register containing root
 		reference to FA representing local memory and $o$ is an offset
 		which is a parameter of this function.
 	
-	\item {\tt get\_GLOB($r_d$,$ABP$,$o$)} loads a root reference from the register $ABP$
+	\item {\tt get\_$\glb$($r_d$,$\abp$,$o$)} loads a root reference from the register $\abp$
 		to the destination register $r_d$ and adds the offset $o$ to a displacement in the root reference.
 		
 		$f(\stdsym) = \symstate{F}
 			{\regssub{r_{d}}{
 				\rreftuple{\droot}{\ddispl + o}
 			}}
-			{I_n}$ where $\rrefreg{r_{GLOB}}$ is the register containing root
+			{I_n}$ where $\rrefreg{r_{\glb}}$ is the register containing root
 			reference to FA representing the global memory state and $o$ is an offset
 			which is a parameter of this instruction.
 	
@@ -1545,11 +1550,11 @@ The second part consists of the rest.
 		
 		Formal definition is the same but the result stores in the selector is a structure.
 
-	\item {\tt load\_ABP($r_d$,$r_s$,$o$), load\_GLOB($r_d$,$r_s$,$o$)} instructions do the same as
-		the previous instruction but loads a value from a TA pointed by $r_{ABP}$ or $r_{GLOB}$ register.
+	\item {\tt load\_$\abp$($r_d$,$r_s$,$o$), load\_$\glb$($r_d$,$r_s$,$o$)} instructions do the same as
+		the previous instruction but loads a value from a TA pointed by $r_{\abp}$ or $r_{\glb}$ register.
 		
 		Formally it could be defined as the previous instruction but
-		$ABP$ and $GLOB$ are used instead of $r_s$.
+		$\abp$ and $\glb$ are used instead of $r_s$.
 
 	\item {\tt push\_greg($r_s$)} instruction creates a new global register $r_g$
 		and fills it with a value in the~source register $r_s$.
@@ -1878,7 +1883,7 @@ and $\F_{\B}$ and the output is a forest automaton $\F_{\CC}$ such that
 $\lang(\F_{\A}) \cap \lang(\F_{\B}) = \lang(\F_{\CC})$.
 
 The algorithm starts with the initialization of auxiliary data structures and
-resulting automaton at lines $3$-$5$.
+resulting automaton on lines $3$-$5$.
 Then it iterates over all of the pointer variables (in a symbolic state) of the analysed program
 that are visible at the point the intersection.
 Then it calls the function \emph{intersect} over the states of FA pointed
@@ -1897,15 +1902,15 @@ The result of this function is the index of TA created by the~function in the re
 The function creates a product state from the input states $lhs$ and $rhs$ and
 adds it to the set of already processed product states if it is not already processed.
 Otherwise it returns index of such product state in the result automaton.
-This is done at line $1$-$3$.
+This is done on line $1$-$3$.
 Then the counter of processed product states is increased and
 the stack \emph{workset} is initialized to serve like auxiliary data
-structure where the product states are stored to be processed later at line $4-8$.
+structure where the product states are stored to be processed later on line $4-8$.
 
 The function creates a new TA with the product state of $lhs$ and $rhs$ as the root
-and with an empty transition relation at line $8$.
+and with an empty transition relation on line $8$.
 The product states from the workset are gradually processed at the~cycle beginning
-at line $9$.
+on line $9$.
 We denote $(r,s)$ the actually processed product state.
 There are several cases how the product state is managed.
 The first case is when both $r$ and $s$ are the references
@@ -1914,14 +1919,14 @@ The function intersect is called recursively on the referenced
 root states and creates a new TA with index $cp$.
 Finally the product state $(r,s)$ is added to the resulting FA
 as a root reference to a TA indexed $cp$.
-This case is at lines $13$-$14$.
+This case is on lines $13$-$14$.
 Another similar cases are when $r$ or $s$ is a root reference and the second one is not.
 The function intersect is called with the referenced root state as one parameter
 and the second parameter is the state of product state that is not a root reference.
 The result of this function call is a index $cp$ of newly created TA.
 Then the product state $(r,s)$ is added to the resulting FA as the root reference
 to a component indexed by $cp$.
-These cases are in algorithm processed at line $16$-$18$ and $20$-$22$.
+These cases are in algorithm processed on line $16$-$18$ and $20$-$22$.
 The last one case is when both $r$ and $s$ are not root references
 but the standard states of FA.
 Then it is iterated over all $a \in \Sigma$ with $\#(a) = n$
@@ -2161,13 +2166,13 @@ Formally, $\grev(\stdsym) = \symstate{F}
 
 	\item {\tt FI\_move\_reg\_inc}
 
-	\item {\tt FI\_get\_ABP}
+	\item {\tt FI\_get\_$\abp$}
 
-	\item {\tt FI\_get\_GLOB}
+	\item {\tt FI\_get\_$\glb$}
 
 	\item {\tt FI\_load}
 	
-	\item {\tt FI\_load\_ABP, FI\_load\_GLOB}
+	\item {\tt FI\_load\_$\abp$, FI\_load\_$\glb$}
 	
 	\item {\tt FI\_get\_greg}
 	
