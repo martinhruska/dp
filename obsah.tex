@@ -1646,36 +1646,44 @@ that do not change forest automata.
 \chapter{Forester with VATA}
 \label{ch:fova}
 
-This chapter describes the first enhancement of Forester done as the part of this thesis\,---\,
-switching the underlying tree automata library to VATA.
+This chapter describes the first enhancement of Forester done as the part of this thesis\,---\,replacing
+the underlying tree automata library by VATA.
 We discuss its difficulties and technical issues we had to handle during
 the design and implementation phase.
 
-We use \vata\ implementation of explicit encoding of TA as
-it is currently the only one that support the most of needed operations over TA.
-It is also more efficient for purposes of Forester than semi-symbolic encoding
-since no large alphabets are used during the verification procedure.
-Hence the advantages of the semi-symbolic encoding would not be fully utilized here.
+We decided to use \vata\ implementation of explicit encoding of TA because
+it is currently the only one that support the most of needed operations over TA,
+including language inclusion checking or computing intersection of TA.
+The semi-symbolic encoding is designed to tackle automata
+with large alphabets
+and since no large alphabets are used during the verification procedure
+the advantages of the semi-symbolic encoding would not be fully utilized here.
 
-Forester implementation is currently far from maturity and the high structural dependency is
-one of its bottlenecks.
-And thus we focused on reduction of dependencies between the classes (described in Section \ref{sec:forester_prep}) first.
-This allows us to apply design pattern \emph{adapter} \cite{gamma95} (described in Section \ref{sec:adapter}) to create
+Forester implementation is currently far from maturity.
+The high structural dependency is one of bottlenecks.
+It makes difficult to change a module because the other modules are
+dependent on it internals such as the used data types.
+Therefore we first focused on reduction of dependencies between the classes (described in Section \ref{sec:forester_prep}).
+Then we apply the design pattern \emph{adapter} \cite{gamma95} (described in Section \ref{sec:adapter}) to create
 an interface between Forester and \vata\ (implementation itself is described in Section \ref{sec:fova_impl}).
-Application of adapter design pattern makes possible to include VATA without the need of rewriting
+Application of adapter design pattern makes it possible to include VATA without the need of rewriting
 Forester to the names of methods and data members used in VATA.
 It also creates only one particular place (adapter class) connecting Forester and VATA instead of
 including VATA into Forester classes.
-This prevents from creating too strong relations between Forester and VATA.
+This prevents and removes a need of creating too strong relations between Forester and VATA.
 
-\section{The Refactoring of Forester}
+\section{Refactoring of Forester}
 \label{sec:forester_prep}
 
-The original implementation of tree automata library has also strong dependencies
-the other classes.
-Hence it was needed to refactore implementation before it was possible to create adapter class for VATA API.
-The core class of the original tree automata is class \emph{TA} and there are also related classes,
-e.g. class \emph{TT} for transitions representation or class \emph{Antichain} for language inclusion checking using the Antichain algorithm from \cite{tacas10}.
+The original Forester implementation of tree automata library
+has the strong dependencies to the other classes.
+Hence it was needed to refactore the implementation
+before creating adapter class for VATA API.
+The core class of the original tree automata is class \emph{TA}.
+There are also the othe related classes, e.g.,
+class \emph{TT} for representation of the transitions
+or class \emph{antichain} for language inclusion checking
+using the Antichain algorithm from \cite{tacas10}.
 This set of classes realizing original tree automata library will be further referred as \emph{tree automata module}.
 
 The refactoring is mainly based on reduction of a number of data types and data members declared
@@ -1683,17 +1691,22 @@ to be \emph{public} (in sense of the C++ programming language).
 This is by exploiting the features provided by C++11 \cite{stroustrup13}
 which allows auto deduction of the mentioned data types in compilation time (using keyword \emph{auto}).
 That enables us to make some of the data types of the original tree automata module \emph{private}.
-\emph{Iterator} is another concept often used in combination with auto deduction of types to reduce the number of export the internals of tree automata module.
+\emph{Iterator} is another concept often used in combination with auto deduction of types
+to bring higher genericity and reduce the number of dependencies to a concrete implementation.
 The combination of these two patterns are used for example for
-iteration over of all transitions of tree automata or all transitions which
-have the same state as parent.
+iteration over of all transitions of tree automata or over all transitions with
+the same state at the left-handed side.
 These kinds of iterations are quite common in Forester.
-Another part of the refactoring consists of simple replacing access of the class data members by the corresponding getters and setters method.
+Another part of the refactoring consists of replacing direct access to
+the class data members by the corresponding getters and setters.
 Reducing the structural dependencies is also done by emphasis on application of \emph{Law of Demeter} \cite{lod89} which practically
-means that classes using TA explicitly should implement methods providing information about TA instead of providing instance of TA object itself.
-E.g., when one class wants to know whether a given state is final in an tree automaton of a forest automaton then FA implementation should
-implement a method providing this information instead of providing access to it private TA data member.
-That helps us to make a smaller interface for TA module.
+means that classes using TA explicitly should implement methods providing information about
+TA instead of providing instance of TA object itself.
+For instance, when one class wants to know whether a given state is a final state
+of a TA of a FA then the implementation of FA should
+implement a method providing this information instead of
+providing access to its private TA data member.
+That helps us to make the interface for TA module smaller.
 %However, also after this refactoring Forester source code is still far from accomplishing the mentioned good practices (and also those not mentioned)
 %access the whole source code.
 
