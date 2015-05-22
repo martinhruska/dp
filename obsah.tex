@@ -1105,7 +1105,7 @@ further described in Section \ref{ch:fova}.
 \subsection{Implementation of Forest Automata Concepts}
 \label{subsec:faimpl}
 
-This subsection describes an implementation of the forest automata 
+This subsection describes the implementation of the forest automata 
 based verification procedure in Forester.
 The core of the forest automata module is class {\tt FA}.
 The implementation corresponds with the definitions given in Chapter \ref{ch:prel}.
@@ -1113,57 +1113,57 @@ Class FA has a data member representing a vector of tree automata $(t_1 \cdots t
 It also has a data member keeping a reference to an automaton representing the global variables
 and a reference to the automata representing the local variables of the actually executed function. %TODO define \abp
 The basic operations over an FA (like adding or removing a TA from an FA) are encapsulated in class FA.
-The another class providing operations over FA is class {\tt FAE}. 
+The other class providing operations over FA is class {\tt FAE} (Forest Automata Extension). 
 
 The labels of the TA transitions are represented by the structure {\tt NodeLabel}.
-It can be defined as a tuple $NL=(T,V)$.
+It is defined as a tuple $\nodelab=(T,V)$.
 This structure contains a data member $T$ determining the type of the root node of a transition
 (whether it is a general node, a data node or~a node containing a vector of data).
 A~value $V$ related to the type of the node is also stored as a data member of the structure.
 
 As it was already mentioned, the forest automata are further used in the representation of a symbolic state.
 An implementation of the representation of a symbolic state is in class {\tt SymState}.
-This class keeps a reference to a Forester microcode instruction $I$ to which the~symbolic state corresponds.
+This class keeps a reference to a Forester microcode instruction $I$
+which is executed at the~symbolic state.
 It has a data member that is a pointer to a forest automaton~$F$ (an instance of class {\tt FAE})
 representing the actual memory shape in the symbolic state.
 Another data member of class SymState is a set of registers $\regsset$.
 We denote set $\regsset$ by $\regs$. 
-The register can be local or global.
+A~register can be local or global one.
 There are two global registers.
 The first one contains a reference to the forest automata modelling
 the global state, e.g., the block of global variables in the symbolic state.
 The other then represents the allocated memory of the actually executed function.
 The local registers serve as temporary memory used in
-the microcode instructions for the data manipulation.
+the microcode instructions for data manipulation.
 Putting together the data members of class {\tt SymState},
-we can define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
+we define symbolic state formally as a triple $S=\symstate{F}{\regs}{I}$.
 
 The values of the registers are instances of a structure {\tt Data}.
-We can formally define structure Data as $\ddata$ where
+We formally define structure Data as $\ddata$ where
 $T$ is a data type,
 $S \in \natnum$ is a size of data,
 $V$ is a value of type $T$,
-$MB=(D_1 \cdots D_n)$ represents nested data if they are present (this is the case when $D$ represents a data structure)
-and $D_i$ is another instance of data.
+$\mathit{MB}=(D_1 \cdots D_n)$ represents nested data when $D$ represents a data structure.
 $T$ can be one of the following data types: pointer, reference to a TA, integer, boolean,
 structure or generally some other data type.
-$T$ can be also undefined or a state with the type that is unknown.
+$T$ can be also undefined or it can be a state with the type that is unknown.
 We describe in detail one of the types\,---\,the root reference.
-Its values are defined as $RR=({\tt Root},{\tt Displ})$
-where ${\tt Root} \in \natnum$ is an index of a tree automaton in $F$
-and ${\tt Displ} \in \natnum$ is an index of a selector in a structured label of
-the transition with ${\tt Root}$ at the left-handed side.
+Its values are defined as $\rootref=(\rootit, \displ)$
+where $\rootit \in \natnum$ is an index of a tree automaton in $F$
+and the displacement $\displ \in \natnum$ is an index of a selector in a structured label of
+the transition with $\rootref$ at the left-handed side.
+The displacement $\displ$ is given by the sum of sizes of the preceding selectors.
 The~operations for manipulation with a symbolic state are partially provided by class {\tt SymState}
 and some additional operations are provided by class {\tt VirtualMachine}.
 
-We already described the data structures used for the implementation of the forest automata concepts
-and the related symbolic execution.
+We already described described the forest automata implementation in Forester.
 The symbolic execution using this data structures is realized by gradually appending
 and removing the symbolic states from a queue.
-It implementation is in class \emph{SymExec}.
+The implementation of symbolic execution is in class \emph{SymExec}.
 When a symbolic state is taken from the queue a microcode instruction contained in
 the symbolic state is executed.
-Some of the instructions during its execution appends a new symbolic state to the queue.
+Some of the instructions during its execution append a new symbolic state to the queue.
 Symbolic execution finishes when the queue is empty.
 The microcode instructions executed during the symbolic execution are described in the following section.
 
@@ -1202,8 +1202,6 @@ Consider the following data structure that is an implementation of singly-linked
 	When $[r+c]$ is used as an operand then the instruction dereferences a root reference in register $r$.
 	More precisely, the instruction accesses directly a selector
 	with the displacement $c$ in a label of the transition with the root referenced by $r$ at the left-handed side.
-	The displacement states a position of the selector in the label of a transition
-	and it is given by the sum of sizes of the preceding selectors.
 	We will further consider the selector in the label of a transition with
 	the referenced root at left-handed side if it is not stated otherwise.
 	In the following text, the registers $r_1,\ldots,r_n$ are local ones.
