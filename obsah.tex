@@ -1714,17 +1714,18 @@ That helps us to make the interface for TA module smaller.
 \label{sec:adapter}
 
 \emph{Adapter} is a structural design patter \cite{gamma95} used for creating interface between incompatible classes.
-Adapter in notion of UML is shown in Figure \ref{fig:adapter}.
+An UML diagram describing Adapter is shown in Figure \ref{fig:adapter}.
 Adapter consists of a class \emph{Adaptee} which is the class that we want to make compatible with
 another class \emph{Client}.
 Client uses the methods of Adaptee.
 The \emph{Adaptor} class is the one providing the connection between Client and Adaptee.
-There are two ways how to implement the Adaptor.
+There are two ways how to implement an Adaptor.
 The first one is to implement Adaptor as an inherited class from Adaptee
 and to employ the concept of inheritance to redirect
 method calls to its parent (with some possible preprocessing).
 The other implementation is composing Adaptee to Adaptor and using Adaptor like an interface to Adaptee.
-Adaptor also could add a new method that combines Adaptee methods to achieve wanted operations.
+Adaptor could also add a new method that combines
+the methods of Adaptee to implement the wanted operations.
 
 \begin{figure}
 	\begin{center}
@@ -1735,7 +1736,7 @@ Adaptor also could add a new method that combines Adaptee methods to achieve wan
 	\label{fig:adapter}
 \end{figure}
 
-Let us apply this to our case.
+Applied to the case of Forester and VATA,
 Adaptee is the API of \vata, specifically it is the class \emph{ExplicitTreeAut}
 implementing the representation of tree automata in explicit encoding.
 Client is not only one class but the set of the Forester classes using TA library.
