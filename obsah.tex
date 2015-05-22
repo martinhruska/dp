@@ -1737,7 +1737,7 @@ the methods of Adaptee to implement the wanted operations.
 \end{figure}
 
 Applied to the case of Forester and VATA,
-Adaptee is the API of \vata, specifically it is the class \emph{ExplicitTreeAut}
+Adaptee is the API of \vata, specifically, it is the class \emph{ExplicitTreeAut}
 implementing the representation of tree automata in explicit encoding.
 Client is not only one class but the set of the Forester classes using TA library.
 Adaptor is a newly implemented class \emph{VATAAdapter} described in the following section.
@@ -1746,31 +1746,33 @@ Adaptor is a newly implemented class \emph{VATAAdapter} described in the followi
 \label{sec:fova_impl}
 
 The main part of our implementation of the adapter pattern is
-the new class \emph{VATAAdapter} having role of Adaptor.
+the new class \emph{VATAAdapter} having the role of Adaptor.
 We decided to use such approach to Adaptor preferring the composition over the inheritance,
-as it is more suitable for our purposes since we often needs to rename methods.
-E.g., a name of a method in Forester differs from the name of a method in VATA performing the same operation.
-A~conversion of a data type of parameter of tree automata operation is also sometimes needed, e.g. from vector to set. 
+since we often needs to rename methods.
+For instance, the name of a method in Forester differs from
+the name of the method in VATA with the same functionality.
+A~conversion of a data type of a parameter of a tree automata operation
+is also sometimes needed, e.g. from vector to set. 
 
 The class \emph{VATAAdapter} instantiates class \emph{ExplicitTreeAut} from VATA as its private data member
 and redirects to this instance method calls from Forester (the names of methods of VATAAdapter are the same as they were
 in the original TA library).
 \emph{VATAAdapter} also sometimes performs mentioned conversion of the data types.
 There are also the methods implemented by adapter not present
-in VATA like the method \emph{unfoldAtRoot} performing unfolding.
+in VATA, like the method \emph{unfoldAtRoot}, performing unfolding.
 (I~bet you will not read an implementation part, so here is one mug if you do.) % EGG
 These methods are very Forester specific
-and So it is not sensible to add them to a general purpose library like VATA is
-and it is better to implement them in interface like class VATAAdapter is.
+and so it is not sensible to add them to a general purpose library like VATA
+and it is better to implement them in an interface like class VATAAdapter.
 
-We originally supposed that it would be possible to keep the original TA module along VATA adapter
-to be able to easily switch between them.
-However it has proved this would bring high overhead in situations like e.g.,
-a~conversion of some data types would be needed in this case
-what is overhead compared to implementation where the data types compatible
-with VATA are used directly in the Forester code.
+Orignally, we were planning keep the original TA module along VATA adapter
+in order to be able to easily switch between the two implementations of TA.
+However, it has proven that it would bring high overhead in situations such as
+a~conversion of some data types which is not necessary to do
+when implementation using the data types compatible
+with VATA is used directly.
 Hence we decided to remove the original tree automata module and
-from this point Forester supports the VATA library only.
+from this point, Forester supports the VATA library only.
 
 \chapter{Developing Backward Run and Predicate Abstraction for Forest Automata Based Verification}
 \label{ch:backward}
