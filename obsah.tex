@@ -1268,7 +1268,7 @@ Consider the following data structure that is an implementation of singly-linked
 \eexmp
 
 \bexmp
-	The statement \codix{free(x);} is performed by these instructions:
+	The statement \codix{free(x);} is implemented by these instructions:
 	\begin{quote}
 	\begin{verbatim}
 	1: mov_reg r0, [\abp + 12]
@@ -1278,21 +1278,23 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{verbatim}
 	\end{quote}
 
-	The first instruction loads to register $0$ a root reference to TA
+	The first instruction loads to register $0$ the root reference to TA
 	representing the heap reachable from \codix{x}.
 	The reference to this TA is stored in a selector with displacement $12$
 	in TA referenced by register \codix{$\abp$}.
-	The second command isolates all selectors of the TA referenced by register~$0$.
-	The isolation of the selectors to the particular TA is done to enable
+	The second command isolates all selectors of the TA referenced by the~register~$0$.
+	The isolation has the same meaning as in the previous instruction.
+	The isolation of the selectors to the particular TA is done in order to enable
 	freeing right the memory represented by the TA.
 	Then the third instruction removes TA pointed by register $0$ from FA
 	and then it invalidates all references to it.
-	The last instruction again checks whether there is no garbage created by performing this instruction.
+	The last instruction again checks whether there is no garbage created
+	by executing this instruction.
 
 \eexmp
 
 \bexmp
-	The statement \codix{x->data = y->data;} is performed by these instructions:
+	The statement \codix{x->data = y->data;} is done by these instructions:
 	\begin{quote}
 	\begin{verbatim}
 	1: mov_reg r3, [\abp + 16]
@@ -1305,20 +1307,21 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{verbatim}
 	\end{quote}
 
-	The first instruction loads to register $3$ a root reference pointed by a selector (related to pointer \codix{x})
-	with displacement $16$ in TA referenced by register \codix{$\abp$} (what is TA modeling actually executed function).
+	The first instruction loads to register $3$ a root reference pointed by a selector
+	with displacement $16$ in TA referenced by register \codix{$\abp$} (which is the TA modelling the heap
+	of the actually executed function).
 	Then the data selector \codix{x->data} (which has displacement $4$ in label in TA reference by register $3$)
 	is isolated.
-	A~data value from this selector	is loaded to register $r$ by the instructions on line $2$ and $3$.
-	The instructions on line $4$ and $5$ prepare data selector \codix{y->data} in the same way
-	as the selector \codix{x->data} has been prepared.
-	Finally on line $6$ the data value in register $3$ is copied to TA node pointed by
+	A~data value of selector is loaded to register $r$ by the instructions on line $2$ and $3$.
+	The instructions on line $4$ and $5$ prepare the data selector \codix{y->data} in the same way
+	as has been prepared the selector \codix{x->data}.
+	Finally, on line $6$, the data value in register $3$ is copied to the TA node pointed by
 	the selector \codix{y->data}.
-	The last operation is again checking whether no garbage left.
+	The last operation is again checking whether no garbage is left.
 \eexmp
 
 \bexmp
-	The statement \codix{x == y} translates Forester into this list of the instructions:
+	The statement \codix{x == y} translates Forester into the following list of the instructions:
 	\begin{quote}
 	\begin{verbatim}
 	1: mov_reg r0, [\abp + 12]
@@ -1327,41 +1330,43 @@ Consider the following data structure that is an implementation of singly-linked
 	\end{verbatim}
 	\end{quote}
 
-	The instruction on line $1$ loads a root reference pointed by a selector
+	The instruction on line $1$ loads the root reference pointed by a selector
 	with displacement $12$ in TA referenced by register \codix{$\abp$}
 	related to a pointer $x$ to register $0$.
-	The second instruction does the same thing as the previous one but for a pointer $y$
+	The second instruction does the same thing as the previous one but for a pointer \codix{y}
 	and register $1$.
-	The third register then compares the content of the registers $1$ and $2$ and stores the result
+	The third operation then compares the content of the registers $1$ and $2$ and stores the result
 	to register $5$.
 \eexmp
 
 \vskip 1em
 
-These examples should bring some intuition into the concept of the microcode instructions and
-now we will describe a more detailed and formal description of the instructions.
+These examples provide an overview of the concept of the microcode instructions.
+We will further describe a more detailed and formal description of them.
 We use $r_s \in \regs$ to denote the source register,
 $r_d \in \regs$ to denote the destination register,
 $r_l \in \regs$ to denote a local register and
 $r_g \in \regs$ to denote a global register.
-Note that the source register is a global or a local one as well and it holds also for the destination register.
+Note that the source and destination registers can be the local as well as the global ones.
 The~source and destination registers are the parameters of some instructions.
-We use $\regssub{r}{r'}$ to denote a~set of the registers substituting register $r$ with register $r'$.
-A~symbol $I_n$ denotes the next instruction following an actually executed instruction.
-We define the semantics of each instruction formally using a function 
+We use $\regssub{r}{r'}$ to denote the~set $G$ of the registers with
+register $r$ substituted by the register $r'$.
+A~symbol $I_n$ denotes then next instruction following an actually executed instruction.
+We define the semantics of each instruction formally as a function 
 $f: \instrset \times \symset \rightarrow \symset$
 where $\symset$ is a set of all symbolic states and $\instrset$ is a set of all instructions.
-When it is clear for which instruction is used we omit the first parameter of $f$.
-The function $f$ defines an effect of the instruction as transformation of
+When the instruction is clear from context, we omit the first parameter of $f$.
+The function $f$ defines the effect of the instruction as a transformation of
 the current symbolic state $s$ to a new symbolic state $s'$.
 
-A~list of the microcode instructions used in Forester
-with the description of their semantics follows.
-Each instruction is described informally first and then its effect is defined
-in the notion of the function $f$.
-The instructions are divided into the two parts.
-The first part contains the instructions modifying forest automata.
-The second part consists of the rest.
+We now present a~list of the microcode instructions used in Forester
+with the description of their semantics.
+Each instruction is first described informally and
+then its effect is defined formally by the function $f$.
+The instructions are divided into two parts.
+The first part contains the instructions modifying forest automata
+and the second part consists of the remaing instructions
+that do not change forest automata.
 
 \subsubsection{The Instructions Modifying Forest Automata}
 \begin{itemize}
