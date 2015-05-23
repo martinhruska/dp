@@ -547,7 +547,7 @@ A~FA $F$ is canonicity respecting if $\forall f \in L_f(F): \emph{f is canonical
 Since definition of canonical FA is not affected by extending the labels to the structured ones the meaning of canonicity is the same as for basic FA.
 The language inclusion checking is again possible in the component-wise way like in the case of basic FA, as it is
 proved in \cite{forester:techrep}.
-However, the testing language inclusion with the same algorithm used for the non-hiearchical FA
+However, the testing language inclusion with the same algorithm used for the non-hierarchical FA
 is sound but incomplete because the structured labels are compared as symbols and their semantics
 is not considered.
 
@@ -1680,9 +1680,9 @@ has the strong dependencies to the other classes.
 Hence it was needed to refactore the implementation
 before creating adapter class for VATA API.
 The core class of the original tree automata is class \emph{TA}.
-There are also the othe related classes, e.g.,
+There are also the other related classes, e.g.,
 class \emph{TT} for representation of the transitions
-or class \emph{antichain} for language inclusion checking
+or class \emph{Antichain} for language inclusion checking
 using the Antichain algorithm from \cite{tacas10}.
 This set of classes realizing original tree automata library will be further referred as \emph{tree automata module}.
 
@@ -1765,7 +1765,7 @@ These methods are very Forester specific
 and so it is not sensible to add them to a general purpose library like VATA
 and it is better to implement them in an interface like class VATAAdapter.
 
-Orignally, we were planning keep the original TA module along VATA adapter
+Originally, we were planning keep the original TA module along VATA adapter
 in order to be able to easily switch between the two implementations of TA.
 However, it has proven that it would bring high overhead in situations such as
 a~conversion of some data types which is not necessary to do
@@ -1831,7 +1831,7 @@ where $\abstr^i$ is an abstract transformer related to the concrete
 program operation at the $i$-th point of the program execution and
 $F^{empt}$ is a forest automaton modelling the (initial) empty heap.
 Moreover, normalization, box folding, and abstraction are performed
-together wtih the abstract transformers at some program locations,
+together with the abstract transformers at some program locations,
 as described in Chapter \ref{ch:fav}.
 
 Consider that an error is detected at the $n$-th program location
@@ -1850,7 +1850,7 @@ Formally, we compute forest automata by application
 $\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F_{n} \cap F^{bad}) \ldots \cap F_{3}) \cap F_{2})$
 from the $n$-th point back to the beginning
 where $F_i$ is the forest automaton obtained as the result of 
-the $i$-th abstract tranformer $\abstr^{i}$ in the forward run
+the $i$-th abstract transformer $\abstr^{i}$ in the forward run
 and $F^{bad}$ is the forest automaton representing heap configuration causing the detected error.
 It is checked whether $\forall 0 \leq i \leq n: L(\rabstr^1(\ldots \rabstr^{i}(F_{i}) \ldots \cap F_2)) \cap
 L(\abstr^i(\ldots \abstr^{1}(F^{empt}) \ldots)) \neq \emptyset$,
@@ -1979,13 +1979,13 @@ There are several cases of how the product state is managed by.
 
 The described Algorithm \ref{alg:isect} returns FA $\F_{\CC}$
 overapproximating the intersection $\lang(\F_{\A}) \cap \lang(\F_{\B})$.
-This comes from nondeterminism causing that a referencing state $r_\A$ from $\A$
+This comes from non-determinism causing that a referencing state $r_\A$ from $\A$
 forms more then one product state with the referencing states $r_\B$ from $\B$.
-FA $\F_{\CC}$ defines by their product states the several bijections between
+FA $\F_{\CC}$ defines by their product states the several bijection between
 the referencing states such that a $r_\A$ from $\F_{\A}$ is in a bijection with $r_\B$ from $\F_{\B}$ iff
 they form a product state in $\F_{\CC}$.
 This ambiguity in mapping among the referencing states
-can led to a generation of a graph where one cut-point appers more then once
+can led to a generation of a graph where one cut-point appears more then once
 what is not possible.
 It can be resolved by splitting FA $F_{\CC}$ to several FA.
 Each of FA corresponds to a one maximum bijection between cut-points.
@@ -2001,7 +2001,7 @@ is referenced more then once.
 To guarantee that this will not happen
 the $n$ variants of the FA $F=(T_1 \cdots T_n, \port)$ are created and each of the variants
 contains at most one product state with $r$ in a TA $T_i$, $1 \leq i \leq n$, and
-no occurence such a product state is in the other TA.
+no occurence of such a product state is in the other TA.
 We remove useless states in ever FA and throw away FA with the empty language.
 We get as a result of the intersection of FA the set of FA representing resulting language.
 
