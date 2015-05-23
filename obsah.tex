@@ -1774,28 +1774,34 @@ with VATA is used directly.
 Hence we decided to remove the original tree automata module and
 from this point, Forester supports the VATA library only.
 
-\chapter{Developing Backward Run and Predicate Abstraction for Forest Automata Based Verification}
+\chapter{Backward Run and Predicate Abstraction in Forester}
 \label{ch:backward}
 
-When an error in analysed program is detected
-it is necessary to check whether it is real or spurious error.
+When an error in the analysed program is detected,
+it is necessary to check whether it is real or spurious.
 A~spurious error can be caused by an overapproximating abstraction over automata.
-The analysis of spuriousness is done by \emph{backward run} which has not
+The analysis of spuriousness can be done by a \emph{backward run} which, however, has not
 yet been designed and implemented for forest automata based shape analysis.
-When we proved that the error is spurious the abstraction is refined to avoid
-reaching this error again.
+An intersection of forest automata is crucial for the backward run but it has not
+been also developed yet.
+After proving that the error is spurious the abstraction is refined to avoid
+the spurious error detection by the same run again.
 The analysis is then restarted with the refined abstraction.
 This principle of gradual refinement of abstraction is based on the CEGAR framework \cite{cegar}.
 
-In this work, we further propose design of backward run and predicate abstraction \cite{artmc} for forest automata.
-Predicate abstraction has more fine tuning than currently used height abstraction.
+As one of the main contributions of this work,
+we design and implement backward run including the intersection of forest automata
+and predicate abstraction \cite{artmc} for forest automata based verification.
 Predicate abstraction can be refined by \emph{predicates} obtained from backward run.
-It guarantees the spurious error will not be reached again.
-We restrict ourselves only to basic forest automata, not the hierarchical ones.
+It can be done is such way that the predicates are created directly
+to avoid the abstraction that caused the error and so the error will not be detected by the same run.
+We restrict ourselves only to basic forest automata, not the hierarchical ones
+in order to keep this work within the bounds of master thesis.
 
-The structure of this chapter is as follows.
-The first Section \ref{sec:br} describes backward and the predicate abstraction run is general.
-Section \ref{sec:isect} describes the algorithm for the intersection of non-hierarchical forest automata.
+The structure of this chapter is the following.
+The first Section \ref{sec:br} describes the backward run and the predicate abstraction in general.
+Section \ref{sec:isect} describes the algorithm for the intersection of non-hierarchical forest automata
+which is important part of the backward run.
 Section \ref{sec:brdesign} contains the design of backward run
 and Section \ref{sec:padesign} describes the design of predicate abstraction for forest automata.
 Section \ref{sec:impl} covers the implementation.
@@ -1816,31 +1822,38 @@ Section \ref{sec:impl} covers the implementation.
 We described in Section \ref{ch:fav} that the abstract transformers $\abstr$
 related to the concrete program operations are gradually applied to forest automata
 starting from a forest automaton modelling an empty heap.
-This gradual application of abstract transformers in the same order of
+This gradual application of abstract transformers in the order of
 the concrete program operations is called \emph{forward run}.
 Formally, a forest automaton representing the memory state 
 at program point $n$ is obtained by
-$\abstr^n(\abstr^{n-1}(\ldots \abstr^{1}(F^{empt}) \ldots))$ in forward run
+$\abstr^n(\abstr^{n-1}(\ldots \abstr^{1}(F^{empt}) \ldots))$
 where $\abstr^i$ is an abstract transformer related to the concrete
-program operation at the $i$-th point of program and $F^{empt}$ is
-a forest automaton modelling an (initial) empty heap.
-Moreover, normalization, box folding and abstraction is performed
-as a part of the abstract transformers at some program locations as
-it was described in Chapter \ref{ch:fav}.
+program operation at the $i$-th point of the program execution and
+$F^{empt}$ is a forest automaton modelling the (initial) empty heap.
+Moreover, normalization, box folding, and abstraction are performed
+together wtih the abstract transformers at some program locations,
+as described in Chapter \ref{ch:fav}.
 
-Consider that a program error is detected at the $n$-th program location
+Consider that an error is detected at the $n$-th program location
 during the forward run.
-The verification of non-spuriousness of the error is done by gradual applying
+The verification of non-spuriousness of the error is done by a gradual application of
 \emph{reverse abstract transformers} $\rabstr$ over forest automata.
-It starts from the error line and then checks whether an intersection of
+The backward run starts from the error line and
+then checks whether an intersection of
 the languages of forest automata from forward and backward run is non-empty
 at each program line.
-When the intersection is non-empty the backward run continues using the intersection automaton.
-This process is called backward run.
-Formally, we compute forest automata by application $\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F^{n}) \ldots))$
-from the $n$-th point back to the beginning.
-We check whether $\forall 0 \leq i \leq n: L(\rabstr^1(\ldots \rabstr^{i}(F^{i}) \ldots)) \cap
-L(\abstr^i(\ldots \abstr^{1}(F^{empt}) \ldots)) \neq \emptyset$,
+When the intersection is non-empty the backward run continues using the automaton
+representing the intersection of the languages.
+This process is called \emph{backward run}.
+We use $F_A \cap F_B$ to denote a forest automaton with language $L(F_A) \cap L(F_B)$.
+Formally, we compute forest automata by application
+$\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F_{n} \cap F^{bad}) \ldots \cap F_{3}) \cap F_{2})$
+from the $n$-th point back to the beginning
+where $F_i$ is the forest automaton obtained as the result of 
+the $i$-th abstract tranformer $\abstr^{i}$ in the forward run
+and $F^{bad}$ is the forest automaton representing heap configuration causing the detected error.
+It is checked whether $\forall 0 \leq i \leq n: L(\rabstr^1(\ldots \rabstr^{i}(F_{i}) \ldots \cap F_2)) \cap
+L(\abstr^i(\ldots \abstr^{1}(F^{empt}) \ldots))) \neq \emptyset$,
 When the intersection is empty the found error is reported as spurious.
 
 This principle is illustrated in Figure \ref{fig:bwrun}.
@@ -1858,11 +1871,13 @@ forest automata language from backward (the blue ovals) and forward
 with the language $L(M_{k-1})$.
 
 Predicate abstraction has not yet been used in forest automata based verification
-because it would lose its advantages over height abstraction without
-a backward run which detects the predicates to refine predicate abstraction
+because it is meant to work with backward run
+which detects the predicates to refine predicate abstraction
 in the case of a spurious counterexample detection.
 
-Let $\predset=\{\pred_1, \ldots, \pred_n\}$ be a set of predicates.
+The used predicate abstraction is defined over a TA as in \cite{artmc}
+and its extension to FA will be described later.
+The predicate abstraction is parameterized by the set of predicates $\predset=\{\pred_1, \ldots, \pred_n\}$.
 A~predicate $\pred \in \predset$ is a language represented by
 a tree automaton.
 As we described in Section \ref{subsec:abstraction}, the abstraction function $\abs$
@@ -1874,20 +1889,17 @@ they have an empty intersection with the same predicates.
 Formally, $\forall q_1,q_2 \in Q: q_1 \peqrel q_2 \defarrow
 (\forall \pred \in \predset: \langstate{A}{q_1} \cap \pred \neq \emptyset
 \Leftrightarrow \langstate{A}{q_2} \cap \pred \neq \emptyset)$.
-Note, that predicate abstraction is defined over a TA
-and its extension to FA will be described later.
 
-The refinement of predicate abstraction is done by adding
-tree automata from a FA in backward run that has empty language
+The refinement of predicate abstraction is done by extending the
+set of predicates by adding tree automata languages from
+a FA in backward run that has empty language
 intersection with the related FA from the forward run.
-Then the new forward run can be started using the extended predicate
+Then the new forward run is started using the extended predicate
 set for the abstraction.
-The new predicates should prevent the merging the states that caused
-detection of the spurious error again.
-Note that the abstraction merges at most the same states as
-in the previous run.
-TODO: dukaz, proc je takto dobre.
-Mozna neco o~terminaci.
+The new predicates will prevent merging the states at the points
+that caused detection of the spurious error again.
+When the refinement from \cite{artmc} is used
+then termination of the method is guaranteed.
 
 \section{Intersection of Forest Automata Languages}
 \label{sec:isect}
