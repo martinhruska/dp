@@ -2,7 +2,7 @@
   \caption{Intersection for non-hierarchical forest automata}
 \label{alg:isect}
   \KwIn{ $\F_{\A} = (\A_1, \dots, \A_n, \portseq{k}{\A})$, $\F_{\B} = (\B_1, \dots, \B_m, \portseq{k}{\B})$}
-  \KwOut{$\F_{\CC} = (\CC_1, \dots, \CC_p, R_{\CC})$ such that $\lang(\F_{\CC}) = \lang(\F_{\A}) \cap \lang(\F_{\B})$}
+  \KwOut{$\F_{\CC} = (\CC_1, \dots, \CC_p, R_{\CC})$ such that $\lang(\F_{\A}) \cap \lang(\F_{\B}) \subseteq \lang(\F_{\CC})$}
 
   $\mathit{processed} := \emptyset$\;
   $\mathit{cnt} := 0$\;
@@ -21,6 +21,7 @@
 
   \Return{$\mathit{F}$}\;
 \end{algorithm}
+
 
 \begin{function}[H]
 
