@@ -1,13 +1,8 @@
 \begin{algorithm}[ht]
   \caption{Intersection for non-hierarchical forest automata}
 \label{alg:isect}
-  \KwIn{ $\F_{\A} = (\A_1, \dots, \A_n, R_{\A})$, $\F_{\B} = (\B_1, \dots, \B_m, R_{\B})$}
+  \KwIn{ $\F_{\A} = (\A_1, \dots, \A_n, \portseq{k}{\A})$, $\F_{\B} = (\B_1, \dots, \B_m, \portseq{k}{\B})$}
   \KwOut{$\F_{\CC} = (\CC_1, \dots, \CC_p, R_{\CC})$ such that $\lang(\F_{\CC}) = \lang(\F_{\A}) \cap \lang(\F_{\B})$}
-
-  \If{$R_{\A} \neq R_{\B}$}
-  {
-    \Return{$()$}\;
-  }
 
   $\mathit{processed} := \emptyset$\;
   $\mathit{cnt} := 0$\;
@@ -15,7 +10,13 @@
   
   \For{$i := 1$ \KwTo $k$}
   {
-    $\mathit{intersect}((\F_{\A}[x_i], \F_{\B}[x_i]))$\;
+	\For{$\emph{a root state } r \emph{ of } \A_{\portof{i}{\A}}$}
+	{
+		\For{$\emph{a root state } s \emph{ of } \B_{\portof{i}{\B}}$}
+		{
+			$\mathit{intersect}((r,\portof{i}{\A}),(s,\portof{i}{\B}))$\;
+		}
+	}
   }
 
   \Return{$\mathit{F}$}\;
@@ -66,7 +67,7 @@
       $\mathit{cp} := \intersect((\mathit{lhs.aut}, r), (j, \mathtt{root}(j)))$\;
       $\Delta := \Delta \cup \{(r,s) \ltr{\mathtt{ref}(\mathit{cp})}\}$\;
     }
-    \Else(\tcp*[h]{for normal transitions})
+    \Else(\tcp*[h]{for normal states})
     {
       \ForEach{$a \in \Sigma$ (in the reverse order than given by $\preceq_{\Sigma}$)}
       {
