@@ -1905,67 +1905,72 @@ then termination of the method is guaranteed.
 As an important part of the backward run,
 we design and implement the algorithm for intersection
 of languages of non-hierarchical forest automata.
+The algorithm is based on the algorithm for the top-down
+intersection of tree automata and extends it idea to forest automata.
 
 The main part of the method is given at Algorithm~\ref{alg:isect}.
 The algorithm takes two non-hierarchical forest automata $\F_{\A}$
-and $\F_{\B}$ as its input and outputs a forest automaton $\F_{\CC}$ such that
+and $\F_{\B}$ with the same number of port indicies
+as its input and outputs a forest automaton $\F_{\CC}$ such that
 $\lang(\F_{\A}) \cap \lang(\F_{\B}) = \lang(\F_{\CC})$.
 
 The algorithm starts with the initialization of auxiliary data structures $\mathit{processed}$,
 $\mathit{cnt}$ and $\mathit{FA}$ and data structure for the resulting automaton on lines $3$-$5$.
-Then it iterates over all of the pointer variables (in a symbolic state) of the analysed program
-that are visible at the point the intersection.
-Then it calls the function \emph{intersect} over the states of FA pointed
-by the variables.
+Then it iterates over all port indicies (in a symbolic state) of the input FA.
+Then it calls the function $\mathit{intersect}$ over the states of FA pointed
+by the port index.
 
-The function intersect takes as the input these states and
-and the references to the roots of TA of FA to which the state belongs.
-The function also manipulates the structures created in the beginning of the
-whole algorithm.
-It gradually constructs the part of the resulting intersection forest automata that starts
-from the input states.
+The function $\mathit{intersect}$ takes as the input parameter these states together with
+the references to the roots of TA of FA to which the state belongs.
+It gradually constructs the component of the resulting forest automata
+with the product state composed from the input states as the root state.
 The states of the resulting automaton are so-called \emph{product states}\,---\,pairs $(r,s)$ where $r$ is a state of $\F_{\A}$
 and $s$ is a state of $\F_{\B}$.
-The result of this function is the index of TA created by the~function in the resulting FA.
+The result of this function is the index of the created TA in the resulting FA.
 
-The function creates a product state from the input states $lhs$ and $rhs$ and
-adds it to the set of already processed product states if it is not already processed.
-Otherwise it returns index of such product state in the result automaton.
+The function $\mathit{intersect}$ starts with creating a product state from the input states $lhs$ and $rhs$ and
+adding it to the set of already processed product states if it is not already processed.
+Otherwise it returns the index of TA with such product state as the root.
 This is done on line $1$-$3$.
-Then the counter of processed product states is increased and
-the stack \emph{workset} is initialized to serve like auxiliary data
-structure where the product states are stored to be processed later on line $4-8$.
+Then the counter $\mathit{cnt}$ of the created TA of the resulting FA is increased and
+the stack $\mathit{workset}$ is initialized to serve like auxiliary data
+structure where the product states are stored to be processed later on lines $4-8$.
 
-The function creates a new TA with the product state of $lhs$ and $rhs$ as the root
-and with an empty transition relation on line $8$.
-The product states from the workset are gradually processed at the~cycle beginning
+The function $\mathit{intersect}$ creates a new TA with the product state ($lhs$,$rhs$) as the root
+and with the empty transitions set on line $8$.
+The product states from the workset are gradually processed in the~cycle beginning
 on line $9$.
 We denote $(r,s)$ the actually processed product state.
-There are several cases how the product state is managed.
-The first case is when both $r$ and $s$ are the references
-to the other tree automata.
-The function intersect is called recursively on the referenced
-root states and creates a new TA with index $cp$.
-Finally the product state $(r,s)$ is added to the resulting FA
-as a root reference to a TA indexed $cp$.
-This case is on lines $13$-$14$.
-Another similar cases are when $r$ or $s$ is a root reference and the second one is not.
-The function intersect is called with the referenced root state as one parameter
-and the second parameter is the state of product state that is not a root reference.
-The result of this function call is a index $cp$ of newly created TA.
-Then the product state $(r,s)$ is added to the resulting FA as the root reference
-to a component indexed by $cp$.
-These cases are in algorithm processed on line $16$-$18$ and $20$-$22$.
-The last one case is when both $r$ and $s$ are not root references
-but the standard states of FA.
-Then it is iterated over all $a \in \Sigma$ with $\#(a) = n$
-and a new transition $t$ is added to the transition relation~$\Delta$.
-where $t = (r,s) \xrightarrow{a} ((r_1,s_1) \cdots (r_n, s_n))$ such that
-$(r_1 \cdots r_n) \in \post{a}{r}$, $(s_1 \cdots s_n) \in \post{a}{s}$ and
-$\post{a}{q} = \{(q_1 \cdots q_n) \in Q^n\,|\, q \xrightarrow{a} (q_1 \cdots q_n) \in \Delta\}$.
-Finally, when the product state $(r_i,s_i)$ where $1 \leq i \leq n$ is a new one
-then it is added to the state set $Q$ and appended to the workset to be further processed.
-This last case corresponds to lines $24$-$30$ in the algorithm.
+We call \emph{referencing} states that are at the left-handed side
+of transition labeled by a root reference.
+The \emph{normal} states are states that are not referencing states.
+There are several cases of how the product state is managed by.
+\begin{enumerate}
+	\item The both $r$ and $s$ are referencing states.
+		  The function intersect is called recursively on the referenced
+		  root states and creates a new TA with the index $cp$.
+		  Finally the product state $(r,s)$ is added to the resulting FA
+		  as a root reference to a TA indexed $cp$.
+		  This is on lines $13$-$14$ of the function $\mathit{intersect}$.
+	  \item The state $r$ or the state $s$ is a referencing state and the second one is normal.
+			The function $\mathit{intersect}$ is called with the referenced root state as one parameter
+			and the second parameter is the normal state of product state.
+    		The result of this function call is the position $cp$ of a new TA created by this call at FA.
+    		Then a transition with the product state $(r,s)$ at the left-handed side
+			that is labeled by the root reference to a component at the position $cp$
+			is added to the new TA.
+    		These cases in the algorithm correspond to lines $16$-$18$ and $20$-$22$.
+	  \item The both $r$ and $s$ are not root references
+			but the normal states of FA.
+			Then it is iterated over all $a \in \Sigma$ with $\#(a) = n$
+			and a new transition $t$ is added to the transition relation~$\Delta$.
+			where $t = (r,s) \xrightarrow{a} ((r_1,s_1) \cdots (r_n, s_n))$ such that
+			$(r_1 \cdots r_n) \in \post{a}{r}$, $(s_1 \cdots s_n) \in \post{a}{s}$ and
+			$\post{a}{q} = \{(q_1 \cdots q_n) \in Q^n\,|\, q \xrightarrow{a} (q_1 \cdots q_n) \in \Delta\}$.
+			Finally, when the product state $(r_i,s_i)$, $1 \leq i \leq n$, is a new one,
+			then it is added to $Q$ and appended to the workset for a further processing.
+			This last case corresponds to lines $24$-$30$ of the function \texttt{intersect}.
+\end{enumerate}
 
 \input{alg_isect.tex}
 
