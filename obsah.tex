@@ -1853,22 +1853,21 @@ where $F_i$ is the forest automaton obtained as the result of
 the $i$-th abstract tranformer $\abstr^{i}$ in the forward run
 and $F^{bad}$ is the forest automaton representing heap configuration causing the detected error.
 It is checked whether $\forall 0 \leq i \leq n: L(\rabstr^1(\ldots \rabstr^{i}(F_{i}) \ldots \cap F_2)) \cap
-L(\abstr^i(\ldots \abstr^{1}(F^{empt}) \ldots))) \neq \emptyset$,
+L(\abstr^i(\ldots \abstr^{1}(F^{empt}) \ldots)) \neq \emptyset$,
 When the intersection is empty the found error is reported as spurious.
 
 This principle is illustrated in Figure \ref{fig:bwrun}.
-Figure shows a forest automata language before (green area)
-and after (yellow area) abstraction at a program location where abstraction is performed.
-One are consisting of a green and a yellow part represents a language of a forest automaton
-in a symbolic state of symbolic execution.
-Figure also shows how forest automaton (and it language) is gradually changed
-by abstract transformers illustrated by lines connecting the ovals.
-A~found error is shown as a red area in the last oval.
-The backward run starts from this error and it finds
-that an error is spurious because an intersection (the orange areas) of
+Figure shows how a forest automaton (and its language) is gradually changed
+by abstract transformers, illustrated by lines connecting the ovals
+that represents the particular symbolic states of symbolic execution.
+A~found error configuration is shown as a red area in the last oval.
+The backward run starts from the error configuration and it finds
+that it is spurious because the intersection (the orange areas) of
 forest automata language from backward (the blue ovals) and forward
 (the green and yellow area) run is empty at level of the symbolic state
 with the language $L(M_{k-1})$.
+The green area represents forest automata language before abstraction
+and the yellow area after the abstraction.
 
 Predicate abstraction has not yet been used in forest automata based verification
 because it is meant to work with backward run
@@ -1901,20 +1900,19 @@ that caused detection of the spurious error again.
 When the refinement from \cite{artmc} is used
 then termination of the method is guaranteed.
 
-\section{Intersection of Forest Automata Languages}
+\section{Intersection of Forest Automata}
 \label{sec:isect}
-The most fundamental operations over forest automata in backward run is
-intersection of forest automata languages.
-We design and implement the algorithm for intersection
-of languages of non-hierarchical forest automata since it has not been develop yet.
-The algorithm is given at Algorithm \ref{alg:isect}.
+As an important part of the backward run,
+we design and implement the algorithm for intersection
+of languages of non-hierarchical forest automata.
 
-The input of the algorithm is two non-hierarchical forest automata $\F_{\A}$
-and $\F_{\B}$ and the output is a forest automaton $\F_{\CC}$ such that
+The main part of the method is given at Algorithm~\ref{alg:isect}.
+The algorithm takes two non-hierarchical forest automata $\F_{\A}$
+and $\F_{\B}$ as its input and outputs a forest automaton $\F_{\CC}$ such that
 $\lang(\F_{\A}) \cap \lang(\F_{\B}) = \lang(\F_{\CC})$.
 
-The algorithm starts with the initialization of auxiliary data structures and
-resulting automaton on lines $3$-$5$.
+The algorithm starts with the initialization of auxiliary data structures $\mathit{processed}$,
+$\mathit{cnt}$ and $\mathit{FA}$ and data structure for the resulting automaton on lines $3$-$5$.
 Then it iterates over all of the pointer variables (in a symbolic state) of the analysed program
 that are visible at the point the intersection.
 Then it calls the function \emph{intersect} over the states of FA pointed
