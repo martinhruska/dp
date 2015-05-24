@@ -1863,19 +1863,32 @@ When the intersection is empty the found error is reported as spurious.
 
 This principle is illustrated in Figure \ref{fig:bwrun}.
 Figure shows how a forest automaton (and its language) is gradually changed
-by abstract transformers, illustrated by lines connecting the ovals
-that represents the particular symbolic states of symbolic execution.
-A~found error configuration configuration is shown
-as the red area in the last oval (representing language $L_{\mathit{Bad}}$).
-The backward run starts from the error configuration and it finds
-that it is spurious because the intersection (the orange areas) of
-forest automata language from backward (the blue ovals) and forward
-(the green and yellow area) run is empty at level of the symbolic state
-with the language $L(M_{i-1})$.
-The green area represents forest automata language before abstraction
-and the yellow area after the abstraction.
+by abstract transformers until an error is found.
+The backward run starts from the error configuration and reverse the abstract transformers
+until the empty intersection between the forward and backward FA languages
+is get at the level $i-1$.
+Then the error is reported as spurious.
+The figure shows FA in an symbolic states in the forward run using the green (language of
+FA before abstraction) and the yellow areas (language of FA after abstraction).
+There are $k$ symbolic states in the figure.
+Each step of the forward run does abstraction of FA,
+e.g., FA $\alpha(F_{i})$ is obtained by the abstraction of FA $F_i$.
+Then the abstract transformer is applied to the abstracted FA
+and the next symbolic state with FA $F_{i+1}$ is obtained.
+An abstract transformer is illustrated by the arrows connecting
+the yellow area of one state with the green areas of the next state.
+The error configuration in language $L_{\mathit{Bad}}$ is shown as the red area.
+The backward run starts from the error configuration and applies the reverse abstract transformer
+(illustrated by the dotted arrows) to FA representing the intersection
+(the orange areas) of the languages of the forest automata
+from the forward (the green and yellow areas) and backward run (the blue areas).
+The result of a reverse abstract transformer is a new backward run state
+with the FA having language shown as a~blue and an~orange area.
+It is found that the error is spurious because the intersection
+is empty at the~level~$i-1$.
 
-Predicate abstraction has not yet been used in forest automata based verification
+
+\emph{Predicate abstraction} has not yet been used in forest automata based verification
 because it is meant to work with backward run
 which detects the predicates to refine predicate abstraction
 in the case of a spurious counterexample detection.
