@@ -26,7 +26,7 @@
 \begin{function}[H]
 
   \caption{intersect(lhs, rhs)}
-  \KwIn{$\mathit{lhs} = (\mathit{lhs.state}, \mathit{lhs.root})$ and $\mathit{rhs} = (\mathit{rhs.state}, \mathit{rhs.root})$ are pairs of an automaton and a state from the automaton}
+  \KwIn{$\mathit{lhs} = (\mathit{lhs.aut}, \mathit{lhs.state})$ and $\mathit{rhs} = (\mathit{rhs.aut}, \mathit{rhs.state})$ are pairs of an automaton and a state from the automaton}
   \SetKwInput{KwData}{Globals}
   \KwData{$\mathit{F}$: a tuple of tree automata; $\mathit{processed}$: set of processed root points; $\mathit{cnt}$: counter of components of $\mathit{F}$}
   \KwOut{Index of the resulting component in $\mathit{F}$}
