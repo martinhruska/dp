@@ -1924,7 +1924,7 @@ then termination of the method is guaranteed.
 As an important part of the backward run,
 we design and implement the algorithm for intersection
 of languages of non-hierarchical forest automata.
-The algorithm is based on the algorithm for the top-down
+The algorithm comes out of the algorithm for the top-down
 intersection of tree automata and extends it idea to forest automata.
 
 The main part of the method is given at Algorithm~\ref{alg:isect}.
@@ -1935,24 +1935,25 @@ $\lang(\F_{\A}) \cap \lang(\F_{\B}) \subseteq \lang(\F_{\CC})$.
 The explanation why $\F_{\CC}$ overapproximates language
 of the intersection is given after the description of the algorithm.
 
-The algorithm starts with the initialization of auxiliary data structures $\mathit{processed}$,
-$\mathit{cnt}$ and $\mathit{FA}$ and data structure for the resulting automaton on lines $3$-$5$.
-Then it iterates over all port indicies (in a symbolic state) of the input FA.
-Then it calls the function $\mathit{intersect}$ over the states of FA pointed
-by the port index.
+The algorithm starts with the initialization of the auxiliary
+data structures $\mathit{processed}$,
+$\mathit{cnt}$ and the data structure for the resulting automaton $F$ on lines $3$-$5$.
+Then it iterates over all port indicies of the input FA
+and it calls the function $\mathit{intersect}$ over the root states of TA at position in
+the~input FA given by a port index.
 
-The function $\mathit{intersect}$ takes as the input parameter these states together with
-the references to the roots of TA of FA to which the state belongs.
-It gradually constructs the component of the resulting forest automata
-with the product state composed from the input states as the root state.
-The states of the resulting automaton are so-called \emph{product states}\,---\,pairs $(r,s)$ where $r$ is a state of $\F_{\A}$
-and $s$ is a state of $\F_{\B}$.
+The function $\mathit{intersect}$ takes as the input parameter these root states
+together with the references to the roots of TA of FA to which the state belongs.
+It gradually constructs the component of the~resulting forest automaton
+which has as the root state the product state composed from the input states.
+The states of the resulting automaton are so-called \emph{product states}\,---\,pairs $(r,s)$ where $r$ is a state of~$\F_{\A}$
+and $s$ is a state of~$\F_{\B}$.
 The result of this function is the index of the created TA in the resulting FA.
 
 The function $\mathit{intersect}$ starts with creating a product state from the input states $lhs$ and $rhs$ and
 adding it to the set of already processed product states if it is not already processed.
 Otherwise it returns the index of TA with such product state as the root.
-This is done on line $1$-$3$.
+This is done on lines $1$-$3$.
 Then the counter $\mathit{cnt}$ of the created TA of the resulting FA is increased and
 the stack $\mathit{workset}$ is initialized to serve like auxiliary data
 structure where the product states are stored to be processed later on lines $4-8$.
@@ -1963,7 +1964,7 @@ The product states from the workset are gradually processed in the~cycle beginni
 on line $9$.
 We denote $(r,s)$ the actually processed product state.
 We call \emph{referencing} states that are at the left-handed side
-of transition labeled by a root reference.
+of a transition labeled by a root reference.
 The \emph{normal} states are states that are not referencing states.
 There are several cases of how the product state is managed by.
 
@@ -1971,7 +1972,7 @@ There are several cases of how the product state is managed by.
 
 \begin{enumerate}
 	\item The both $r$ and $s$ are referencing states.
-		The function $\mathit{intersect}$ is called recursively on the referenced
+		The function $\mathit{intersect}$ is called recursively on the~referenced
 		  root states and creates a new TA with the index $cp$.
 		  Finally the product state $(r,s)$ is added to the resulting FA
 		  as a root reference to a TA indexed $cp$.
@@ -1979,7 +1980,8 @@ There are several cases of how the product state is managed by.
 	  \item The state $r$ or the state $s$ is a referencing state and the second one is normal.
 			The function $\mathit{intersect}$ is called with the referenced root state as one parameter
 			and the second parameter is the normal state of product state.
-    		The result of this function call is the position $cp$ of a new TA created by this call at FA.
+    		The result of this function call is the position $cp$
+			of a~new TA created by this call at the resulting FA.
     		Then a transition with the product state $(r,s)$ at the left-handed side
 			that is labeled by the root reference to a component at the position $cp$
 			is added to the new TA.
@@ -1993,15 +1995,19 @@ There are several cases of how the product state is managed by.
 			$\post{a}{q} = \{(q_1 \cdots q_n) \in Q^n\,|\, q \xrightarrow{a} (q_1 \cdots q_n) \in \Delta\}$.
 			Finally, when the product state $(r_i,s_i)$, $1 \leq i \leq n$, is a new one,
 			then it is added to $Q$ and appended to the workset for a further processing.
-			This last case corresponds to lines $24$-$30$ of the function $\mathit{intersect}$.
+			This last case corresponds to lines $24$-$27$ of the function $\mathit{intersect}$.
 \end{enumerate}
+
+The function $\mathit{intersect}$ finally adds a new TA to the resulting FA
+and returns the index of TA in FA whas is done on lines $28$-$29$.
 
 The described Algorithm \ref{alg:isect} returns FA $\F_{\CC}$
 overapproximating the intersection $\lang(\F_{\A}) \cap \lang(\F_{\B})$.
 This comes from non-determinism causing that a referencing state $r_\A$ from $\A$
 forms more then one product state with the referencing states $r_\B$ from $\B$.
-FA $\F_{\CC}$ defines by their product states the several bijection between
-the referencing states such that a $r_\A$ from $\F_{\A}$ is in a bijection with $r_\B$ from $\F_{\B}$ iff
+FA $\F_{\CC}$ defines by their product states the several~bijection between
+the referencing states of the input FA
+such that $r_\A$ from $\F_{\A}$ is in a bijection with $r_\B$ from $\F_{\B}$ iff
 they form a product state in $\F_{\CC}$.
 This ambiguity in mapping among the referencing states
 can led to a generation of a graph where one cut-point appears more then once
@@ -2019,10 +2025,12 @@ This would mean that the product state, which is the root,
 is referenced more then once.
 To guarantee that this will not happen
 the $n$ variants of the FA $F=(T_1 \cdots T_n, \port)$ are created and each of the variants
-contains at most one product state with $r$ in a TA $T_i$, $1 \leq i \leq n$, and
-no occurence of such a product state is in the other TA.
+contains at most one product state with~$r$ and a normal state
+in a TA $T_i$, $1 \leq i \leq n$, and
+no occurence of such product state is in the other TA.
 We remove useless states in ever FA and throw away FA with the empty language.
-We get as a result of the intersection of FA the set of FA representing resulting language.
+We get as a result of the intersection of FA the set of FA representing
+the resulting language.
 
 \section{Designing Backward Run over Symbolic States}
 \label{sec:brdesign}
