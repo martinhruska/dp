@@ -857,19 +857,17 @@ by the tool Forester.
 Since FA are closely related to TA, as it was shown in Chapter \ref{ch:prel},
 Forester also depends on an implementation of TA.
 It currently has its own implementation of TA providing the operations needed during the verification procedure.
-However, it is impractical to maintain a special TA library inside of Forester.
-This library has the strong dependencies with the rest of codes.
+This library has the strong dependencies with the rest of code.
 The other classes depend to the library data types,
-manipulates its data types and so on.
+manipulates its data members and so on.
 The changes in this library are very difficult due to these dependencies.
 Encapsulating of the library to a module with an clearly defined interface
 can improve the overall quality of Forester code.
 It is also not practical to maintain and further develop such one purpose library.
 It is not general to be used anywhere else.
-But the development in algorithms for TA, especially for checking inclusion of TA
-languages, goes on and an implementation of the new algorithms is necessary
-for greater efficiency.
-A~new algorithm can also bring greater efficiency than
+But the development in algorithms for TA, especially the one for checking inclusion of TA
+languages, goes on and an implementation of the new algorithms brings the greater efficiency.
+A~new efficient algorithm also often achieves greater efficiency than
 an implementation optimization of an existing algorithm.
 Therefore the replacement of library by a general purpose one
 can bring the advantages such as maintainability and modularity.
@@ -879,7 +877,7 @@ the mentioned Forester TA implementation by \vata.
 The VATA library is a very efficient, general purpose, library which provides implementation
 of the standard operations over TA like union or intersection.
 It mainly aims at implementing the state-of-the-art algorithms \cite{tacas10}
-for language inclusion checking, efficiency of which
+for language inclusion checking efficiency of which
 is crucial for performance of Forester.
 
 This chapter provides a brief description of the VATA library and the Forester tool.
@@ -906,7 +904,7 @@ The main concept of the design of the library is given in Figure \ref{fig:vata}.
 There are the three main parts in the library design:
 \begin{enumerate}
 	\item \emph{Parsers}\,---\,Parsing an input automaton from a text file.
-		Timbuk \cite{timbuk} is currently the only one supported format for parsing the input automata.
+		Timbuk \cite{timbuk} is currently the~only one supported format for parsing the input automata.
 	\item \emph{Serializers}\,---\,Serializing an automaton to a text file.
 		Timbuk format is again the only supported format.
 	\item \emph{Automata encodings}\,---\,The particular encodings of NTA.
@@ -927,7 +925,7 @@ An input automaton is loaded by one of the parsers to an intermediate representa
 The wrapping program chooses an internal encoding of NTA into which the automaton is
 translated from the intermediate encoding (note that it is also
 possible to create automaton in the chosen encoding directly using API provided by VATA).
-The automaton is then processed by applying the operations implemented by a module of the chosen encoding.
+The automaton is then processed by applying the operations implemented by a module of the~chosen encoding.
 Finally, the automaton can be serialized to an output format.
 When one wants to add her own encoding,
 then she needs to implement only the core of the encoding (with an API for creating the automaton itself)
@@ -1012,7 +1010,7 @@ The full enumeration of the supported operations for the particular encodings is
 
 Forester is an open source for verification of programs manipulating
 complex dynamic data structures tool written in C++.
-It currently supports the programs in the C language.
+It currently supports the analysis of programs in the C language.
 Forester is distributed as a \emph{GCC} plugin under GPL license, version 3,
 and it can be obtained from its official website \cite{www:forester}.
 
@@ -1031,13 +1029,14 @@ that provides a fronted over the GIMPLE format.
 	\label{fig:fa_exec}
 \end{figure}
 
-Let us describe the high-level conceptual design of Forester (which is shown in Figure~\ref{fig:fa_design})
+Let us describe the verification procedure done by Forester (shown in Figure~\ref{fig:fa_exec})
+and the high level conceptual design of Forester (which is shown in Figure~\ref{fig:fa_design})
 and the relations between its modules.
 The implementation of Forester is not explicitly separated into stand-alone compilation modules.
-The notion of the modules used in the following text is rather an abstract one, serving to reader basic summary of the Forester design.
+The notion of the modules used in the following text is rather an abstract one, serving to a reader basic summary of the~Forester design.
 A~module typically is e.g., a set of closely related classes with a similar purpose.
 Forester starts the analysis by translation of the intermediate
-code of GCC in representation provided by Code Listener to its own microcode.
+code of GCC in representation provided by \emph{Code Listener} to its own microcode.
 This is done mainly by Forester \emph{Compiler} module.
 The microcode instructions of Forester are implemented by module \emph{Microcode Instructions}.
 Each program statement is represent by one
@@ -1060,7 +1059,7 @@ by FA, and it also keeps the information about
 the corresponding microcode instructions.
 
 \emph{Forest Automata} module provides the methods
-for manipulation FA during the verification procedure.
+for manipulation of FA during the verification procedure.
 The~operations such as normalization or abstraction over FA are not the part of the module
 containing FA implementation but are provided as classes taking FA as parameters.
 So these operations can be understood as another module \emph{Operations over Forest Automata}.
@@ -1069,7 +1068,7 @@ It is very lightweighted and contains the operations optimized
 for the purposes of Forester.
 One of them is an operation for language inclusion checking.
 It uses the simulation relation for acceleration
-because efficiency of inclusion checking is crucial for the performance.
+because the efficiency of inclusion checking is crucial for the performance.
 The advantage of this implementation is its simplicity and the efficiency raising
 from the optimization the implementation to suit the needs of Forester.
 %	On the other hand, it is not easy to maintain such a optimized implementation.
@@ -1096,11 +1095,12 @@ It was already mentioned that the substitution of the underlying TA implementati
 VATA library could bring some improvements.
 The first one is the easier maintenance of the library where
 the state-of-the-art algorithms are implemented and optimized
-in comparison with the hardwired implementation.
-Since VATA and Forester are developed by the same developers it also easy to add
+in comparison with the one purpose implementation.
+Since VATA and Forester are developed by the same developers it is also easy to add
 to VATA the operations needed by Forester.
 The clearly defined interface between TA library and the rest of Forester
-also improves code quality of Forester in the sense of modularity, maintainability and code organization.
+also improves the code quality of Forester in the sense of modularity,
+maintainability and code organization.
 These benefits led us to implement the version of Forester using VATA,
 further described in Section \ref{ch:fova}.
 
@@ -1146,7 +1146,7 @@ We formally define structure Data as $\ddata$ where
 $T$ is a data type,
 $S \in \natnum$ is a size of data,
 $V$ is a value of type $T$,
-$\mathit{MB}=(D_1 \cdots D_n)$ represents nested data when $D$ represents a data structure.
+$\mathit{MB}=(D_1 \cdots D_n)$ are nested data when $D$ is a data structure.
 $T$ can be one of the following data types: pointer, reference to a TA, integer, boolean,
 structure or generally some other data type.
 $T$ can be also undefined or it can be a state with the type that is unknown.
@@ -1155,7 +1155,8 @@ Its values are defined as $\rootref=(\rootit, \displ)$
 where $\rootit \in \natnum$ is an index of a tree automaton in $F$
 and the displacement $\displ \in \natnum$ is an index of a selector in a structured label of
 the transition with $\rootref$ at the left-handed side.
-The displacement $\displ$ is given by the sum of sizes of the preceding selectors.
+The displacement $\displ$ is given by the sum of sizes of the preceding selectors
+so it determines the precise position of the selector in label.
 The~operations for manipulation with a symbolic state are partially provided by class {\tt SymState}
 and some additional operations are provided by class {\tt VirtualMachine}.
 
@@ -1163,9 +1164,9 @@ We already described described the forest automata implementation in Forester.
 The symbolic execution using this data structures is realized by gradually appending
 and removing the symbolic states from a queue.
 The implementation of symbolic execution is in class \emph{SymExec}.
-When a symbolic state is taken from the queue a microcode instruction contained in
+When a symbolic state is taken from the~queue a microcode instruction contained in
 the symbolic state is executed.
-Some of the instructions during its execution append a new symbolic state to the queue.
+Some of the~instructions during its execution append a new symbolic state to the queue.
 Symbolic execution finishes when the queue is empty.
 The microcode instructions executed during the symbolic execution are described in the following section.
 
@@ -1218,7 +1219,7 @@ Consider the following data structure that is an implementation of singly-linked
 	1: mov_reg r0, (int)4
 	2: alloc r0, r0
 	3: node_create r0, r0, next[0:4:+0]
-	4: mov_reg r1, \abp + 0
+	4: mov_reg r1, ABP + 0
 	5: mov_reg [r1 + 12], r0    
 	6: check
 	\end{verbatim}
@@ -1231,7 +1232,6 @@ Consider the following data structure that is an implementation of singly-linked
 	The TA $t$ has one transition from the root with a label that consists of
 	one pointer selector {\tt next} whose displacement in the label
 	is $0$ and the size of the allocated node is $4$.
-	The displacement defines the order of the selector in the label.
 	The instruction \codix{node} stores a root reference to $t$ to register $0$.
 	Finally lines $4$ a $5$ add a root reference pointing to $t$ to a FA representing
 	a memory state of the actually executed function (which is in this case the function {\tt main}).
@@ -1244,10 +1244,10 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{y = x->next;} is symbolically executed by the following instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov_reg r0, [\abp + 12]
+	1: mov_reg r0, [ABP + 12]
 	2: acc_sel [r0+0]
 	3: mov_reg r0, [r0 + 0]
-	4: mov_reg r1, \abp + 0
+	4: mov_reg r1, ABP + 0
 	5: mov_reg [r1 + 16], r0    
 	6: check
 	\end{verbatim}
@@ -1255,11 +1255,12 @@ Consider the following data structure that is an implementation of singly-linked
 
 	The first instruction stores a root reference to a TA representing heap pointed by the pointer \codix{x} to register $0$.
 	In this case, a node with a root reference is pointed by the selector with the displacement $12$ in a label in TA referenced by register $\abp$.
-	The second instruction performs isolation of the selector with displacement $0$ in the TA referenced by register $0$.
+	Because the pointer~\codix{y} will point also to the this memory after the execution of statement,
+	the new cut-point will be created at this node.
+	The special TA representing the heap reachable from \codix{y} will be needed.
+	This is done by the second instruction that makes so-called \emph{isolation}
+	of the selector with displacement $0$ in the TA referenced by register $0$.
 	This creates a~new TA if \codix{x->next} points to an allocated memory, otherwise the instruction does not do anything.
-	Because the pointer \codix{y} will point also to the this memory after the execution of statement,
-	the new cut-point will be created created at this node
-	so the special TA representing the heap reachable from \codix{y} will be needed.
 	The~instruction on line $3$ loads to register $0$ a root reference from a selector of TA referenced by register~$0$.
 	The instruction on line $4$ moves a reference to TA that represents a local memory state to register~$1$.
 	Finally, the instruction on line $5$ copies the root reference from register $0$ to
@@ -1271,7 +1272,7 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{free(x);} is implemented by these instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov_reg r0, [\abp + 12]
+	1: mov_reg r0, [ABP + 12]
 	2: acca_sel [r0]
 	3: free r0
 	4: check
@@ -1297,10 +1298,10 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{x->data = y->data;} is done by these instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov_reg r3, [\abp + 16]
+	1: mov_reg r3, [ABP + 16]
 	2: acc_sel [r3 + 4]
 	3: mov_reg r3, [r3 + 4]
-	4: mov_reg r1, [\abp + 12]
+	4: mov_reg r1, [ABP + 12]
 	5: acc_sel [r1 + 4]
 	6: mov_reg [r1 + 4], r3
 	7: check
@@ -1324,8 +1325,8 @@ Consider the following data structure that is an implementation of singly-linked
 	The statement \codix{x == y} translates Forester into the following list of the instructions:
 	\begin{quote}
 	\begin{verbatim}
-	1: mov_reg r0, [\abp + 12]
-	2: mov_reg	r1, [\abp + 16]
+	1: mov_reg r0, [ABP + 12]
+	2: mov_reg	r1, [ABP + 16]
 	3: eq r5, r0, r1
 	\end{verbatim}
 	\end{quote}
@@ -1343,7 +1344,7 @@ Consider the following data structure that is an implementation of singly-linked
 
 These examples provide an overview of the concept of the microcode instructions.
 We will further describe a more detailed and formal description of them.
-We use $r_s \in \regs$ to denote the source register,
+We use $r_s \in \regs$ to denote a source register,
 $r_d \in \regs$ to denote the destination register,
 $r_l \in \regs$ to denote a local register and
 $r_g \in \regs$ to denote a global register.
@@ -1355,13 +1356,13 @@ A~symbol $I_n$ denotes then next instruction following an actually executed inst
 We define the semantics of each instruction formally as a function 
 $f: \instrset \times \symset \rightarrow \symset$
 where $\symset$ is a set of all symbolic states and $\instrset$ is a set of all instructions.
-When the instruction is clear from context, we omit the first parameter of $f$.
+When the instruction is clear from context, we omit the~first parameter of $f$.
 The function $f$ defines the effect of the instruction as a transformation of
-the current symbolic state $s$ to a new symbolic state $s'$.
+the~current symbolic state $s$ to a new symbolic state $s'$.
 
 We now present a~list of the microcode instructions used in Forester
 with the description of their semantics.
-Each instruction is first described informally and
+Each instruction is described informally and
 then its effect is defined formally by the function $f$.
 The instructions are divided into two parts.
 The first part contains the instructions modifying forest automata
@@ -1375,7 +1376,7 @@ that do not change forest automata.
 		The root of TA is defined by the destination register $r_d$.
 		This instruction checks whether a~selector pointed by the destination register
 		selects a node that represents allocated memory node or undefined pointer.
-		In the first case the node is isolated to a new TA and the original node in the
+		In the first case, the node is isolated to a new TA and the original node in the
 		original TA is replaced by a root reference to the new TA.
 		In the other case nothing changes.
 		Note that this basically corresponds to the identification of the cut-points
@@ -1383,9 +1384,9 @@ that do not change forest automata.
 		
 		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
 		where $F'$ is a new FA obtained from $F$ by isolating
-		the $i$-th selector of a label of a transition of the root of TA $t$.
+		the $i$-th selector of TA $t$.
 		TA $t$ and the related selector are determined by a root reference $RR=(Root, Displ)$
-		in the register $r_d$ such that $Root$ points to $t$ and $i=Displ+o$
+		in the register $r_d$ such that $Root$ references to $t$ and $i=Displ+o$
 		where $o$ is a offset which is a parameter of this instruction.
 
 	\item {\tt acc\_set($r_d$),acc\_all($r_d$)} instruction does the same thing as the previous one
@@ -1393,21 +1394,22 @@ that do not change forest automata.
 	
 	\item {\tt node\_create($r_d$,$r_s$)} instructions creates a new node
 		(and hereby also a new TA) which is the root node of the new TA.
-		A~reference to the new TA is stored to the destination register $r_d$.
+		A~reference to the new TA is stored to the destination register~$r_d$.
 		A~type info of the new node and its size is obtained from source
 		register $r_s$.
+		Note that the reference to $t$ is not added to a TA in $F$ in this step
+		but it is done by instruction assigning a register value to a
+		node of TA.
 		
 		$f(\stdsym) = \symstate{F'}{
 		\regssub{
 			r_{d}}
 			x}
 		{I_n}$
-		where $F'$ is a new FA created by adding newly created TA $t$ to $F$
-		and $x$ is a reference to $t$.
-		The selectors in the label of $t$ are specified in $r_s$. 
-		Note that the reference to $t$ is not added to a TA in $F$ in this step
-		but it is done by instruction assigning a register value to a
-		node of TA.
+		where $F=(T_1 \cdots T_N, \port)$, $F'=(T_1 \cdots T_N, T_{\mathit{new}}, \port)$,
+		$T_{\mathit{new}}$ is the newly created TA,
+		and $x$ is a reference to $T_{\mathit{new}}$.
+		The selectors in the label of $T_{\mathit{new}}$ are specified in $r_s$. 
 	
 	\item {\tt node\_free($r_s$)} instruction deletes a node in FA (referenced by register $r_s$) and
 		invalidates all references to it.
@@ -1415,8 +1417,8 @@ that do not change forest automata.
 		$f(\stdsym) = \symstate{F'}
 		{\regs}
 		{I_n}$
-		where $F'$ is obtained from $F$ by deleting a TA $t$ referenced
-		by a value of $r_s$ and removing all reference to $t$ from TA of $F$.
+		where $F'$ is obtained from $F$ by removing the TA $t$ referenced
+		by $r_s$ and removing all reference to $t$ from TA of $F$.
 
 	\item {\tt store($r_d,r_s,o$)} instruction stores a value from the source register $r_s$
 		to a TA $t$ pointed by the destination register $r_d$.
@@ -1424,10 +1426,12 @@ that do not change forest automata.
 		
 		$f(\stdsym) = \symstate{F'}{\regs}{I_n}$
 		where $F'$ is a FA obtained from $F$ by an assignment
-		$S_{F[i]}^{displ} = r_{s}$,
-		$F[i]$ is a TA of $F$ referenced by a root reference $\rref$ stored in $r_d$ register,
-		$o$ is an~offset which is a parameter of this instruction,
-		$i=\droot$ and $displ=\ddispl + o$.
+		$S_{T}^{displ} = r_{s}$,
+		where $S_{T}^{displ}$  is a node of the~TA~$T$
+		referenced by the root reference $\rref$ stored in $r_d$ register.
+		The node is pointed by the selector with $displ$, such that
+		$displ=\ddispl + o$ and
+		$o$ is an~offset which is a parameter of this instruction.
 	
 	\item {\tt stores($r_d,r_s,o$)} instruction does the same as the previous
 		one but manipulates the structures.
@@ -1442,8 +1446,8 @@ that do not change forest automata.
 		{I_n}$
 		where $F'$ is a new FA obtained from $F$ by computing fixpoint with or without abstraction.
 
-	\item {\tt check()} instruction checks whether there is no a garbage
-		and alternatively removes all unreachable TA.
+	\item {\tt check()} instruction checks whether there is no a garbage.
+		It alternatively removes all unreachable TA.
 		
 		$f(\stdsym) = \symstate{F'}
 		{\regs}
@@ -1459,10 +1463,10 @@ that do not change forest automata.
 
 	\item {\tt alloc($r_d$,$r_s$)} instruction creates a new instance of structure {\tt Data} $\ddata$
 		that represents allocated memory.
-		The size $S$ of $D$ is determined by an integer value in the source register $r_s$.
+		The size $S$ is determined by an integer value in the source register $r_s$.
 		The created instance will be further used for creation of a new TA
 		and it is yet stored to the destination register.
-		The second present for the attentive reader. % EGG
+		%The second present for the attentive reader. % EGG
 		
 		$f(\stdsym) = \symstate{F}{
 		\regssub{
@@ -1470,7 +1474,7 @@ that do not change forest automata.
 			{x}}
 		{I_n}$
 		where $x=({\tt void\_ptr},{\tt undef},S',\emptyset)$ is an instance of structure Data
-		such that $S'$ is a size stored in $r_s$ (where should be stored an integer value). 
+		such that $S' \in \natnum$ is a size stored in $r_s$. 
 
 	\item {\tt load\_cst($r_d$,$c$)} instruction loads a constant $c$ to the destination register $r_d$.
 		This creates a new symbolic state which differs only in register contents.
@@ -1489,8 +1493,8 @@ that do not change forest automata.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\neg r_d}}{I_n}$.
 	
-	\item {\tt move\_reg\_offs($r_d$,$r_s$,$o$)} instruction accesses a tree automaton pointed
-		by a reference in the source register $r_s$ and increases its displacement value by the given offset $o$.
+	\item {\tt move\_reg\_offs($r_d$,$r_s$,$o$)} instruction accesses a tree automaton
+		reference in the source register $r_s$ and increases its displacement value by the given offset $o$.
 		The new value is then stored in the destination register $r_d$.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl+o}}}{I_n}$
@@ -1499,9 +1503,9 @@ that do not change forest automata.
 	
 	\item {\tt move\_reg\_inc($r_d$,$r_{s_1}$,$r_{s_2}$)} instruction does the 
 		same thing as the previous one but moreover it increases a displacement
-		by a value in the second source register $r_{s_2}$ (which is present for this instruction).
+		by a value in the second source register $r_{s_2}$.
 		
-		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl + r_{s_2}}}}{I_n}$
+		$f(\stdsym) = \symstate{F}{\regssub{r_d}{\rreftuple{\droot}{\ddispl + o~+ r_{s_2}}}}{I_n}$
 		where $r_{s_1} \in \regs, r_{s_2} \in \regs$ are the source registers such that
 		$\rrefreg{r_{s_1}}$, $r_{s_2}$ is integer value.
 	
@@ -1515,7 +1519,7 @@ that do not change forest automata.
 		
 		$f(\stdsym) = \symstate{F}{\regssub{r_{gd}}{r_{ls}}}{I_n}$.
 	
-	\item {\tt get\_$\abp$($r_d$,$\glb$, $o$)} loads a root reference from the register $\abp$ to
+	\item {\tt get\_$\abp$($r_d$,$\abp$, $o$)} loads a root reference from the register $\abp$ to
 		the destination register $r_d$. The instruction also adds the offset $o$ to a displacement
 		in the root reference.
 
@@ -1525,7 +1529,7 @@ that do not change forest automata.
 		reference to FA representing local memory and $o$ is an offset
 		which is a parameter of this function.
 	
-	\item {\tt get\_$\glb$($r_d$,$\abp$,$o$)} loads a root reference from the register $\abp$
+	\item {\tt get\_$\glb$($r_d$,$\glb$,$o$)} loads a root reference from the register $\abp$
 		to the destination register $r_d$ and adds the offset $o$ to a displacement in the root reference.
 		
 		$f(\stdsym) = \symstate{F}
@@ -1542,18 +1546,18 @@ that do not change forest automata.
 		
 		$f(\stdsym) = \symstate{F}
 			{\regssub{r_{d}}{
-				\rreftuple{\droot}{\ddispl + o}
+				x
 			}}
 			{I_n}$
 			where $\rrefreg{r_{s}}$,
-			$F[i]$ is a TA of F,
-			$o$ is offset which is a parameter of this instruction,
-			$i=\droot$,
-			$displ=\ddispl + o$.
+			$x$ is a value of the selector of $T$ with displacement $\mathit{displ}$
+			$T$ is a TA of $F$ referenced by $\rootit$,
+			$displ=\ddispl + o$,
+			$o$ is the offset which is a parameter of this instruction.
 
 		\item {\tt loads($r_d,r_s,o$)} instruction does the same as {\tt load} instruction but manipulates the structures.
 		
-		Formal definition is the same but the result stores in the selector is a structure.
+		Formal definition is the same but the result stored in the selector is a structure.
 
 	\item {\tt load\_$\abp$($r_d$,$r_s$,$o$), load\_$\glb$($r_d$,$r_s$,$o$)} instructions do the same as
 		the previous instruction but loads a value from a TA pointed by $r_{\abp}$ or $r_{\glb}$ register.
@@ -1593,14 +1597,14 @@ that do not change forest automata.
 
 
 	\item {\tt iadd($r_d$,$r_{s_1}$,$r_{s_2}$), imull($r_d$,$r_{s_1}$,$r_{s_2}$)}
-		instructions performs integer addition and multiplication of the numbers
+		instructions do the integer addition and multiplication of the numbers
 		in the source registers $r_{s_1}$ and $r_{s_2}$ and stores the result to
 		the destination register $r_d$.
 		
 		$f(\stdsym) = \symstate{F}
 		{\regssub{r_d}{r_{s_1} \otimes r_{s_2}}}
 		{I_n}$
-		where $r_{s1} \in \regs, r_{s2} \in \regs$, $\otimes \in \{+,*\}$
+		where $r_{s_1} \in \regs, r_{s_2} \in \regs$, $\otimes \in \{+,*\}$
 		are two source registers with values of integer type.
 
 	\item {\tt eq, neq, ge, gt, le, lt}($r_d$,$r_{s_1}$,$r_{s_2}$) instructions
@@ -1617,9 +1621,8 @@ that do not change forest automata.
 	\item {\tt build\_struct($r_d$,$r_{s}$ $i_1 \cdots i_n$)} instruction creates a structure from a
 		content of the source registers $r_s,r_{s+i_1},r_{s+i_2}, \ldots, r_{s+i_n}$
 		and the result stores to the destination register $r_d$.
-		The source registers are defined by an index of the first register and
-		a vector of offsets from this register to another registers
-		that are used for creating structure.
+		The source registers are defined by the index of the first register $r_s$ and
+		the vector of offsets $i_1 \cdots i_n$ from this register.
 		
 		$f(\stdsym) = \symstate{F}
 		{\regssub{r_d}{x}}
