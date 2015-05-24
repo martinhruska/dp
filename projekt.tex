@@ -95,14 +95,16 @@
 	  V této práci je rozvíjena existující metoda pro shape analýzu programů založená na lesních automatech.
 	  Dále je také vylepšována implementace této metody, nástroj Forester.
 	  Lesní automaty jsou založeny na stromových automatech a Forester obsahuje jejich jednoduchou implementaci.
-	  Prvním přínosem této práce je nahrazení této implementace knihovnou VATA, která obsahuje optimalizované algoritmy
-	  pro efektivní reprezentaci a manipulaci stromových automatů.
+	  Prvním přínosem této práce je nahrazení této implementace knihovnou VATA, která obsahuje efektivní algoritmy
+	  pro reprezentaci a manipulaci stromových automatů.
 	  Verze nástroje Forester používající knihovnu VATA se zúčastnila mezinárodní soutěže SV-COMP 2015.
-	  Za druhé, verifikace založená na lesních automatech je v této práci rozšířena o analýzu nalezených protipříkladů.
+	  Dále je verifikace založená na lesních automatech v této práci rozšířena o predikátovou abstrakci a
+	  analýzu nalezených protipříkladů.
 	  Výsledek této analýzy je možné výužít následujícími způsoby.
 	  Prvním je určení toho, zda je nalezené chyba reálná nebo naopak nepravá.
 	  Druhým je pak zjemnění predikátové abstrakce pomocí predikátů odvozených při zpětném běhu.
-	  Právě predikátová abstrakce využívající informace ze zpětného běhu je také navržena a implementována jako součást této práce.
+	  Obě techniky byly také implementovány v nástroji Forester.
+	  Na závěr je zhodnoceno zlepšení, které tyto techniky přinesly oproti původní verzi nástroje Forester.
   }, % abstrakt v ceskem jazyce
   abstract.en={
 	  In this work, we focus on improving the forest automata based shape analysis implemented in the Forester tool.
@@ -124,7 +126,7 @@
   acknowledgment={Rád bych poděkoval vedoucímu této práce, Mgr. Lukáši Holíkovi, Ph.D., za odborné rady a vedení při tvorbě této práce.
   Dále bych rád poděkoval Ing. Ondřeji Lengálovi za četné konzultace, během kterých mě trpělivě seznamoval s nástrojem Forester, 
   Prof. Ing. Tomáši Vojnarovi, Ph.D., a Mgr. Adamu Rogalewiczovi, Ph.D.,
-  za poskytnuté rady během konzultací.
+  za rady poskytnuté během konzultací.
   Také děkuji Ing. Tomáši Fiedorovi za cenné připomínky k finální podobě technické zprávy.} % nepovinne
 }
 
