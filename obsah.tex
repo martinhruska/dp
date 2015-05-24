@@ -11,7 +11,7 @@ on running the program in different contexts with different inputs
 and matching a program behavior and the outputs with the expected ones.
 This method can satisfy the most of the software quality requirements and often covers the most of the program behavior.
 On the~other side, it is only possible to find the~errors using testing, not to prove their absence~\cite{dijkstra}.
-Finding some of the errors during testing also does not imply the elimination of all of them.
+Finding some of the errors during testing also does not imply the~elimination of all of them.
 
 The mentioned weakness of testing can be resolved by \emph{formal verification}.
 Formal verification aims at using rigorous mathematical methods to check whether a given system meets a given specification \cite{fav:lecture}.
@@ -19,13 +19,12 @@ There are three main branches of formal verification.
 The~first one is \emph{model checking} which systematically explores the state space of a~system (e.g., a program) or its model to
 prove that it satisfies the verified property.
 The second one is \emph{static analysis} which is performed over a source code (or some modification of it) of a~system
-without a need of its explicit execution and it rather explores a syntactic structure of the analysed program.
+without a need of its explicit execution and it rather explores a syntactic structure of~the analysed program.
 One of the important and very widely used approaches in static analysis is called \emph{abstract interpretation} where the analysis is performed by
 applying abstract transformers corresponding to the original program semantics over an abstract domain.
 Model checking and static analysis are overlapping in present.
-Abstract interpretation is an example of technique that is consider
-to be the static analysis technique but it also has some attributes of
-the model checking techniques.
+Abstract interpretation is an example of technique that belongs to static analysis
+but it also has some attributes of the model checking techniques.
 The last approach is \emph{theorem proving}.
 It proves the program safety in the standard mathematical way\,---\,starting
 from axioms and using inference rules to verify properties of the given system.
@@ -58,7 +57,7 @@ A~general goal of this work is to improve Forester in the areas described furthe
 
 One of the problems of Forester is low modularity and maintainability of the code.
 The first goal of this thesis is to improve it by changing the~underlying implementation
-of finite tree automata in Forester to \vata\,---\,a state-of-the-art library for manipulation with TA \cite{libvata}.
+of finite tree automata in Forester to \vata\,---\,a library for manipulation with TA \cite{libvata}.
 %This should bring better maintainability and modularity than having
 %a special TA library implementation within Forester as it is now.
 The VATA library implements very efficiently the most of state-of-the-art algorithms for TA.
@@ -80,14 +79,16 @@ a found error can be spurious what is caused by overapproximating
 the set of reachable heap configurations by abstraction.
 When this happens then the analysis of the detected error can determine
 whether the error is a real or not.
-The results of the counterexample analysis can be also used for refinement of abstraction.
-Then the analysis can be restarted with the refined abstraction.
+The results of the counterexample analysis can be also used for refinement of abstraction
+when the counterexample is spurious.
+Then the analysis can be restarted with the refined abstraction
+to avoid the same run leading to the spurious counterexample.
 This gradual refinement of abstraction is based on \emph{counterexample-guided abstraction refinement} (CEGAR) \cite{cegar}.
 %The verification procedure cannot verify correct programs with detected spurious error without this refinement.
 %It can also detect a spurious error instead of the real one because the verification procedure ends after the
 %first error detection without the analysis of the found error.
 The second goal of this thesis is to design and implement the analysis of the counterexamples
-and a refinement of abstraction (when a spurious error is found).
+and a refinement of abstraction (when a spurious error is found) for forest automata based verification.
 The method for analysing counterexamples is in this case \emph{backward run}
 and its results will be further used for refinement of \emph{predicate abstraction}.
 Forester does not currently use the mentioned predicate abstraction but \emph{height abstraction}
@@ -148,11 +149,11 @@ The \emph{joins} of $g$ are nodes $v \in V$ such that $idg(v') > 1$.
 
 A~\emph{path} from $v\in V$ to $v' \in V$ is a sequence $p=v_0, i_1, v_1, \ldots, i_n, v_n$ where $v=v_0, v' = v_n$
 and $\forall j \in \{1,\ldots,n\}: v_j = S^{i_j}(v_{j-1})$ (informally, $v_j$ is the $i_j$-th successor of $v_{j-1}$).
-The empty path has $n=0$.
-The path $p$ has \emph{length} $n$ denoted by $length(p) = n$.
-The path $p=u_0,i_1,u_1,\ldots,i_n,u_n$ is acyclic if $\forall u_i,u_j \in p: i \neq j \Rightarrow u_i \neq u_j$.
-The \emph{cost} of the acyclic path $p$ is the sequence $i_1, \ldots, i_n$.
-The path $p$ is \emph{cheaper} than path $p'$ iff the cost of $p$ is lexicographically smaller than that of $p'$. 
+The~empty path has $n=0$.
+The~path $p$ has \emph{length} $n$ denoted by $length(p) = n$.
+The~path $p=u_0,i_1,u_1,\ldots,i_n,u_n$ is acyclic if $\forall u_i,u_j \in p: i \neq j \Rightarrow u_i \neq u_j$.
+The~\emph{cost} of the acyclic path $p$ is the sequence $i_1, \ldots, i_n$.
+The~path $p$ is \emph{cheaper} than path $p'$ iff the cost of $p$ is lexicographically smaller than that of $p'$. 
 A~node $u \in V$ is \emph{reachable} from a node $v \in V$ iff there exists a path from $v$ to $u$ or $u=v$.
 A~node $u \in V$ is a \emph{root} of the graph $g$ iff all nodes $v \in V$ are reachable from $u$.
 We use the term $root$ also for a mapping $\funcdecl{root}{g}{V}$ which maps a graph to its root.
@@ -273,9 +274,9 @@ The nodes (that were the roots of the trees) pointed by the output port indices 
 \bexmp
 Recall the graph $t$ from Figure \ref{fig:graph_tree}.
 It can be extended to an io-graph $t_\phi$ by adding ports $\phi=(v_1,v_4,v_5)$.
-The resulting io-graph $t_\phi$ has the input port $v_1$ and the output ports $v_2,v_3$.
-Because $v_1$ is the root, the graph $t_\phi$ is accessible.
-The cut-points of $t_\phi$ are $v_1, v_4, v_5$.
+The resulting io-graph $t_\phi$ has the input port $v_1$ and the~output ports $v_2,v_3$.
+Because $v_1$ is the~root, the~graph $t_\phi$ is accessible.
+The~cut-points of $t_\phi$ are $v_1, v_4, v_5$.
 
 In Figure \ref{fig:forest}, we shown the forest $f$.
 This forest could be extended to an io-forest $f_{io}=((t_1,t_2,t_3),\pi)$ 
@@ -300,7 +301,7 @@ so there exists a bijection between $\{root(t_k)\,|\, t_k \in \{t_1, \ldots, t_n
 The minimal io-forest is hence a unique representation of $\otimes f$ up-to to permutations of $t_1,\ldots,t_n$.
 
 To be able to define truly canonicity representation of the forest $f$
-we define an ordering $\preceq_p$, so called \emph{canonical ordering}, of the cut-points of $\otimes f$.
+we define an ordering~$\preceq_p$, so called \emph{canonical ordering}, of the cut-points of $\otimes f$.
 The canonical ordering ${\preceq_p} \subseteq {cps(\otimes f) \times cps(\otimes f)}$
 is defined as follows: $c_1 \preceq_p c_2 \Leftrightarrow \text{the cost of the cheapest path from }
 \phi_1$ (input port) to $c_1 \text{ is}$ $\emph{smaller}$ $\text{ than the cost of the smallest path from } \phi_1 \text{ to } c_2$.
@@ -312,11 +313,12 @@ we need to assume that there is an ordering $\leq_\Sigma$ over labels $\Sigma$ o
 The DFT then uses a stack of nodes initialized with the input and output ports
 ordered by $\preceq_p$ with the smallest node on the top of the stack.
 The DFT is run over $\otimes f$.
-It visits the successors of a node in the order given by $\leq_{\Sigma}$ and
+It visits the successors tuples of a node in the order given by $\leq_{\Sigma}$ and
 the nodes in successors tuples are in their order in tuple.
 We obtain canonical forest $f_c$ where trees are in the following order.
-The first ones are trees corresponding to the ports of $f$ ordered by $\preceq_p$
-and the rest of the trees is in the canonical ordering of the trees
+The first ones in canonical ordering are trees corresponding
+to the ports of $f$ ordered by $\preceq_p$ and the rest of
+the trees is in the canonical ordering of the trees
 which is defined by the order of the DFT traversal visit.
 
 
@@ -405,7 +407,7 @@ Proof can be found in \cite{forester:techrep}.
 \bexmp
 Consider the io-forest $f_{io}=((t_1,t_2,t_3), (1,3))$ from Example \ref{ex:iograph}.
 The tree $t_1$ (which is the same as the tree $t$) belongs to the language of TA $A$
-defined in Example \ref{ex:ta}.
+defined in Example~\ref{ex:ta}.
 We further have a TA $B=(Q_B,\Sigma, \Delta_B, R_B)$ where $Q_B=\{p_1,p_2,p_3\}$,
 $\Sigma$ is same as in Example \ref{ex:ta},
 $\Delta=\{p_1 \xrightarrow{a} (p_2,p_3),
@@ -455,12 +457,12 @@ $A \subseteq \Gamma$ and $\#A = n$.
 We denote such edge by $e$.
 Each edge $e$ consists of \emph{sub-edges} that creates sequence
 $e\langle 1\rangle = v~\mapsto (a_1,v_1 \cdots v_{\#a_1}) \cdots e\langle n\rangle= v~\mapsto (a_m,v_{n-\#a_m+1} \cdots v_m)$.
-We denote the $i$-th sub-edge of $e$ in $g$ by $e\langle i\rangle = v~\mapsto (a_i,v_k \cdots v_l)$ where $i: 1 \leq i \leq m\}$.
+We denote the $i$-th sub-edge of $e$ in $g$ by $e\langle i\rangle = v~\mapsto (a_i,v_k \cdots v_l)$ where $i: 1 \leq i \leq m$.
 We use $SE(g)$ to denote all sub-edges of the graph $g$.
 A~node $v$ of a graph is \emph{isolated} if it is not part of any sub-edge.
 Formally, a node $v$ is isolated
 iff $\nexists\, e\langle i\rangle = v~\mapsto (a_i,v_k \cdots v_l) \wedge \nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l): v~\in \{v_k,\ldots, v_l\}$.
-If you read this really carefully, you got a beer on me. % EGG
+%If you read this really carefully, you got a beer on me. % EGG
 A~graph $g$ is \emph{unambiguously determined} by $SE(g)$ if $g$ has no isolated nodes.
 
 \subsection{Tree Automata over Structured Labels}
@@ -469,7 +471,7 @@ Since we have already extended the notion of labels to the structured ones,
 we also extend tree automata to the ones over such labels.
 A~TA over structured labels is quadruple $A=(Q,2^\Gamma, \Delta, R)$
 where $Q$, $\Gamma$ and $R$ has the same meaning as in the case of basic TA and
-	$\Delta$ is a set of transition rules set with the rules in the form
+	$\Delta$ is a set of transition rules with the rules in the form
 		$(q,\{a_1,\ldots,a_m\},q_1 \cdots q_n)$
 		where $q,q_1,\ldots,q_n \in Q$, $\{a_1,\ldots,a_m\} \in \Gamma$.
 	Each rule could be interpreted as a sequence of the \emph{rule-terms}
@@ -484,7 +486,7 @@ This makes it possible to build a hierarchy of forest automata.
 We explain the hierarchy using induction.
 Let start from the forest automata of \emph{level} 1.
 Forest automata of level 1 can have only the structured labels from $2^\Gamma$ in alphabet but not forest automata.
-They forms the set $\Gamma_1$.
+They forms the set~$\Gamma_1$.
 Then all forest automata of \emph{level $i$} form the set $\Gamma_i$.
 A~forest automaton $F$ of level $i+i$ is defined over the ranked alphabet $2^{\Gamma \cup \Delta}$ where $\Delta$ is a subset of forest automata of
 level $i$ which are called \emph{boxes} of $F$.
@@ -548,7 +550,7 @@ Since definition of canonical FA is not affected by extending the labels to the 
 The language inclusion checking is again possible in the component-wise way like in the case of basic FA, as it is
 proved in \cite{forester:techrep}.
 However, the testing language inclusion with the same algorithm used for the non-hierarchical FA
-is sound but incomplete because the structured labels are compared as symbols and their semantics
+is sound but incomplete because the structured labels are compared as uninterpreted symbols and their semantics
 is not considered.
 
 %TODO sets of FA. are they really needed anywhere?
@@ -557,21 +559,21 @@ is not considered.
 \label{ch:fav}
 
 Consider programs manipulating dynamic data structures.
-These programs can change the shape of the heap (and so reach another heap configuration)
+These programs can change the~shape of the heap (and so reach another heap configuration)
 by performing operations like allocation of a new memory node on the heap,
 freeing an existing memory node, updating the references between memory nodes
 or other pointer operations.
 Since dynamic data structures used in these programs can be
 unbounded, the number of potentially reachable heap configurations is infinite.
 However, we use FA to represent this infinite state space by forest automata in a finite way.
-Then we can perform shape analysis over the forest automata representation of the reachable
+Then the~shape analysis can be done over the forest automata representating the reachable
 heap configurations to discover whether no undesirable behavior
 like a dereference of an uninitialized pointer can happen.
 
 This chapter provides an overview of the shape analysis based on forest automata introduced in \cite{forester12}.
 First, a heap representation using FA is described and then
 we provide an overview of the symbolic execution and
-also describe the method in context of the framework of abstract interpretation.
+also describe the method in context of the~framework of abstract interpretation.
 
 \section{Heap Representation}
 \label{sec:hd}
@@ -582,7 +584,7 @@ The heap cells consists of \emph{pointer selectors} and \emph{data selectors}.
 A~pointer selectors can point to another graph node, to the \emph{null} value or it can be \emph{undefined}.
 A~data selector is related to data from some finite data domain.
 Such heap graph can be viewed as an io-graph where
-the pointer variables pointing to the nodes of the heap are the ports of the io-graph.
+the pointer variables pointing to the nodes of the heap are the ports of the~io-graph.
 The io-graph can be accepted by a forest automaton as
 a member of its graph language.
 Forest automata are able to represent of the reachable heap graphs
@@ -610,9 +612,9 @@ data structures down to their higher expressive power.
 
 Let us formalize the idea given above.
 We denote a pointer selector by $PSel$, a data selector by $DSel$ and data domain by $\mathbb{D}$.
-A~single heap configuration is a io-graph $g_{st}$ over the ranked alphabet of the structured labels from $2^\Gamma$
-with the sub-labels from the ranked alphabet $\Gamma = PSel \cup (DSel \times \mathbb{D})$ having the
-ranking function that assigns $1$ to the pointer selectors and $0$ to the data selectors.
+A~single heap configuration is an~io-graph $g_{st}$ over the ranked alphabet of the~structured labels from $2^\Gamma$
+with the~sub-labels from the~ranked alphabet $\Gamma = PSel \cup (DSel \times \mathbb{D})$ having the
+ranking function that assigns $1$ to the~pointer selectors and $0$ to the~data selectors.
 The values of data selectors are stored in the structured labels as the sub-labels from $DSel \times \mathbb{D}$.
 The internal structure of a memory cell in the heap
 is reflected by the structured label $l_g(v)$ of a node $v$ representing the memory cell. 
@@ -620,7 +622,7 @@ A~null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) =
 The undefined selectors of a memory node $v$ have no special syntax so they are
 not presented in the structured label $l_g(v)$.
 
-Not only the allocated memory on the heap is modeled by forest automata
+Not only the allocated memory on the heap is modelled by forest automata
 in the verification procedure but also a \emph{stack frame} of the actually
 analyzed function of the original program is represented by forest automata.
 Particularly, the io-graphs and forest automata have from their definitions exactly one (index of) input port and
@@ -630,7 +632,7 @@ just the one input port $\mathit{sf}$ keeps the information about the stack fram
 \bexmp
 We illustrate described principle of heap representation with an example taken from \cite{techrep}.
 We consider a singly-linked list whose items are data structures containing pointers to
-a next item and also integer data variable, written in C:
+a next item and also integer data variable. Written in C:
 \begin{center}
 \begin{minipage}{0.3\textwidth}
     \begin{verbatim}
@@ -666,7 +668,7 @@ and has no successor what is denoted by $()$.
 \label{sec:se}
 
 So far we described the representation of heap configurations using forest automata.
-Now we will describe how the forest automata representation is computed for each point of the analysed program.
+Now we will describe how the forest automata representation is computed for each point of the~analysed program.
 FA-based verification procedure is a standard \emph{abstract interpretation}~\cite{cousot:77}.
 The concrete domain is a set of heap graphs.
 To each program location can be assigned a set of pairs
@@ -677,14 +679,14 @@ to the nodes in $H$, to $\texttt{null}$ or to an \emph{undefined} value.
 The abstract domain is a set of forest automata.
 The verification procedure computes for each program location
 a finite set of pairs $(\sigma, F)$ (called \emph{abstract configuration}) where
-$F$ is a forest automata of higher level respecting canonicity and
+$F$ is a hierarchical forest automata of higher level respecting canonicity and
 $\sigma$ maps again each variable to
 $\texttt{null}$ or to undefined value or to an index of TA in $F$.
-Since FA are not closed under union, it is not possible to represent the sets of heaps by single FA.
+Since FA are not closed under union, it is not possible to represent the~sets of heaps by single FA.
 Therefore a set of FA is needed to represent the set of all reachable heap
 configurations at one program location.
 
-Let us describe the notion of abstract transformers.
+Let us now describe the notion of abstract transformers.
 The function $\concrop{st}$ is related to an operation \texttt{op} of the analysed program.
 This function models semantics of \texttt{op} in the concrete domain in such way that $\concrop{st}$
 transforms an io-graph representing the heap configuration before and after the execution of
@@ -692,20 +694,20 @@ the concrete operation \texttt{op}.
 The abstract transformers $\tau_{\texttt{op}}$ are defined for each concrete
 operation \texttt{op} reflecting the semantics of~$\concrop{st}$.
 They transform a FA $S$ representing the heap in abstract domain to a resulting FA $S' = \tau_{\texttt{op}}(S)$
-such that $\bigcup_{F' \in S'} \llbracket F' \rrbracket = \{\concrop \mid g_{sf} \in \llbracket F \rrbracket \wedge F \in S~\}$.
+such that $\bigcup_{F' \in S'} \llbracket F' \rrbracket = \{\concrop{sf} \mid g_{sf} \in \llbracket F \rrbracket \wedge F \in S~\}$.
 %The abstract transformer is applied separately to each forest $F \in S$.
 
 
 The verification starts from an initial abstract configuration that consists of
-an FA for initial heap configuration representing an io-graph
+an FA for the initial heap configuration representing an io-graph
 $g_{\mathit{sf}}$ where $g$ consists of two nodes.
-The first one is $\texttt{null}$ and the second one is the empty stack frame
+The~first one is $\texttt{null}$ and the second one is the empty stack frame
 $\mathit{sf}$ with $l_g(\mathit{sf}) = \emptyset$.
-The sequence of \emph{abstract transformers} related to the program statements is then iteratively applied to the abstract configurations.
-The process of applying abstract transformers over the~abstract domain is called \emph{symbolic execution}.
+The~sequence of \emph{abstract transformers} related to the program statements is then iteratively applied to the abstract configurations.
+The~process of applying abstract transformers over the~abstract domain is called \emph{symbolic execution}.
 %As it was said, each abstract transformer correspond to a statement of the analyzed program.
 
-The abstract transformers related to a program location are applied iteratively until
+The~abstract transformers related to a program location are applied iteratively until
 abstract configurations reach fixpoint.
 Each iteration consists the following steps:
 \begin{enumerate}
@@ -795,7 +797,7 @@ rising from the possible unboudness of the mentioned dynamic data structures
 by representing them in a finite way.
 The finite representation is possible due to abstraction over forest automata.
 The abstraction merges some states and so creates the cycles
-in transitions what make forest automaton able to represent infinite state space.
+in transitions what make forest automaton able to represent an infinite state space.
 %However, there is still the problem of the state explosion that often makes
 %nearly impossible to finish the verification procedure of a system in the real time
 %and moreover, not even termination of the verification procedure is guaranteed at all.
@@ -824,7 +826,7 @@ by their restriction up-to height $\leq n$.
 
 The abstraction over forest automata overapproximates the set of the reachable
 configurations of a program (formally, $L(M) \subseteq L(\abs(M))$).
-This it could led to a detection of a spurious counterexample which is not present
+This it can led to a detection of a spurious counterexample which is not present
 in an original program but it is caused by a heap configuration created by abstraction.
 In \cite{cegar}, the \emph{counterexample-guided abstraction refinement} (CEGAR)
 for avoiding a spurious counterexample was proposed.
@@ -843,7 +845,7 @@ Moreover, no automatic refinement and also not even spurious counterexample dete
 have been implemented in the Forester tool yet.
 This will be resolved by implementing backward run and
 predicate abstraction what is described later in Chapter \ref{ch:backward}.
-Predicate abstraction is refined by predicates learnt from backward run
+Predicate abstraction is refined by the~predicates learnt from backward run
 what prevents reaching the spurious error again and so provides finer refinement then height
 abstraction.
 
@@ -1811,7 +1813,7 @@ Section \ref{sec:impl} covers the implementation.
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[scale=0.9]{fig/artmc.png}
+	\includegraphics[scale=0.3]{fig/artmc.png}
 	\caption{
 		Figure is taken from \cite{artmc}.
 		Figures illustrates principle of forward and backward run and
@@ -1860,12 +1862,13 @@ This principle is illustrated in Figure \ref{fig:bwrun}.
 Figure shows how a forest automaton (and its language) is gradually changed
 by abstract transformers, illustrated by lines connecting the ovals
 that represents the particular symbolic states of symbolic execution.
-A~found error configuration is shown as a red area in the last oval.
+A~found error configuration configuration is shown
+as the red area in the last oval (representing language $L_{\mathit{Bad}}$).
 The backward run starts from the error configuration and it finds
 that it is spurious because the intersection (the orange areas) of
 forest automata language from backward (the blue ovals) and forward
 (the green and yellow area) run is empty at level of the symbolic state
-with the language $L(M_{k-1})$.
+with the language $L(M_{i-1})$.
 The green area represents forest automata language before abstraction
 and the yellow area after the abstraction.
 
