@@ -1785,9 +1785,9 @@ from this point, Forester supports the VATA library only.
 \label{ch:backward}
 
 When an error in the analysed program is detected,
-it is necessary to check whether it is real or spurious.
-A~spurious error can be caused by an overapproximating abstraction over automata.
-The analysis of spuriousness can be done by a \emph{backward run} which, however, has not
+it is necessary to check whether is it real or spurious.
+A~spurious error can be caused by an overapproximating abstraction over foster automata.
+The~analysis of spuriousness can be done by a \emph{backward run} which, however, has not
 yet been designed and implemented for forest automata based shape analysis.
 An intersection of forest automata is crucial for the backward run but it has not
 been also developed yet.
@@ -1801,7 +1801,8 @@ we design and implement backward run including the intersection of forest automa
 and predicate abstraction \cite{artmc} for forest automata based verification.
 Predicate abstraction can be refined by \emph{predicates} obtained from backward run.
 It can be done is such way that the predicates are created directly
-to avoid the abstraction that caused the error and so the error will not be detected by the same run.
+to avoid the abstraction that caused the error
+and so the~error will not be detected by the same run again.
 We restrict ourselves only to basic forest automata, not the hierarchical ones
 in order to keep this work within the bounds of master thesis.
 
@@ -1833,7 +1834,7 @@ This gradual application of abstract transformers in the order of
 the concrete program operations is called \emph{forward run}.
 Formally, a forest automaton representing the memory state 
 at program point $n$ is obtained by
-$\abstr^n(\abstr^{n-1}(\ldots \abstr^{1}(F^{empt}) \ldots))$
+$\abstr^n(\abstr^{n-1}(\ldots \abstr^{1}(\femp) \ldots))$
 where $\abstr^i$ is an abstract transformer related to the concrete
 program operation at the $i$-th point of the program execution and
 $F^{empt}$ is a forest automaton modelling the (initial) empty heap.
@@ -1843,7 +1844,7 @@ as described in Chapter \ref{ch:fav}.
 
 Consider that an error is detected at the $n$-th program location
 during the forward run.
-The verification of non-spuriousness of the error is done by a gradual application of
+The~verification of non-spuriousness of the error is done by a gradual application of
 \emph{reverse abstract transformers} $\rabstr$ over forest automata.
 The backward run starts from the error line and
 then checks whether an intersection of
@@ -1854,37 +1855,39 @@ representing the intersection of the languages.
 This process is called \emph{backward run}.
 We use $F_A \cap F_B$ to denote a forest automaton with language $L(F_A) \cap L(F_B)$.
 Formally, we compute forest automata by application
-$\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F_{n} \cap F^{bad}) \ldots \cap F_{3}) \cap F_{2})$
+$\rabstr^1(\rabstr^{2}(\ldots \rabstr^{n}(F_{n} \cap \fbad) \ldots \cap F_{3}) \cap F_{2})$
 from the $n$-th point back to the beginning
-where $F_i$ is the forest automaton obtained as the result of 
-the $i$-th abstract transformer $\abstr^{i}$ in the forward run
-and $F^{bad}$ is the forest automaton representing heap configuration causing the detected error.
-It is checked whether $\forall 0 \leq i \leq n: L(\rabstr^1(\ldots \rabstr^{i}(F_{i}) \ldots \cap F_2)) \cap
-L(\abstr^i(\ldots \abstr^{1}(F^{empt}) \ldots)) \neq \emptyset$,
+where $F_i$ is the forest automaton at the $i$-th point of the forward run
+and $\fbad$ is the forest automaton representing heap configuration causing the detected error.
+It is checked whether $\forall\,0 \leq i < n: L(\rabstr^1(\ldots \rabstr^{i}(F_{i} \cap F^B_{i}) \ldots \cap F_2)) \cap
+L(\abstr^i(\ldots \abstr^{1}(\femp) \ldots)) \neq \emptyset$
+where $F_i^B$ is the forest automaton at $i$-th point of the backward run.
 When the intersection is empty the found error is reported as spurious.
 
 This principle is illustrated in Figure \ref{fig:bwrun}.
 Figure shows how a forest automaton (and its language) is gradually changed
 by abstract transformers until an error is found.
-The backward run starts from the error configuration and reverse the abstract transformers
+The backward run starts from the error configuration and reverses the abstract transformers
 until the empty intersection between the forward and backward FA languages
-is get at the level $i-1$.
+is get at the point $i-1$.
 Then the error is reported as spurious.
-The figure shows FA in an symbolic states in the forward run using the green (language of
-FA before abstraction) and the yellow areas (language of FA after abstraction).
+Forest automata are in the figure represented by their languages
+which are shown as the colored areas.
+The figure shows FA of a symbolic states in the forward run using the green (language of
+FA before abstraction) and the yellow (language of FA after abstraction) areas.
 There are $k$ symbolic states in the figure.
 Each step of the forward run does abstraction of FA,
 e.g., FA $\alpha(F_{i})$ is obtained by the abstraction of FA $F_i$.
 Then the abstract transformer is applied to the abstracted FA
 and the next symbolic state with FA $F_{i+1}$ is obtained.
 An abstract transformer is illustrated by the arrows connecting
-the yellow area of one state with the green areas of the next state.
-The error configuration in language $L_{\mathit{Bad}}$ is shown as the red area.
+the yellow area of one state with the green area of the next state.
+The error configuration in language $L(\fbad)$ is shown as the red area.
 The backward run starts from the error configuration and applies the reverse abstract transformer
 (illustrated by the dotted arrows) to FA representing the intersection
 (the orange areas) of the languages of the forest automata
 from the forward (the green and yellow areas) and backward run (the blue areas).
-The result of a reverse abstract transformer is a new backward run state
+The~result of a reverse abstract transformer is a new backward run state
 with the FA having language shown as a~blue and an~orange area.
 It is found that the error is spurious because the intersection
 is empty at the~level~$i-1$.
@@ -1902,10 +1905,10 @@ A~predicate $\pred \in \predset$ is a language represented by
 a tree automaton.
 As we described in Section \ref{subsec:abstraction}, the abstraction function $\abs$
 over a set of states $Q$ of TA $A=(Q,\Sigma,\delta, R)$ basically
-merges states in the same equivalence class of a equivalence relation.
-The predicate abstraction introduces a equivalence relation $\peqrel$
+merges states in the same equivalence class of an equivalence relation.
+The predicate abstraction introduces an equivalence relation $\peqrel$
 where the states of tree automaton are equivalent when
-they have an empty intersection with the same predicates.
+their languages have an non-empty intersection with the same predicates.
 Formally, $\forall q_1,q_2 \in Q: q_1 \peqrel q_2 \defarrow
 (\forall \pred \in \predset: \langstate{A}{q_1} \cap \pred \neq \emptyset
 \Leftrightarrow \langstate{A}{q_2} \cap \pred \neq \emptyset)$.
@@ -1919,7 +1922,7 @@ set for the abstraction.
 The new predicates will prevent merging the states at the points
 that caused detection of the spurious error again.
 When the refinement from \cite{artmc} is used
-then termination of the method is guaranteed.
+then the termination of the method is guaranteed.
 
 \section{Intersection of Forest Automata}
 \label{sec:isect}
