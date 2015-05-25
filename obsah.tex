@@ -2763,8 +2763,8 @@ only to the programs that use the supported C language constructions.
 	\vskip6pt
 	\caption{Evaluation of predicate abstraction
 	in the SV-COMP benchmark and the~Forester test suite.
-	Table shows the number of the programs which correctness Forester verfied 
-	for the first time and the number of the newly found errors
+	Table shows the number of the programs which correctness Forester was not
+	verfied before and the number of the newly found errors
 	that Forester was not able to detect or confirm before.
 	}
 	\centering
@@ -2796,17 +2796,18 @@ Then the newly analysed cases are studied in a more depth and
 the performance of Forester is compared to the Predator tool, the winner of HeapManipulation category
 and the best sound tool in MemorySafety category of SV-COMP'15.
 
-The results summarizing the evaluation of the predicate abstraction on SV-COMP'15
-benchmark and Forester test suite is in Table \ref{tab:pares}.
+Table \ref{tab:pares} summarizes the results of the evaluation
+of the predicate abstraction on SV-COMP'15 benchmark and Forester test suite.
 We distinguish between the programs with a new detected error
-and the programs proved to be correct.
-The most of the new errors are detected in HeapManipulation category of SV-COMP'15
-benchmark where $9$ errors have been detected.
+that Forester was not able to find before and the programs proved to be correct.
+The most of the new errors are detected in the HeapManipulation category of SV-COMP'15
+benchmark, where $9$ new errors have been detected.
 We also proved $2$ programs from the LDV project to be correct.
-In the memory safety category the results are worse but this is partially caused
-by the fact that this category contains less test cases.
+In the MemorySafety category, there is less found errors and verified programs
+but it is partially caused by the fact that this category contains less test cases
+then the HeapMnipulation category.
 Finally, we prove correctness of $4$ programs from Forester test set
-which were not possible to prove without the use of the predicate abstraction.
+which could not be proved without the use of predicate abstraction.
 These programs manipulate the data structures like doubly-linked list
 or trees.
 They do not need creating boxes during the verification procedure although
@@ -2814,28 +2815,24 @@ some other use of these data structures can lead to an application of boxes.
 
 The main issue complicating the successful analysis of
 more programs is the immaturity of the Forester tool.
-It does not support all the C language constructions
-or it fails due to an internal error because some unexpected
+It does not support all C language constructions
+and it fails due to an internal error because some unexpected
 state occurs during the analysis.
-This may cause that a lot of test cases remain not analysed.
-The symbolic execution for the purposes of the SV-COMP competition rules and benchmark
-where only an error breaking a given specification is reported
-by the analyser may improve the process as well.
-This is problematic mainly because a garbage is often created
-in a program from benchmark but the analysis should continue
-and check whether an error label is not reached.
-In this case a TA representing garbage should be removed FA
-and the analysis should continue correctly avoiding
-an unexpected Forester state that causes an internal error.
-Resolving this problem is another goal of the future work.
+This often causes that many test cases remain not analysed.
+The symbolic execution able to remove a detected
+garbage and continue would also improve the results as well.
+This is problematic mainly because the programs from SV-COMP
+benchmark create a garbage in the tests cases where
+a different safety property is verified.
 
-Now a comparison of the performance of the particular programs analysis 
+Last, a comparison of the performance
 between Forester and Predator is given.
-The programs described here are possible to analyse due to the
+The programs described here can be analysed only due to the
 backward run and predicate analysis implementation.
 Table \ref{tab:patimes} summarizes the results.
-Forester outperforms Predator in verification of red black lists.
-But moreover, to our best knowledge, it is the only sound tool able to verify these
+Forester outperforms Predator in verification of red black lists
+because the abstraction in Predator is not able to create the shape invariant.
+To our best knowledge, it is the only sound tool able to verify these
 kind of data structures.
 The other test case is a singly-linked list which
 has an integer value as the data.
@@ -2847,9 +2844,7 @@ the distance between a node having integer $6$ as a data member.
 In the case of verification of correct program, Predator outperforms Forester
 because Forester found a few spurious counterexamples
 before the shape invariant was computed.
-When there is an error in a program manipulating this
-data structure then Forester is lightly faster
-but the times are very similar.
+In the case when the program contains an error, Forester is slightly faster.
 
 Another case when Predator ran out of time
 is a tree (without the parent pointers) ensuring
@@ -2863,16 +2858,23 @@ freeing the list by two nodes at time (which is safe because
 the number of nodes is even).
 Predator in this case reported a spurious error.
 Forester detects that the error is spurious but is
-unable to establish a predicate set avoiding this error.
-It gradually creates predicate stating that list would not
-be $3, 5, \ldots$, etc. long but it was unable to generalize
-the predicates to all odd numbers.
+unable to learn a set of predicates avoiding this error.
+After the first run, it learns that the list should not be
+$3$ elements long.
+When the analysis is restarted then a spurious error is
+detected for the list with $5$ elements.
+The predicates preventing the error are learnt
+but the analysis will find a new spurious error for
+the list with $7$ elements and so on.
+Forester is unable to generalize the predicates
+to exclude all list of odd length from the set of all reachable
+heap configurations and so the analysis does not terminate.
 
 It is necessary to admit that predicate abstraction
 is not fully complete in Forester.
 It needs to be implemented more efficiently to get the better
 performance on the hard cases.
-The new predicates are currently not also created in the most
+The new predicates are not also created in the most
 precise way so some state may not be abstracted
 although it would be theoretically possible.
 Predicate abstraction also often causes an internal
