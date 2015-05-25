@@ -2493,23 +2493,21 @@ in Section \ref{sec:padesign}.
 It is necessary to perform the intersection between TA representing
 predicates and TA of FA from symbolic state of backward run.
 The bottom-up intersection algorithm of tree automata was implemented
-to the VATA library for this purpose because VATA contained only the
-intersection in top-down way which is less suitable for our purposes since
-it generates more product states that are not further needed.
+in VATA for this purpose because VATA contained only a top-down
+algorithm for computing intersection which is not suitable for our purposes.
 
 The first run of predicate abstraction should be done
-with an empty set of predicates what can lead to very
-strong abstraction where the most states would be merge.
-The result of this would be a lot of spurious counterexamples found
+with an empty set of predicates.
+This can lead to a very strong abstraction where the most TA states would be merged.
+This would lead to a trivial spurious counterexamples found
 in the first run of the analysis.
 Therefore we use height abstraction with height $1$ (what is
 also the original configuration of abstraction used in Forester)
 for the first run of symbolic execution.
-When a spurious error is detected in this run then the new
+When a spurious error is detected in this run then~the new
 predicates are created and the next runs of symbolic execution use the predicate abstraction.
-Moreover, this approach keeps the original Forester behavior
-because the first run of the analysis remains the same.
-Only the behavior after the detection of a spurious error is changed.
+Moreover, the behavior of the new implementation is different only
+after the detection of a spurious error.
 
 
 \chapter{Experimental Evaluation}
