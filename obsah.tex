@@ -1804,7 +1804,7 @@ It can be done is such way that the predicates are created directly
 to avoid the abstraction that caused the error
 and so the~error will not be detected by the same run again.
 We restrict ourselves only to basic forest automata, not the hierarchical ones
-in order to keep this work within the bounds of master thesis.
+to keep this work within the bounds of master thesis.
 
 The structure of this chapter is the following.
 The first Section \ref{sec:br} describes the backward run and the predicate abstraction in general.
@@ -1838,9 +1838,9 @@ $\abstr^n(\abstr^{n-1}(\ldots \abstr^{1}(\femp) \ldots))$
 where $\abstr^i$ is an abstract transformer related to the concrete
 program operation at the $i$-th point of the program execution and
 $F^{empt}$ is a forest automaton modelling the (initial) empty heap.
-Moreover, normalization, box folding, and abstraction are performed
-together with the abstract transformers at some program locations,
-as described in Chapter \ref{ch:fav}.
+Normalization, (un)folding, and abstraction are done
+along with the abstract transformers at some program locations,
+as described in Chapter~\ref{ch:fav}.
 
 Consider that an error is detected at the $n$-th program location
 during the forward run.
@@ -2514,18 +2514,20 @@ after the detection of a spurious error.
 \label{ch:eval}
 
 This chapter summarizes the experimental evaluation of the results of this work.
-First, we compare the~versions of Forester without and with \vata.
+First, we compare a performance of the~versions of Forester without and with \vata.
 Then we evaluate the~backward run on the SV-COMP benchmark
 and finally the version of Forester using predicate abstraction is compared to the
 original one with height abstraction.
-We also discuss the newly verified programs.
+We also discuss the programs that were newly verified by Forester
+because it was not possible to analyze them without the backward run and
+the predicate abstraction.
 
-All of the test cases have been evaluated on the computer with CPU Intel Core $2$ Duo ($2.13$ GHz)
+All of the experiments have been evaluated on the computer with CPU Intel Core $2$ Duo ($2.13$ GHz)
 and $4$ GiB memory, using Debian Linux, testing version.
 We used g++, version, 4.9 for compiling Forester and gcc, version 4.8,
 for compiling the analysed programs.
 The measured time is the CPU~time.
-The result times of the experiments are the averages of the five measurings.
+The presented times are the averages of the five measurings.
 The evaluations over SV-COMP benchmark are done following the rules of
 SV-COMP competition \cite{www:svcomp}.
 
