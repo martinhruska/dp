@@ -566,7 +566,7 @@ or other pointer operations.
 Since dynamic data structures used in these programs can be
 unbounded, the number of potentially reachable heap configurations is infinite.
 However, we use FA to represent this infinite state space by forest automata in a finite way.
-Then the~shape analysis can be done over the forest automata representating the reachable
+Then the~shape analysis can be done over the forest automata representing the reachable
 heap configurations to discover whether no undesirable behavior
 like a dereference of an uninitialized pointer can happen.
 
@@ -622,7 +622,7 @@ A~null value is represented by a node $\texttt{null}$ with $l_g(\texttt{null}) =
 The undefined selectors of a memory node $v$ have no special syntax so they are
 not presented in the structured label $l_g(v)$.
 
-Not only the allocated memory on the heap is modelled by forest automata
+Not only the allocated memory on the heap is modeled by forest automata
 in the verification procedure but also a \emph{stack frame} of the actually
 analyzed function of the original program is represented by forest automata.
 Particularly, the io-graphs and forest automata have from their definitions exactly one (index of) input port and
@@ -1900,7 +1900,7 @@ in the case of a spurious counterexample detection.
 
 The used predicate abstraction is defined over a TA as in \cite{artmc}
 and its extension to FA will be described later.
-The predicate abstraction is parameterized by the set of predicates $\predset=\{\pred_1, \ldots, \pred_n\}$.
+The predicate abstraction is parametrized by the set of predicates $\predset=\{\pred_1, \ldots, \pred_n\}$.
 A~predicate $\pred \in \predset$ is a language represented by
 a tree automaton.
 As we described in Section \ref{subsec:abstraction}, the abstraction function $\abs$
@@ -1934,7 +1934,7 @@ intersection of tree automata and extends it idea to forest automata.
 
 The main part of the method is given at Algorithm~\ref{alg:isect}.
 The algorithm takes two non-hierarchical forest automata $\F_{\A}$
-and $\F_{\B}$ with the same number of port indicies
+and $\F_{\B}$ with the same number of port indices
 as its input and outputs a forest automaton $\F_{\CC}$ such that
 $\lang(\F_{\A}) \cap \lang(\F_{\B}) \subseteq \lang(\F_{\CC})$.
 The explanation why $\F_{\CC}$ overapproximates language
@@ -1943,7 +1943,7 @@ of the intersection is given after the description of the algorithm.
 The algorithm starts with the initialization of the auxiliary
 data structures $\mathit{processed}$,
 $\mathit{cnt}$ and the data structure for the resulting automaton $F$ on lines $1$-$3$.
-Then it iterates over all port indicies of the input FA
+Then it iterates over all port indices of the input FA
 and it calls the function $\mathit{intersect}$ over the TA at position in
 the~input FA given by a port index.
 
@@ -2325,7 +2325,7 @@ Formally written, $\grev(\bstdsym) =
 It was already mentioned that predicate abstraction taken from \cite{artmc}
 is defined over tree automata.
 We decided not to extend the concept completely to forest automata but
-to perform the prdicate abstraction over forest automata component wise.
+to perform the predicate abstraction over forest automata component wise.
 This means that when the abstraction is performed by the microcode instruction
 {\tt FI\_abs} it is done for each tree automaton of forest automaton in current symbolic
 state separately.
@@ -2466,7 +2466,7 @@ as its parameter.
 The abstraction is performed over a forest automaton which is a member of
 class~\emph{Abstraction}.
 
-The abstraction is choiced by setting value of macro
+The abstraction is chosen by setting value of macro
 {\tt FA\_USE\_PREDICATE\_ABSTRACTION} to~$1$.
 When the predicate abstraction is chosen the method \emph{predicateAbstraction}
 is called on {\tt FA\_ABS} instruction execution.
@@ -2625,7 +2625,7 @@ loss for Forester using VATA comes from the inability of compiler
 to perform the advanced optimization.
 The fact that VATA does not reduce tree automata based on simulation relation
 has the impact probably mainly in the demanding cases like verification of skip-list.
-However, employinh the algorithm for reduction of tree automata in VATA would be
+However, employing the algorithm for reduction of tree automata in VATA would be
 needed to be done.
 Otherwise, the analysis programs with heap represented by forest automata
 with a lot of states would be inefficient.
