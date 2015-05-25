@@ -2418,27 +2418,28 @@ It checks whether a given error is an spurious or not.
 This method is implemented in class \emph{BackwardRun}\,---\,the wrapper
 class of backward run.
 
-As it was described, the backward run is performed by going through the given
-forward trace in the backward order and executing the reverse instruction to each
-microcode instruction.
+As it was described in Section \ref{sec:brdesign},
+the backward run is performed by going through the given
+forward trace in the backward order and executing the reverse
+instructions.
 The method \emph{reverseAndIsect} has been added to class \emph{AbstractInstruction}
-for model a reversion of instruction.
+for modelling a reversion of instruction.
 The class \emph{AbstractInstruction} is the parent class of the inheritance hierarchy of
 the classes implementing microcode instructions.
 Each microcode instruction has to implement this method if the parent class does not
 already implement it.
-The~method should change the symbolic state to reverse the semantic of
-the method \emph{execute} implementing microcode instruction in forward run.
-Despite the name of the method, each instruction does not make
-intersection of forest automata always (which is done only by the instruction described in
-previous section).
+The~method \emph{reverseAndIsect} basically implements
+the reverse abstract transformer of a given instruction.
+Despite the name of the method, the intersection of forest automata
+is not done by each microcode instruction but only in the cases described in
+the previous section.
 The method \emph{reverseAndIsect} returns a new symbolic state that
 is used as the next symbolic state in the backward run.
 
 The method \emph{isSpuriousCE} returns {\tt true} whenever
 a symbolic state returned by the method \emph{reverseAndIsect}
 contains a forest automaton with an empty language.
-In such case, it also creates the new predicates.
+In such a case, it also creates the new predicates.
 When the method reaches the beginning of the forward
 trace, then the found error is real and the {\tt false}
 is returned.
@@ -2449,23 +2450,23 @@ is returned.
 The method \emph{reverseAndIsect} of class \emph{FixpointBase}
 performs the intersection of forest automata.
 This class is inherited by the classes implementing microcode
-instructions {\tt FI\_abs, FI\_fix} which both computes the fixpoint.
+instructions {\tt FI\_abs, FI\_fix} which both compute the fixpoint.
 The intersection of forest automata is implemented by class \emph{SymState}
 representing a symbolic state.
 Moreover, it contains information about the variables in the current
-symbolic states what is needed by the algorithm for forest automata intersection.
+symbolic states, which is needed by the algorithm for forest automata intersection.
 
-The main method for symbolic state intersection is called \emph{Intersect}
-which makes the intersection between the symbolic states.
-The intersection is done between the symbolic states calling
-this method and the symbolic state given as a parameter.
+The main method for symbolic state intersection is called \emph{Intersect}.
+It computes the intersection between the symbolic states.
+The parameters of the intersection are the symbolic state, that calls the method \emph{Intersect},
+and the symbolic state given as a parameter.
 The result of the intersection replaces the content of the calling object.
 
 Another operation implemented for the purposes of the backward run is
 the method \emph{SubstituteRefs}.
-It performs the root references substitution as it is needed
+It performs substitution of the root references, which is needed
 for reversing the instruction {\tt FI\_free}.
-The root represent to be substituted and reference for substitution are
+The root supposed to be substituted and reference for substitution are
 given in the parameters of this method.
 The method is again member of class \emph{SymState}.
 
@@ -2481,7 +2482,7 @@ class~\emph{Abstraction}.
 
 The abstraction is chosen by setting value of macro
 {\tt FA\_USE\_PREDICATE\_ABSTRACTION} to~$1$.
-When the predicate abstraction is chosen the method \emph{predicateAbstraction}
+When the predicate abstraction is chosen, the method \emph{predicateAbstraction}
 is called on {\tt FA\_ABS} instruction execution.
 
 The new predicates used by predicate abstraction are created during
