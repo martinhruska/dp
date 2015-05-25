@@ -1852,6 +1852,9 @@ the languages of forest automata from forward and backward run is non-empty
 at each program line.
 When the intersection is non-empty the backward run continues using the automaton
 representing the intersection of the languages.
+If the backward run reaches the beginning of the program without detection of
+an empty intersection of the languages, the error is real, otherwise
+is spurious.
 This process is called \emph{backward run}.
 We use $F_A \cap F_B$ to denote a forest automaton with language $L(F_A) \cap L(F_B)$.
 Formally, we compute forest automata by application
@@ -1862,7 +1865,8 @@ and $\fbad$ is the forest automaton representing heap configuration causing the 
 It is checked whether $\forall\,0 \leq i < n: L(\rabstr^1(\ldots \rabstr^{i}(F_{i} \cap F^B_{i}) \ldots \cap F_2)) \cap
 L(\abstr^i(\ldots \abstr^{1}(\femp) \ldots)) \neq \emptyset$
 where $F_i^B$ is the forest automaton at $i$-th point of the backward run.
-When the intersection is empty the found error is reported as spurious.
+When the intersection is empty the found error is reported as spurious
+and if no empty intersection is found the error is real.
 
 This principle is illustrated in Figure \ref{fig:bwrun}.
 Figure shows how a forest automaton (and its language) is gradually changed
@@ -1906,6 +1910,7 @@ a tree automaton.
 As we described in Section \ref{subsec:abstraction}, the abstraction function $\abs$
 over a set of states $Q$ of TA $A=(Q,\Sigma,\delta, R)$ basically
 merges states in the same equivalence class of an equivalence relation.
+The predicate abstraction function is denoted by $\pabs$.
 The predicate abstraction introduces an equivalence relation $\peqrel$
 where the states of tree automaton are equivalent when
 their languages have an non-empty intersection with the same predicates.
@@ -2342,7 +2347,7 @@ $\fclass$ is a domain of forest automata and $\predset = \{\pred_1, \ldots, \pre
 The function $\pabs$ is defined as follows.
 Let $F_1=(A_1 \cdots A_n, \pi_A)$ and $F_2=(B_1 \cdots B_n, \pi_B)$ be two forest automata
 and let $\pabs$ be an abstraction function merging states of a tree automaton according
-to the equivalence relation $\peqrel$.
+to the equivalence relation $\peqrel$ defined in Section \ref{sec:br}.
 Then $\fpabs(F_1) = F_2 \defarrow \forall i \in \{1,\ldots,n\}: B_i = \pabs(A_i)$.
 
 The states are merged only in one tree automaton and not across the different
@@ -2403,15 +2408,13 @@ predicate abstraction in Section \ref{subsec:paimpl}.
 \subsection{Backward Run}
 \label{subsec:bwimpl}
 
-The backward can be enabled by setting the macro {\tt FA\_BACKWARD\_RUN}
+The backward run can be enabled by setting the macro {\tt FA\_BACKWARD\_RUN}
 in file \emph{config.h} to~$1$.
-If this macro is set to value $1$ then the backward run is executed
+If this macro is set to value $1$, then the backward run is executed
 by class \emph{SymExec} on an error detection.
 
-The main method of backward run is called \emph{isSpuriousCE} that
-checks whether for a given program trace is an error
-spurious or not.
-It returns true or false according to it.
+The main method of backward run is called \emph{isSpuriousCE}.
+It checks whether a given error is an spurious or not.
 This method is implemented in class \emph{BackwardRun}\,---\,the wrapper
 class of backward run.
 
