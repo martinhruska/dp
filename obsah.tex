@@ -2050,37 +2050,34 @@ the resulting language.
 \section{Designing Backward Run over Symbolic States}
 \label{sec:brdesign}
 
-An overview of the backward run was given in the beginning of this chapter.
-We describe now design of the backward run over symbolic state in Forester.
+We describe now the design of the backward in Forester.
+A~general overview of the backward run was given in the beginning of this chapter.
 
-It was mentioned that Forester implements abstract
-transformers as instructions of its microcode.
-The input C program is translated to the list $T=\isfwdp{1}, \isfwdp{2},\ldots, \isfwdp{n+1}$
-of the microcode instructions.
+It was mentioned that abstract
+transformers in Forester implements the instructions of its microcode in an abstract domain.
+The input C program is translated to
+microcode instructions $T=\isfwdp{1}, \isfwdp{2},\ldots, \isfwdp{n+1}$.
 An instruction has a symbolic state as its input and
 returns a~new symbolic state.
-The part of a symbolic state contains also forest automata representing
-the reachable heap configurations in the symbolic state.
 
-The \emph{forward run} is done by going through $T$ in the forward order.
-The trace of symbolic states $\ftraceseq$ is obtained by the forward run.
-We use $\ftrace$ to denote the trace and we call it the \emph{forward trace}.
-The~state $\sfwdp{i}$ is the input of the instruction $\isfwdp{i+1}$
-where $ 0 \leq i \leq n$ and $\sfwdp{i+1}$ is the resulting symbolic state
-of the instruction.
+The \emph{forward run} is done by going through $T$ in the forward order
+and executing the abstract transformers implementing the instructions in $T$
+over symbolic states.
+It generates the \emph{forward trace} of symbolic states $\ftrace=\ftraceseq$.
+The~state $\sfwdp{i}$ is the input of the abstract transformer $\abstr^{i+1}$
+where $ 0 \leq i \leq n$ and $\sfwdp{i+1}$ is the resulting symbolic state.
 
-The extension with backward run is quite straightforward.
-When an error is detected in a symbolic state $\sfwd$
-the backward run starts from this symbolic state.
-The backward run is done by going through $T$ in the reverse order
-and an execution of the \emph{reverse instruction} $\isbwdp{j}$ to each $\isfwdp{j}$
-over $\sbwdp{j}$ obtaining $\sbwdp{j-1}$ where $0 < j \leq i$.
-We obtain the \emph{backward trace} $\btraceseq{i}$ by the backward run.
-We denote the trace by $\btrace$.
-Note that a reverse instruction $\isbwd$ corresponds to a
-reverse abstract transformer $\rabstr$ that is
-the reversion of an abstract transformer $\abstr$
-implemented by an instruction~$\isfwd$.
+Assume that an error is detected in the symbolic state $\sfwdp{n}$.
+Then the backward run starts from this symbolic state
+and it is done by going through $T$ in the reverse order
+executing the reverse transformers $\rabstr^{i}$
+over the intersection $\sbwdp{i}$ and $\sfwdp{i}$ obtaining $\sbwdp{i-1}$ where $0 < j \leq n$.
+The intersection of $\sbwdp{i}$ and $\sfwdp{i}$ is a symbolic state that is identical
+to $\sbwdp{i}$ but has an FA representing a language
+that is an intersection of languages of FA of both states.
+The backward run generates the \emph{backward trace} $\btrace=\btraceseq{i}$.
+Each $\rabstr^{i}$ implements \emph{reverse instruction} $\isbwdp{j}$
+and is reversion to $\abstr^{i}$ which implements the instruction $\isfwdp{j}$.
 
 It is not necessary to compute FA with the language
 $L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B)$ to get the next
@@ -2094,12 +2091,17 @@ The other instructions are precise and elementary enough
 that they could be reversed without need of intersection.
 
 The next sections provides the description of the inverse microcode instructions.
-We describe each instruction informally first and then the instruction is defined in the notion
-of the function $\grev: \grevinter$.
-The function should have the reverse semantics
-to the function $f$ from Section \ref{subsec:microinstr}.
+We describe each reverse instruction first informally
+and then define it formally as the function $\grev: \grevinter$.
+The~function $\grev$ should have the reverse semantics
+to the forward function $f$ from Section \ref{subsec:microinstr}.
+The function models behavior of the reverse transformer
+implementing a reverse instruction with a given symbolic state as an input.
+The reverse transformers are an implementation of the reverse instruction 
 We further use $\ipred$ to denote an instruction $I_{i-1}$
 that precedes the instruction $I_{i}$.
+The symbolic states, their registers and instructions have the
+same role as they have in Section \ref{subsec:microinstr}.
 %Another drink on me for reading this (but only when you read carefully). % EGG
 
 \begin{comment}
@@ -2129,14 +2131,16 @@ added to the backward trace $\btrace$.
 \begin{itemize}
 	\item {\tt FI\_node\_create($r_s$, $r_d$)}
 		does the reversion the C function \code{malloc}.
-		The instruction gets a value from the source register $r_s$ in $\sfwd$.
+		The instruction gets a value from the source register $r_s$ in $\sfwd$
+		where $i$ is order of this instruction in $T$.
 		If the value is a reference or a null pointer then the new
 		state is just copy of $\sbwd$.
 		
 		Otherwise the value type is void pointer.
-		The new symbolic state has the same values in the registers as the state $\sbwd$ with
+		The new symbolic state registers have the same values
+		in the registers as the state $\sbwd$ with
 		the exception of the register $r_d$.
-		This register is substituted by the value $r'_{d}$ of $\sfwd$.
+		The value of this register is substituted by the value $r'_{d}$ of $\sfwd$.
 		The substitution is done because the register $r_d$ contains reference to the TA $t$
 		representing the heap pointed by the allocated pointer.
 		TA $t$ is then removed from FA and all references to it are invalidated.
@@ -2164,7 +2168,7 @@ added to the backward trace $\btrace$.
 			{\regs}
 			{\ipredb}$
 			where $\bstdsym = \sbwd$ and $F'= l(F \cup \{T\})$ where
-			$T$ is TA referenced by $RR$ in the register $r_d$ of $\sfwd$
+			$T$ is the TA referenced by $RR$ in the register $r_d$ of $\sfwd$
 			and $l$ performs relabeling such that if $r \xrightarrow{undef} () \in F
 			\wedge r \xrightarrow{RR} () \in \ffwd$ then $r \xrightarrow{undef} ()$ is
 			replaced by $r \xrightarrow{RR} ()$.
@@ -2174,14 +2178,14 @@ added to the backward trace $\btrace$.
 		Then the root reference $\rref$ is loaded from the register $r_d$ of $\sbwd$.
 		The value $V$ from a node pointed by the selector with displacement $\ddispl$ in FA of $\sfwd$
 		referenced by $\droot$ is loaded.
-		Finally, the value $V$ is stored to FA of the new symbolic state to the node
-		pointed by the selector referenced by $RR$.
+		Finally, the value $V$ is stored to the node of FA of the new symbolic state.
+		The node is pointed by the selector referenced by $RR$.
 
 		$\grev(\bstdsym) = \symstate{F'}
 			{\regs}
 			{\ipredb}$
 			where $\stdsym = \sbwd$ and $F'$ is obtained
-			by the described operation.
+			by the described operation of storing value to the node of FA.
 
 	
 	\item {\tt FI\_stores}
@@ -2201,7 +2205,7 @@ added to the backward trace $\btrace$.
 
 	\item {\tt FI\_push\_greg($r_g$)}
 		creates a new symbolic state identical to the state $\sbwd$ but~the
-		last global register from is removed the new state (what inverts push operation).
+		last global register added $\sfwd$ is removed the new state.
 
 		$\grev(\bstdsym) = \symstate{F}
 		{\regs \setminus \{r_g\}}
@@ -2211,7 +2215,7 @@ added to the backward trace $\btrace$.
 	\item {\tt FI\_pop\_greg($r_g$)}
 		creates a new state identical to the $\sbwd$,
 		then the register $r_g$ from $\sbwd$ is moved to the
-		forest automaton of the new state (what actually reverts the pop)
+		forest automaton of the new state
 		and finally the original value of $r_g$ in $\sfwd$ is stored
 		to the corresponding register in the new state.
 	
@@ -2253,10 +2257,10 @@ added to the backward trace $\btrace$.
 \end{itemize}
 
 \subsubsection{Register Assignment Instructions}
-The following instructions do simply an assignment to the register.
-So reversing them consists of creating a symbolic state $S'$ with
-the same registers as the symbolic state $\sbwd$ has
-and a substitution of the original destination register $r_d$ of $S'$
+The instructions in the list bellow perform simply an assignment to the register.
+Reversing them consists of creating a symbolic state $S'$ with
+the same registers as the symbolic state $\sbwd$ and
+substituting of the original destination register $r_d$ of $S'$
 by the value of the same register in the state $\sfwd$ (denoted by $r'_d$).
 Formally, $\grev(\bstdsym) = \symstate{F}
 			{\regssub{r_{d}}{r'_{d}}
@@ -2299,9 +2303,10 @@ Formally, $\grev(\bstdsym) = \symstate{F}
 \end{itemize}
 
 \subsubsection{Void Instructions}
-The following instructions have no reverse semantics
-(because they do not change the symbolic state in forward run)
-so the symbolic state obtained by the reverse instruction
+The following instructions have reverse semantics that is identity
+to the input symbolic state 
+because they do not change the symbolic state in forward run.
+The symbolic state obtained by the reverse instruction
 is the same as the symbolic state $\sfwd$.
 Formally written, $\grev(\bstdsym) = 
 			\symstate{F}
@@ -2961,7 +2966,7 @@ A~modification of Forester that makes it able to continue also
 when a garbage is created and e.g., the absence of invalid
 dereferences is verified, is needed.
 Then there are also the~conceptual extensions of the theory.
-The backward run, including FA interseciton, and predicate analysis should be generalized
+The backward run, including FA intersection, and predicate analysis should be generalized
 to the hierarchical forest automata.
 Improving the predicate abstraction to make Forester able to verify
 the data structures like singly-link lists of even length is
