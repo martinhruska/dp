@@ -2205,7 +2205,7 @@ added to the backward trace $\btrace$.
 
 	\item {\tt FI\_push\_greg($r_g$)}
 		creates a new symbolic state identical to the state $\sbwd$ but~the
-		last global register added $\sfwd$ is removed the new state.
+		last global register added $\sfwd$ is removed from the new state.
 
 		$\grev(\bstdsym) = \symstate{F}
 		{\regs \setminus \{r_g\}}
@@ -2259,8 +2259,8 @@ added to the backward trace $\btrace$.
 \subsubsection{Register Assignment Instructions}
 The instructions in the list bellow perform simply an assignment to the register.
 Reversing them consists of creating a symbolic state $S'$ with
-the same registers as the symbolic state $\sbwd$ and
-substituting of the original destination register $r_d$ of $S'$
+the same values of registers as the symbolic state $\sbwd$ and
+substituting of a value of the original destination register $r_d$ of $S'$
 by the value of the same register in the state $\sfwd$ (denoted by $r'_d$).
 Formally, $\grev(\bstdsym) = \symstate{F}
 			{\regssub{r_{d}}{r'_{d}}
