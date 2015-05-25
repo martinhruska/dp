@@ -2674,14 +2674,17 @@ to fully clarify its reasons.
 		and the Forester test set.
 	}
 	\centering
-	\begin{tabular}{lcc}
-		\toprule
+	\begin{tabular}{| l | c | c |}
+		\hline
 		Category & Real & Spurious \\
-		\midrule
+		\hline
+		\hline
 		HeapMnipulation & $8$ & $3$ \\
+		\hline
 		MemorySafety & $6$ & $0$ \\
+		\hline
 		Forester test set & $-$ & $7$ \\
-		\bottomrule
+		\hline
 	\end{tabular}
 	\label{tab:bwres}
 \end{table}
@@ -2691,7 +2694,7 @@ and also on the test suite distributed with Forester.
 The evaluation was done by analysing the programs that was correct
 but Forester found an (spurious) error in them.
 We also checked whether backward run correctly
-reports that the real errors are really real,
+reports that the real errors are really real
 because Forester cannot verify
 that a found error is real before backward run implementation.
 Therefore it cannot report them correctly in SV-COMP'15 competition
@@ -2702,20 +2705,20 @@ Forester test suite and SV-COMP benchmark.
 All found errors, including a memory garbage detection, are reported
 and the analysis is stopped after the detection in Forester test suite.
 On the other side, only the errors breaking a given specification
-causes the stopping the analysis in the context of SV-COMP benchmark.
-Particularly, the~garbage in SV-COMP test cases should not
-stop the analysis but the analysis continues to
+causes the stopping the analysis in the SV-COMP benchmark.
+Particularly, the~garbage on the heap in the test cases from SV-COMP should not
+stop the analysis but it continues to
 detect other errors like an invalid pointer dereference.
-We respect the specific rules for the both test sets in these evaluation.
+We respect the specific rules for the both test sets in our evaluation.
 It is possible to configure whether
-Forester should stop after a garbage detection by
+Forester will stop after a garbage detection by
 macro {\tt FA\_CONTINUE\_WITH\_GARBAGE} in file \emph{config.h}.
 
 The implementation of backward run confirmed $6$ real errors in the programs
 in the memory safety category of SV-COMP benchmark and
-the $8$ new real errors in the heap manipulation category.
+the $8$ real errors in the heap manipulation category.
 Moreover, the~$3$ spurious counterexamples were detected in the heap manipulation category.
-The results are summarized in Table \ref{tab:bwres}.
+The~results are summarized in Table \ref{tab:bwres}.
 The analyzed programs in SV-COMP benchmark includes 
 e.g., programs from LDV (Linux Drivers Verification) project
 containing implementation of alternating singly-linked list
@@ -2726,12 +2729,13 @@ because it does not currently support all the C language constructions.
 It causes that the number of the found errors, spurious or real, is not as high as it would be when
 Forester could analyze all the programs in the benchmark.
 
-The results of evaluation at the existing Forester test set are following.
-There are $8$ cases when a spuriousness of the found error was proved.
-The confirming of the real errors does not make sense because
-it is expected that a test set contains only the cases with the known results.
-Therefore the correct detection of the real errors were verified
-also before of backward run implementation.
+The results of evaluation at the Forester test set are following.
+There are $8$ cases where the spuriousness of the found error was proved.
+A~confirmation of the real errors does not make sense because
+the test set contains only the cases with the known results.
+Therefore a detection of the real errors was
+matched with the expected result also
+before backward run implementation.
 
 The important contribution of backward run is a guarantee of correctness when
 an error in a program is reported to the user.
@@ -2748,19 +2752,22 @@ only to the programs that use the supported C language constructions.
 
 \begin{table}[bt]
 	\vskip6pt
-	\caption{The evaluation of predicate abstraction
+	\caption{Evaluation of predicate abstraction
 	in the SV-COMP benchmark and the Forester test suite after.
 	Table shows the number of the newly proved programs and the new found
 	errors.}
 	\centering
-	\begin{tabular}{lcc}
-		\toprule
+	\begin{tabular}{| l | c | c |}
+		\hline
 		Category & New errors found & Newly proved programs  \\
-		\midrule
+		\hline
+		\hline
 		HeapMnipulation & $9$ & $2$ \\
+		\hline
 		MemorySafety & $2$ & $1$ \\
+		\hline
 		Forester test set & $0$ & $4$  \\
-		\bottomrule
+		\hline
 	\end{tabular}
 	\label{tab:pares}
 \end{table}
@@ -2770,7 +2777,7 @@ The predicate abstraction is used in the way described in Section \ref{sec:impl}
 The first run is performed using height abstraction with height $1$ and when a spurious
 counterexample is found, the analysis creates the predicates and follows with
 the predicate abstraction.
-This method ensures that Forester successfully passes all the cases that it did
+This method ensures that Forester successfully passes all the cases that it passed
 before because the first run remains the same.
 First, the number of the~new cases that Forester can analyse due to
 the predicate abstraction is evaluated.
@@ -2778,22 +2785,21 @@ Then the newly analysed cases are studied more deeply and
 the Forester performance is compared to the Predator tool, the winner of HeapManipulation category,
 and the best sound tool in MemorySafety category of SV-COMP'15.
 
-The results summarizing the evaluation of the predicate abstraction over SV-COMP'15
+The results summarizing the evaluation of the predicate abstraction on SV-COMP'15
 benchmark and Forester test suite is in Table \ref{tab:pares}.
 We distinguish between the programs with a new detected error
 and the programs proved to be correct.
 The most of the new errors are detected in HeapManipulation category of SV-COMP'15
-benchmark where $9$ errors have been detected in the programs
-mentioned in the previous section.
+benchmark where $9$ errors have been detected.
 We also proved $2$ programs from the LDV project to be correct.
 In the memory safety category the results are worse but this is partially caused
 by the fact that this category contains less test cases.
 Finally, we prove correctness of $4$ programs from Forester test set
-which cannot be proved without the use of the predicate abstraction.
+which were not possible to prove without the use of the predicate abstraction.
 These programs manipulate the data structures like doubly-linked list
 or trees.
-They do not need creating boxes during boxes although
-some other use of these data structures can lead to the use of boxes.
+They do not need creating boxes during the verification procedure although
+some other use of these data structures can lead to an application of boxes.
 
 The main issue complicating the successful analysis of
 more programs is the immaturity of the Forester tool.
@@ -2807,24 +2813,24 @@ by the analyser may improve the process as well.
 This is problematic mainly because a garbage is often created
 in a program from benchmark but the analysis should continue
 and check whether an error label is not reached.
-In this case a forest automaton needs to be modified
-to remove the garbage and the analysis should continue correctly avoiding
+In this case a TA representing garbage should be removed FA
+and the analysis should continue correctly avoiding
 an unexpected Forester state that causes an internal error.
 Resolving this problem is another goal of the future work.
 
-Now the particular programs analysis comparing performance
-of Forester and Predator is given.
+Now a comparison of the performance of the particular programs analysis 
+between Forester and Predator is given.
 The programs described here are possible to analyse due to the
 backward run and predicate analysis implementation.
 Table \ref{tab:patimes} summarizes the results.
 Forester outperforms Predator in verification of red black lists.
-But moreover it is the only sound tool able to verify these
+But moreover, to our best knowledge, it is the only sound tool able to verify these
 kind of data structures.
-The other test case is a singly-linked list with integer
-as the data members.
+The other test case is a singly-linked list which
+has an integer value as the data.
 The items of the analysed singly-linked list are ordered
 by the value of their data.
-So for example, a distance between head of the list and a 
+So for example, a distance between the head of a list and a 
 node having integer $4$ as a data member is smaller than
 the distance between a node having integer $6$ as a data member.
 In the case of verification of correct program, Predator outperforms Forester
@@ -2835,19 +2841,19 @@ data structure then Forester is lightly faster
 but the times are very similar.
 
 Another case when Predator ran out of time
-is a tree which (without the parent pointers) ensures
+is a tree (without the parent pointers) ensuring
 that each left successor node have allocated it
 right successor node.
 Forester is able to verify the correctness of such a structure
 but it is the most time demanding task of this set.
-Finally, the last tested program is one traversing
+Finally, the last tested program is the one traversing
 a singly-linked list of even length and then
 freeing the list by two nodes at time (which is safe because
 the number of nodes is even).
 Predator in this case reported a spurious error.
 Forester detects that the error is spurious but is
 unable to establish a predicate set avoiding this error.
-It gradually creates predicate defining that list would not
+It gradually creates predicate stating that list would not
 be $3, 5, \ldots$, etc. long but it was unable to generalize
 the predicates to all odd numbers.
 
@@ -2866,24 +2872,30 @@ kind of error should be proved.
 %originally supported by Forester before its extension
 %done as part of this thesis.
 
-\begin{table}[h]
+\begin{table}[bt]
 	\vskip6pt
-	\caption{Evaluation of predicate abstraction over SV-COMP benchmark
+	\caption{Evaluation of predicate abstraction on SV-COMP benchmark
 		and the Forester test set.
 		Timeout is set to 1000 second.
 	}
 	\centering
-	\begin{tabular}{lrr}
-		\toprule
-		Category & Forester & Predator  \\
-		\midrule
+	\begin{tabular}{| l | r | r |}
+		\hline
+		Category & Forester [s] & Predator [s]  \\
+		\hline
+		\hline
 		Red black list, correct     & $1.10$   &  $timeout$ \\
+		\hline
 		Red black list, error       & $0.12$   &  $timeout$ \\
+		\hline
 		SLL with integers, correct  & $0.12$   &  $0.03$ \\
+		\hline
 		SLL with integers, error    & $0.02$   &  $0.03$ \\
+		\hline
 		Tree, correct               & $251.03$ &  $timeout$ \\
+		\hline
 		SLL of even length, correct & $timeout$ & $false\ positive$ \\
-		\bottomrule
+		\hline
 	\end{tabular}
 	\label{tab:patimes}
 \end{table}
