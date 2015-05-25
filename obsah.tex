@@ -2371,7 +2371,7 @@ in the bottom-up way manner \cite{tata2007}.
 
 Each of product automata $A \times \predauti{i}$, where $1 \leq i \leq n$, has the state set
 containing the product states of the form $(p,q) \in Q_A \times Q_{\predauti{i}}$.
-To eaiser the construction of $\peqrel$, we introduce the auxiliary function $m$ that labels
+To easier the construction of $\peqrel$, we introduce the auxiliary function $m$ that labels
 each state of $A$ by the states of predicate tree automata.
 Formally, the function $m: Q_A \rightarrow 2^{Q_{\predauti{1}} \cup \ldots
 \cup Q_{\predauti{m}}}$ is defined as follows: $m(p) = \{q \in Q_{\predauti{1}} \cup \ldots \cup Q_{\predauti{m}}\,|\,
@@ -2571,7 +2571,7 @@ then Forester implementation of tree automata, we tried to verify these results
 by compiling Forester and VATA without optimization and running the tests again.
 We found that with the optimization turned off,
 Forester with VATA is more efficient.
-The are two possible explainations of the the worse performance of Forester with VATA
+The are two possible explanations of the the worse performance of Forester with VATA
 in the case when optimizations of compiler are used.
 The first one is that the original implementation of tree automata
 in Forester uses simulation to reduce the size of tree automata
@@ -2581,7 +2581,7 @@ However, this does not explain why the original implementation is more efficient
 only when the advanced compiler optimization are used.
 The second possible explanation of the slowdown is
 that VATA is linked to Forester as a static library so the compiler cannot
-perform the advanced optimization between Forester and VATA, as oposed to
+perform the advanced optimization between Forester and VATA, as opposed to
 Forester using its own tree automata module.
 
 
@@ -2670,7 +2670,7 @@ where FA with many states are generated.
 \end{table}
 
 Although Forester using VATA is slower in some cases,
-the slowdown is not as significant to preveil
+the slowdown is not as significant to prevail
 the advantages of the better modularity
 and maintainability coming from having the separate library
 for tree automata, especially with regarded to the further development.
@@ -2764,7 +2764,7 @@ only to the programs that use the supported C language constructions.
 	\caption{Evaluation of predicate abstraction
 	in the SV-COMP benchmark and the~Forester test suite.
 	Table shows the number of the programs which correctness Forester was not
-	verfied before and the number of the newly found errors
+	verified before and the number of the newly found errors
 	that Forester was not able to detect or confirm before.
 	}
 	\centering
@@ -2966,7 +2966,7 @@ Resolving these issues is one of the future goals.
 Predicate abstraction is not also yet fine tuned and
 the further improvements would bring the better performance.
 There is also needed a~modification that would allow Forester to continue also
-when a garbage is created but a different property is verfied.
+when a garbage is created but a different property is verified.
 The other future directions involve also conceptual and
 theoretical extensions of backward run, including intersection of
 FA intersection, and predicate analysis such as a generalization
