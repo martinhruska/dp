@@ -2332,61 +2332,61 @@ Formally written, $\grev(\bstdsym) =
 \section{Designing Predicate Abstraction over Forest Automata}
 \label{sec:padesign}
 
-It was already mentioned that predicate abstraction taken from \cite{artmc}
-is defined over tree automata.
-We decided not to extend the concept completely to forest automata but
-to perform the predicate abstraction over forest automata component wise.
-This means that when the abstraction is performed by the microcode instruction
-{\tt FI\_abs} it is done for each tree automaton of forest automaton in current symbolic
-state separately.
+The predicate abstraction from \cite{artmc} defined for tree automata
+was already introduced.
+We extend the concept to forest automata in automata component wise way.
+This means that the abstraction is applied to each tree automaton of
+forest automaton in the current symbolic state separately.
 Formally, let $\fpabs: \fclass \rightarrow \fclass$ be an abstract function where
-$\fclass$ is a domain of forest automata.
+$\fclass$ is a domain of forest automata and $\predset = \{\pred_1, \ldots, \pred_n\}$ is a set of predicates.
 The function $\pabs$ is defined as follows.
 Let $F_1=(A_1 \cdots A_n, \pi_A)$ and $F_2=(B_1 \cdots B_n, \pi_B)$ be two forest automata
 and let $\pabs$ be an abstraction function merging states of a tree automaton according
-to the equivalence relation $\peqrel$,
-then $\fpabs(F_1) = F_2 \defarrow \forall i \in \{1,\ldots,n\}: B_i = \pabs(A_i)$.
+to the equivalence relation $\peqrel$.
+Then $\fpabs(F_1) = F_2 \defarrow \forall i \in \{1,\ldots,n\}: B_i = \pabs(A_i)$.
 
-This also implies that the states are merged only in one tree automaton and not across the different
-tree automata of forest automata.
+The states are merged only in one tree automaton and not across the different
+tree automata of forest automata using the proposed method.
 However, merging the states of different tree automata can be more efficient (since
 a forest automaton with smaller number of states is created).
 This work purposes the first version of predicate abstraction and 
 an optimization of the new method could be done as the future work.
 
-The predicates are languages represented by tree automata.
-Furthermore, we use compressing representation of predicates
-proposed in \cite{artmc} where the predicates are the languages $\lang(A,q)$
-of the states $q \in Q$ of a tree automaton $A=(Q,\Sigma,\Delta, R)$.
+The predicates from $\predset$ are languages represented by tree automata.
+We use compressing representation from \cite{artmc}.
+A~tree automaton $A=(Q,\Sigma,\Delta, R)$ represents a set of predicates
+where the predicates are the languages $\lang(A,q)$ of the states $q \in Q$.
 Checking whether a state of a tree automaton has non-empty intersection
 with the~same sets of predicates as another state of the automaton is done by the following method.
-Consider TA $A$ and the set of predicates $\predset = \{\pred_1, \ldots, \pred_n\}$
+Consider a TA $A$ and the set of predicates $\predset$
 that are represented by the set of TA $T=\{\predauti{1}, \ldots, \predauti{m}\}$.
-Note that one TA can represent the several predicates.
+Recall that the TA can represent a set of predicates.
 We create the product automata $A \times \predauti{1}, \ldots, A~\times \predauti{m}$
-by the algorithm for the bottom-up intersection.
+in the bottom-up way manner \cite{tata2007}.
+
 Each of product automata $A \times \predauti{i}$, where $1 \leq i \leq n$, has the state set
 containing the product states of the form $(p,q) \in Q_A \times Q_{\predauti{i}}$.
-It is possible to define the function $m: Q_A \rightarrow 2^{Q_{\predauti{1}} \cup \ldots
-\cup Q_{\predauti{m}}}$ as follows: $m(p) = \{q \in Q_{\predauti{1}} \cup \ldots \cup Q_{\predauti{m}}\,|\,
+To eaiser the construction of $\peqrel$, we introduce the auxiliary function $m$ that labels
+each state of $A$ by the states of predicate tree automata.
+Formally, the function $m: Q_A \rightarrow 2^{Q_{\predauti{1}} \cup \ldots
+\cup Q_{\predauti{m}}}$ is defined as follows: $m(p) = \{q \in Q_{\predauti{1}} \cup \ldots \cup Q_{\predauti{m}}\,|\,
 \exists A~\times \predauti{i}: (p,q) \in Q_{A} \times Q_{\predauti{i}}\}$.
-We define the equivalence relation $\peqrel \subseteq Q \times Q$
-such that $(p_1,p_2) \in \peqrel \defarrow m(p_1) = m(p_2)$.
-Then it is possible to merge the states from $A$ according to this equivalence relation
-using the predicate function $\fpabs$.
+The equivalence relation ${\peqrel} \subseteq {Q \times Q}$ is then constructed
+such that ${(p_1,p_2)} \in {\peqrel} \defarrow m(p_1) = m(p_2)$.
+The application of the function $\fpabs$ can lead to merging the states of $A$.
 
 %Another thing that is needed to design for the predicate abstraction is collecting a predicates.
 When a found error is considered to be a spurious one, then the abstraction needs to be refined
 by creating the new predicates and adding them to the current set of the predicates $\predset$.
-The new predicates are created by as follows.
-Consider a point of an analysed program where the spurious error is detected
-because $\lang(F_F) \cap \lang(F_B) = \emptyset$ where FA $F_F$ is from the forward run
-and FA $F_B$ is from the backward run.
-We create a normalized FA $F_F^N = (A_1 \cdots A_n, \pi_A)$ and a normalized $F_B^N = (B_1 \cdots B_m, \pi_B)$
-by normalization of $F_A$ and $F_B$.
+The new predicates are created as follows.
+Consider a point of an analysed program where the spurious error
+is detected at the $(i-1)$-th step of the backward run
+because $\lang(F^F_{i-1}) \cap \lang(F^B_{i-1}) = \emptyset$ where FA $F^F_{i-1}$ is from the forward run
+and FA $F^B_{i-1}$ is from the backward run.
+We create a normalized FA $F_{i}^{\mathit{FN}} = (A_1 \cdots A_n, \pi_A)$ and a normalized $F_{i}^{\mathit{BN}} = (B_1 \cdots B_m, \pi_B)$
+by normalization of $F^{\mathit{F}}_{i}$ and $F^\mathit{B}_{i}$ from the $i$-th step.
 It can be supposed that $n = m$ because normalization transforms
 the both FA in an uniform form.
-(TODO: MOZNA VIC POPSAT PROC TOTO LZE PREDPOKLADAT).
 Then the set of the new predicates $\predset_{new} = \{B_i \in F^N_B \,|\, \lang(A_i) \cap \lang(B_i) =
 \emptyset\}$ is obtained.
 The symbolic execution is then restarted again with the $\predset = \predset \cup \predset_{new}$.
