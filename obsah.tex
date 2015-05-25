@@ -2533,15 +2533,15 @@ SV-COMP competition \cite{www:svcomp}.
 
 \section{The Evaluation of Forester with VATA}
 
-This section provides a comparison of the early version of the Forester tool
-that uses its own tree automata library and the version using \vata.
+This section provides a comparison of the early version of Forester
+that uses its own tree automata library and the version using VATA.
 Since the version without VATA is no longer compatible with the
 new version of Forester, we can only evaluate the performance
 on the programs that are possible to analyze also with the older
 version of the tool without backward run and predicate abstraction.
-Therefore we use height abstraction of the height $1$
-what was the original configuration of Forester before the
-modifications by this work were done.
+Therefore we use height abstraction of the height $1$,
+which was the original configuration of Forester before this
+work started.
 
 \begin{table}[bt]
 	\vskip6pt
@@ -2561,7 +2561,7 @@ modifications by this work were done.
 	\label{tab:vataregre}
 \end{table}
 
-The first performance tests were performed over the regression test suite for Forester.
+The first performance tests were performed over the regression test suite of Forester.
 The results of these tests are summarized in Table \ref{tab:vataregre}.
 There are two cases that were measured.
 The first one is the case when Forester is compiled with the third level of optimization of the compiler.
@@ -2569,19 +2569,20 @@ The~original implementation outperformed us by the factor of two.
 Since we expected that VATA as an optimized library should be more efficient
 then Forester implementation of tree automata, we tried to verify these results
 by compiling Forester and VATA without optimization and running the tests again.
-We found that with the optimization turned off
-the Forester with VATA is more efficient.
-The are two main possibilities that can cause the worse performance of Forester with VATA
-when the optimizations are used.
-The first one is the fact that the original implementation of tree automata
-in Forester used simulation to reduce the size of tree automata
-what is not done in version with VATA because the reduction based on simulation in VATA is not fully correct yet.
-But this does not explain why the original implementation is more efficient
-only when the advanced optimization are used.
-The second point that can cause the slow down is
+We found that with the optimization turned off,
+Forester with VATA is more efficient.
+The are two possible explainations of the the worse performance of Forester with VATA
+in the case when optimizations of compiler are used.
+The first one is that the original implementation of tree automata
+in Forester uses simulation to reduce the size of tree automata
+what is not done in version with VATA because the reduction
+based on simulation in VATA is not ready yet.
+However, this does not explain why the original implementation is more efficient
+only when the advanced compiler optimization are used.
+The second possible explanation of the slowdown is
 that VATA is linked to Forester as a static library so the compiler cannot
-perform the advanced optimization between Forester and VATA as it does
-when Forester uses it own tree automata module.
+perform the advanced optimization between Forester and VATA, as oposed to
+Forester using its own tree automata module.
 
 
 \begin{table}[bt]
@@ -2609,13 +2610,13 @@ when Forester uses it own tree automata module.
 	\label{tab:vatadef}
 \end{table}
 
-We further decided to explore this problem by comparing
-the programs which analysis were time demanding.
-These programs contains manipulation of singly-linked lists with
-circular singly-linked lists as their data, doubly-linked lists with
-circular doubly-linked lists as their data, the skip-lists of the 2nd and
+We decided to further explore this problem by comparing
+the programs on which the analysis done by Forester is time demanding.
+These programs contain manipulation of singly-linked lists of
+circular singly-linked lists, doubly-linked lists of
+circular doubly-linked lists, the skip-lists of the 2nd and
 the 3rd level and also a snippet from the Linux drivers.
-Not all of these programs are included in the Forester regress test set.
+Not all of these programs are included in the Forester regression test set.
 
 The results comparing Forester with and without VATA library compiled
 without the compiler optimization are in Table \ref{tab:vatadef}.
@@ -2623,31 +2624,30 @@ The version of Forester with VATA is faster in this case.
 The only exception is a verification of the skip-list of the~third
 level.
 We suppose the original implementation takes the advantage of
-reduction of tree automata because the program manipulating the skip-list
-of the third level is the probably the most difficult case from the whole
-Forester testing benchmark.
-So tree automata with the big number of states
-are created during it verification.
+reduction of tree automata because tree automata
+with the big number of states are created during it verification.
+The big number of the generated states is related to the fact
+that the program manipulating the skip-list of the third level
+is the probably the most difficult case from the whole Forester testing benchmark.
 
-The comparison of the Forester versions compiled with the compiler optimization
+The comparison of the two versions of Forester compiled with the compiler optimization
 on the same programs are in Table \ref{tab:vataopt}.
 Here, the original implementation of Forester is again faster.
-The biggest difference is in the time needed for the verification of the skip-list of the third level.
+The~biggest difference is in the time needed for the verification of the skip-list of the third level.
 It has probably the same cause as in the version without optimization.
 Putting the results together, we assume that the main performance
 loss for Forester using VATA comes from the inability of compiler
 to perform the advanced optimization.
 The fact that VATA does not reduce tree automata based on simulation relation
-has the impact probably mainly in the demanding cases like verification of skip-list.
+has the impact probably mainly in the demanding cases such as verification of skip-list.
 However, employing the algorithm for reduction of tree automata in VATA would be
-needed to be done.
-Otherwise, the analysis programs with heap represented by forest automata
-with a lot of states would be inefficient.
+needed in future to prevent inefficiency in verification of the programs
+where FA with many states are generated.
 
 \begin{table}[bt]
 	\vskip6pt
 	\caption{Comparison of Forester with and without VATA on the hard cases.
-		Compiled with g++ with level -O3 of optimization.
+		Compiled with g++ with level -O3 of optimizations.
 	}
 	\centering
 	\begin{tabular}{|l | r | r |}
@@ -2669,14 +2669,13 @@ with a lot of states would be inefficient.
 	\label{tab:vataopt}
 \end{table}
 
-Although Forester using VATA is slower in some cases
+Although Forester using VATA is slower in some cases,
+the slowdown is not as significant to preveil
 the advantages of the better modularity
-and maintainability coming from the separate library
-for tree automata are still more important
-for the further development.
-On the other side, one of the goals of the future work should be
-the deeper investigation of the causes of the slow down
-to fully clarify its reasons.
+and maintainability coming from having the separate library
+for tree automata, especially with regarded to the further development.
+On the other hand, one of the goals of the future work should be
+the deeper investigation of the causes of the slowdown.
 
 
 \section{Backward Run Evaluation}
@@ -2684,8 +2683,8 @@ to fully clarify its reasons.
 
 \begin{table}[bt]
 	\vskip6pt
-	\caption{Evaluation of backward run on SV-COMP benchmark
-		and the Forester test set.
+	\caption{Evaluation of the backward run on SV-COMP benchmark
+		and on the Forester test set.
 	}
 	\centering
 	\begin{tabular}{| l | c | c |}
