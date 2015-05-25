@@ -2045,54 +2045,56 @@ the resulting language.
 \section{Designing Backward Run over Symbolic States}
 \label{sec:brdesign}
 
-An overview of backward run was given in the beginning of this chapter.
-We will now describe it in more detail, recalling the definitions given in Section \ref{subsec:microinstr}.
+An overview of the backward run was given in the beginning of this chapter.
+We describe now design of the backward run over symbolic state in Forester.
 
 It was mentioned that Forester implements abstract
 transformers as instructions of its microcode.
-The input C program is translated to the list $T=\isfwdp{1}, \isfwdp{2},\ldots, \isfwdp{n}$
+The input C program is translated to the list $T=\isfwdp{1}, \isfwdp{2},\ldots, \isfwdp{n+1}$
 of the microcode instructions.
-These instruction are executed over a symbolic state of a program
-and generates a~new symbolic state.
-The part of symbolic state are also forest automata representing
-the reachable heap configurations in a given symbolic state.
+An instruction has a symbolic state as its input and
+returns a~new symbolic state.
+The part of a symbolic state contains also forest automata representing
+the reachable heap configurations in the symbolic state.
 
-The forward run is done by going through $T$ in the forward order.
+The \emph{forward run} is done by going through $T$ in the forward order.
 The trace of symbolic states $\ftraceseq$ is obtained by the forward run.
-We denote the trace by $\ftrace$ and we recall it the \emph{forward trace}.
+We use $\ftrace$ to denote the trace and we call it the \emph{forward trace}.
 The~state $\sfwdp{i}$ is the input of the instruction $\isfwdp{i+1}$
-where $ 0 \leq i \leq n$ and the $\sfwdp{i+1}$ is the resulting symbolic state
+where $ 0 \leq i \leq n$ and $\sfwdp{i+1}$ is the resulting symbolic state
 of the instruction.
 
 The extension with backward run is quite straightforward.
 When an error is detected in a symbolic state $\sfwd$
 the backward run starts from this symbolic state.
-The backward run is performed through $T$ in the reverse order
-and an execution of the reverse instruction $\isbwdp{i}$ to each $\isfwdp{i}$
-over $\sbwdp{i+1}$ obtaining $\sbwdp{i}$.
-We obtain the \emph{backward trace} $\btraceseq$ by the backward run.
+The backward run is done by going through $T$ in the reverse order
+and an execution of the \emph{reverse instruction} $\isbwdp{j}$ to each $\isfwdp{j}$
+over $\sbwdp{j}$ obtaining $\sbwdp{j-1}$ where $0 < j \leq i$.
+We obtain the \emph{backward trace} $\btraceseq{i}$ by the backward run.
 We denote the trace by $\btrace$.
+Note that a reverse instruction $\isbwd$ corresponds to a
+reverse abstract transformer $\rabstr$ that is
+the reversion of an abstract transformer $\abstr$
+implemented by an instruction~$\isfwd$.
 
 It is not necessary to compute FA with the language
-$L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B)$ to get the successor
-of symbolic state in backward run (and also to detect spurious counterexample
-by checking whether $L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B) = \emptyset$)
-after the execution of each instruction in the backward run.
-Indeed, it is sufficient to compute intersect FA only for
+$L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B)$ to get the next
+symbolic state in the backward run (and to check spuriousness of an error)
+after the execution of each reverse instruction in the backward run.
+Indeed, it is sufficient to compute intersection only for
 the microcode instructions {\tt FI\_abs(), FI\_fix()}
-as only these instructions performs an abstraction
-and so they can cause a spurious error.
+because only these instructions do an abstraction of FA
+which can lead to a spurious error.
 The other instructions are precise and elementary enough
 that they could be reversed without need of intersection.
 
-The method of execution of the backward run was already described
-the next sections provides the description of the inverse microcode instructions.
+The next sections provides the description of the inverse microcode instructions.
 We describe each instruction informally first and then the instruction is defined in the notion
 of the function $\grev: \grevinter$.
 The function should have the reverse semantics
 to the function $f$ from Section \ref{subsec:microinstr}.
-We further denote the previous instruction $\ipred$ in forward run
-that precedes the actually reversed instruction.
+We further use $\ipred$ to denote an instruction $I_{i-1}$
+that precedes the instruction $I_{i}$.
 %Another drink on me for reading this (but only when you read carefully). % EGG
 
 \begin{comment}
@@ -2121,87 +2123,88 @@ added to the backward trace $\btrace$.
 
 \begin{itemize}
 	\item {\tt FI\_node\_create($r_s$, $r_d$)}
-		Instruction performs the reverse operation to the C function \code{malloc}.
+		does the reversion the C function \code{malloc}.
 		The instruction gets a value from the source register $r_s$ in $\sfwd$.
 		If the value is a reference or a null pointer then the new
 		state is just copy of $\sbwd$.
-		Otherwise the value type is void pointer then the new symbolic
-		state has the same values in the registers as the state $\sbwd$ has.
-		But the value of the register $r_d$ is substituted by the value $r'_{d}$ in $\sfwd$
-		because the register $r_d$ in $\sbwd$ contains reference to a TA $t$
-		representing heap pointed by the allocated pointer by this instruction in forward run.
-		TA $t$ is then removed from FA and all references to it are set invalidated.
+		
+		Otherwise the value type is void pointer.
+		The new symbolic state has the same values in the registers as the state $\sbwd$ with
+		the exception of the register $r_d$.
+		This register is substituted by the value $r'_{d}$ of $\sfwd$.
+		The substitution is done because the register $r_d$ contains reference to the TA $t$
+		representing the heap pointed by the allocated pointer.
+		TA $t$ is then removed from FA and all references to it are invalidated.
 
 		$\grev(\bstdsym) = \symstate{F'}
 			{\regssub{r_{d}}{r'_{d}}
 			}
-			{\ipred}$
-			where $\stdsym = \sbwd$,
+			{\ipredb}$
+			where $\bstdsym = \sbwd$,
 			$r_{d} \in \sbwd$, $r'_{d} \in \sfwd$
 			and $F'$ is obtained from $T$ by removing TA $t$ referenced by the register $r_d$
 			and invalidating all references to it.
 
 	\item {\tt FI\_node\_free}
-		Instruction reverses the effect of freeing the memory.
+		reverses freeing the memory.
 		The removed TA representing a heap pointed by a freed pointer
 		is referenced by the root reference $RR$ in the register $r_d$.
-		This TA is copied from FA in $\sfwd$ to FA in $\sbwd$ into the
+		This TA is copied from FA $\ffwd$ of $\sfwd$ to FA $\fbwd$ of $\sbwd$ into the
 		corresponding position.
-		It is also necessary to relabel the selectors of FA in $\sbwd$
-		according to FA in $\sfwd$ to replace undefined values created
+		It is also necessary to relabel the selectors of $\fbwd$
+		according to $\ffwd$ to replace undefined values created
 		after free by the root reference to the renewed FA.
 
 		$\grev(\bstdsym) = \symstate{F'}
 			{\regs}
-			{\ipred}$
-			where $\stdsym = \sbwd$ and $F'= l(F \cup \{T\})$ where
-			$T$ is TA referenced by $RR$ in the register $r_d$ in $\sfwd$
+			{\ipredb}$
+			where $\bstdsym = \sbwd$ and $F'= l(F \cup \{T\})$ where
+			$T$ is TA referenced by $RR$ in the register $r_d$ of $\sfwd$
 			and $l$ performs relabeling such that if $r \xrightarrow{undef} () \in F
-			\wedge r \xrightarrow{RR} () \in F''$ then $r \xrightarrow{undef} ()$ is
-			replaced by $r \xrightarrow{RR} ()$ and $F''$ is FA of $\sfwd$.
+			\wedge r \xrightarrow{RR} () \in \ffwd$ then $r \xrightarrow{undef} ()$ is
+			replaced by $r \xrightarrow{RR} ()$.
 
 	\item {\tt FI\_store($r_d$)}
-		Instruction creates a new symbolic state identical to the $\sbwd$.
-		Then the root reference $RR$ is loaded from the register $r_d$ in $\sbwd$.
-		The value $V$ from a node pointed by the selector in FA of $\sfwd$ referenced by
-		the root reference in register $r_d$ is loaded (which is actually value replaced
-		by this instruction in the forward run).
+		creates a new symbolic state identical to the $\sbwd$.
+		Then the root reference $\rref$ is loaded from the register $r_d$ of $\sbwd$.
+		The value $V$ from a node pointed by the selector with displacement $\ddispl$ in FA of $\sfwd$
+		referenced by $\droot$ is loaded.
 		Finally, the value $V$ is stored to FA of the new symbolic state to the node
 		pointed by the selector referenced by $RR$.
 
 		$\grev(\bstdsym) = \symstate{F'}
 			{\regs}
-			{\isfwd}$
+			{\ipredb}$
 			where $\stdsym = \sbwd$ and $F'$ is obtained
 			by the described operation.
 
 	
 	\item {\tt FI\_stores}
-		This instruction has the same semantics as the previous one but for
+		has the same semantics as the previous one but for
 		storing a structure to a FA.
 
 	\item {\tt FI\_abs(), FI\_fix()}
-		The reversion is done by creating a new symbolic state identical to the state $\sbwd$.
-		Then a new FA created by the intersection of FA of $\sbwd$ and FA of $\sfwd$ is assigned
-		to the~new symbolic state.
+		creates a new symbolic state identical to the state $\sbwd$.
+		Then a new FA created by the intersection of FA from $\sbwd$ and $\sfwd$ is used
+		for the~new symbolic state.
 
 		$\grev(\bstdsym) = \symstate{F'}
 			{\regs}
-			{\ipred}$
-			where $\stdsym = \sbwd$, $F' = F \cap F_{FWD}$ and $F_{FWD}$ is
+			{\ipredb}$
+			where $\stdsym = \sbwd$, $F' = F \cap F_{\mathit{FWD}}$ and $F_{\mathit{FWD}}$ is
 			FA of $\sfwd$.
 
 	\item {\tt FI\_push\_greg($r_g$)}
-		Instruction creates a new symbolic state identical to the state $\sbwd$ but~the
-		last global register from the new state is removed (what inverts push operation).
+		creates a new symbolic state identical to the state $\sbwd$ but~the
+		last global register from is removed the new state (what inverts push operation).
 
 		$\grev(\bstdsym) = \symstate{F}
 		{\regs \setminus \{r_g\}}
-		{I}$ where $\sbwd = \stdsym$ and $r_g$
-		is the last global register added to the state.
+		{\ipredb}$ where $\sbwd = \stdsym$ and $r_g$
+		is the last global register added to $\sfwd$.
 
 	\item {\tt FI\_pop\_greg($r_g$)}
-		Instruction creates a new state identical to the $\sbwd$,
+		creates a new state identical to the $\sbwd$,
 		then the register $r_g$ from $\sbwd$ is moved to the
 		forest automaton of the new state (what actually reverts the pop)
 		and finally the original value of $r_g$ in $\sfwd$ is stored
@@ -2209,25 +2212,25 @@ added to the backward trace $\btrace$.
 	
 		$\grev(\bstdsym) = \symstate{F}
 		{\regs \cup \{r_g\}}
-		{\isfwd}$ where $\sbwd = \stdsym$ and $r_g$
-		is the last global register added to the state.
+		{\ipredb}$ where $\sbwd = \stdsym$ and $r_g$
+		is the last global register removed from $\sfwd$.
 	
 	\item {\tt FI\_set\_greg($r_g$)}
-		Instruction creates a new symbolic state identical to the $\sbwd$.
+		creates a new symbolic state identical to the $\sbwd$.
 		It loads an old value of the global register $r_g$ from $\sfwd$
-		and the sets the value of $r_g$ in the new state to it.
+		and assigns it to the register $r_g$.
 
 		$\grev(\bstdsym) = \symstate{F}
 		{\regssub{r_{g}}{r'_{g}}
 		}
-		{\isfwd}$ where $\sbwd = \stdsym$ and $r'_{g}$
+		{\ipredb}$ where $\sbwd = \stdsym$ and $r'_{g}$
 		is the register of $\sfwd$.
 
 	\item {\tt FI\_abort}
-		This instruction is not reversible.
+		is not reversible.
 
 	\item {\tt FI\_acc\_sel}
-		Instruction has an empty semantics.
+		has an empty semantics.
 		The original instruction isolates a selector
 		and so it can create a new TA.
 		It is not necessary to reverse this operation
@@ -2237,7 +2240,7 @@ added to the backward trace $\btrace$.
 		$\grev(\stdsym) = \stdsym$
 
 	\item {\tt FI\_acc\_set,FI\_acc\_all}
-		This the same as the previous instruction and so
+		are the same as the previous instruction and so
 		the semantic of these instructions is empty.
 		
 		$\grev(\stdsym) = \stdsym$
@@ -2246,15 +2249,15 @@ added to the backward trace $\btrace$.
 
 \subsubsection{Register Assignment Instructions}
 The following instructions do simply an assignment to the register.
-So reversing them consist of creating a symbolic state $S'$ with
+So reversing them consists of creating a symbolic state $S'$ with
 the same registers as the symbolic state $\sbwd$ has
 and a substitution of the original destination register $r_d$ of $S'$
 by the value of the same register in the state $\sfwd$ (denoted by $r'_d$).
-Formally, $\grev(\stdsym) = \symstate{F}
+Formally, $\grev(\bstdsym) = \symstate{F}
 			{\regssub{r_{d}}{r'_{d}}
 			}
-			{I}$
-			where $\stdsym = \sbwd$ and $r'_{d} \in \sfwd$.
+			{\ipredb}$
+			where $\bstdsym = \sbwd$ and $r'_{d} \in \sfwd$.
 
 \begin{itemize}
 
@@ -2295,7 +2298,11 @@ The following instructions have no reverse semantics
 (because they do not change the symbolic state in forward run)
 so the symbolic state obtained by the reverse instruction
 is the same as the symbolic state $\sfwd$.
-Formally written, $\grev(\stdsym) = \stdsym$ where $\sbwd = \stdsym$.
+Formally written, $\grev(\bstdsym) = 
+			\symstate{F}
+				{\regs}
+				{\ipredb}$
+			where $\sbwd = \bstdsym$.
 
 \begin{itemize}
 	
@@ -2318,7 +2325,7 @@ Formally written, $\grev(\stdsym) = \stdsym$ where $\sbwd = \stdsym$.
 It was already mentioned that predicate abstraction taken from \cite{artmc}
 is defined over tree automata.
 We decided not to extend the concept completely to forest automata but
-to perform the abstraction over forest automata component wise.
+to perform the prdicate abstraction over forest automata component wise.
 This means that when the abstraction is performed by the microcode instruction
 {\tt FI\_abs} it is done for each tree automaton of forest automaton in current symbolic
 state separately.
@@ -2334,10 +2341,10 @@ This also implies that the states are merged only in one tree automaton and not 
 tree automata of forest automata.
 However, merging the states of different tree automata can be more efficient (since
 a forest automaton with smaller number of states is created).
-This work purposes the first version of predicate abstraction and more
-fine tuning new method could be done as the future work.
+This work purposes the first version of predicate abstraction and 
+an optimization of the new method could be done as the future work.
 
-The predicates are represented by tree automata.
+The predicates are languages represented by tree automata.
 Furthermore, we use compressing representation of predicates
 proposed in \cite{artmc} where the predicates are the languages $\lang(A,q)$
 of the states $q \in Q$ of a tree automaton $A=(Q,\Sigma,\Delta, R)$.
@@ -2345,9 +2352,9 @@ Checking whether a state of a tree automaton has non-empty intersection
 with the~same sets of predicates as another state of the automaton is done by the following method.
 Consider TA $A$ and the set of predicates $\predset = \{\pred_1, \ldots, \pred_n\}$
 that are represented by the set of TA $T=\{\predauti{1}, \ldots, \predauti{m}\}$.
-Note that one TA can represent multiple predicates.
-Then we create the product automata $A \times \predauti{1}, \ldots, A~\times \predauti{m}$.
-The used algorithm for the bottom-up tree automata intersection is from \cite{mt:lengal}.
+Note that one TA can represent the several predicates.
+We create the product automata $A \times \predauti{1}, \ldots, A~\times \predauti{m}$
+by the algorithm for the bottom-up intersection.
 Each of product automata $A \times \predauti{i}$, where $1 \leq i \leq n$, has the state set
 containing the product states of the form $(p,q) \in Q_A \times Q_{\predauti{i}}$.
 It is possible to define the function $m: Q_A \rightarrow 2^{Q_{\predauti{1}} \cup \ldots
@@ -2363,14 +2370,13 @@ When a found error is considered to be a spurious one, then the abstraction need
 by creating the new predicates and adding them to the current set of the predicates $\predset$.
 The new predicates are created by as follows.
 Consider a point of an analysed program where the spurious error is detected
-because $\lang(F_F) \cap \lang(F_B) = \emptyset$ where FA $F_F$ is obtained
-from a symbolic state of the forward run and FA $F_B$ is obtained from a symbolic state of
-the backward run.
+because $\lang(F_F) \cap \lang(F_B) = \emptyset$ where FA $F_F$ is from the forward run
+and FA $F_B$ is from the backward run.
 We create a normalized FA $F_F^N = (A_1 \cdots A_n, \pi_A)$ and a normalized $F_B^N = (B_1 \cdots B_m, \pi_B)$
 by normalization of $F_A$ and $F_B$.
 It can be supposed that $n = m$ because normalization transforms
 the both FA in an uniform form.
-TODO: MOZNA VIC POPSAT PROC TOTO LZE PREDPOKLADAT
+(TODO: MOZNA VIC POPSAT PROC TOTO LZE PREDPOKLADAT).
 Then the set of the new predicates $\predset_{new} = \{B_i \in F^N_B \,|\, \lang(A_i) \cap \lang(B_i) =
 \emptyset\}$ is obtained.
 The symbolic execution is then restarted again with the $\predset = \predset \cup \predset_{new}$.
@@ -2388,9 +2394,9 @@ predicate abstraction in Section \ref{subsec:paimpl}.
 \label{subsec:bwimpl}
 
 The backward can be enabled by setting the macro {\tt FA\_BACKWARD\_RUN}
-in file \emph{config.h} to value~$1$.
-If this macro is set to value $1$ then when an error is detected 
-the backward run is executed by class \emph{SymExec}.
+in file \emph{config.h} to~$1$.
+If this macro is set to value $1$ then the backward run is executed
+by class \emph{SymExec} on an error detection.
 
 The main method of backward run is called \emph{isSpuriousCE} that
 checks whether for a given program trace is an error
@@ -2399,29 +2405,29 @@ It returns true or false according to it.
 This method is implemented in class \emph{BackwardRun}\,---\,the wrapper
 class of backward run.
 
-As it was described backward run is performed by going through the given
-forward trace in the backward order and executing the reverse operation to each
+As it was described, the backward run is performed by going through the given
+forward trace in the backward order and executing the reverse instruction to each
 microcode instruction.
 The method \emph{reverseAndIsect} has been added to class \emph{AbstractInstruction}
-for this purpose.
+for model a reversion of instruction.
 The class \emph{AbstractInstruction} is the parent class of the inheritance hierarchy of
-microcode instructions.
+the classes implementing microcode instructions.
 Each microcode instruction has to implement this method if the parent class does not
 already implement it.
-The~method should change the symbolic state in way that it reverses the semantic of
-the method \emph{execute} that is performed in forward run.
-Despite the name of the method, the instructions do not need to perform
-intersection of forest automata always (which is done only the cases described in
+The~method should change the symbolic state to reverse the semantic of
+the method \emph{execute} implementing microcode instruction in forward run.
+Despite the name of the method, each instruction does not make
+intersection of forest automata always (which is done only by the instruction described in
 previous section).
 The method \emph{reverseAndIsect} returns a new symbolic state that
 is used as the next symbolic state in the backward run.
 
-The method \emph{isSpuriousCE} returns {\tt false} whenever
+The method \emph{isSpuriousCE} returns {\tt true} whenever
 a symbolic state returned by the method \emph{reverseAndIsect}
 contains a forest automaton with an empty language.
-In such case, it also  creates the new predicates.
+In such case, it also creates the new predicates.
 When the method reaches the beginning of the forward
-trace, then the found error is real and the {\tt true}
+trace, then the found error is real and the {\tt false}
 is returned.
 
 \subsection{Intersection of Forest Automata}
@@ -2431,11 +2437,10 @@ The method \emph{reverseAndIsect} of class \emph{FixpointBase}
 performs the intersection of forest automata.
 This class is inherited by the classes implementing microcode
 instructions {\tt FI\_abs, FI\_fix} which both computes the fixpoint.
-The intersection of forest automata is provided by class \emph{SymState}
-representing a symbolic state that contains forest automata.
+The intersection of forest automata is implemented by class \emph{SymState}
+representing a symbolic state.
 Moreover, it contains information about the variables in the current
-symbolic states what is needed by the algorithm for forest automata intersection
-from Section \ref{sec:isect}.
+symbolic states what is needed by the algorithm for forest automata intersection.
 
 The main method for symbolic state intersection is called \emph{Intersect}
 which makes the intersection between the symbolic states.
@@ -2455,14 +2460,14 @@ The method is again member of class \emph{SymState}.
 \label{subsec:paimpl}
 
 The predicate abstraction is implemented by a method \emph{predicateAbstraction}
-a member of class \emph{Abstraction}.
+a data member of class \emph{Abstraction}.
 This method takes a set of tree automata representing the set of predicates
 as its parameter.
 The abstraction is performed over a forest automaton which is a member of
 class~\emph{Abstraction}.
 
-The choice of abstraction is done by setting value of macro
-{\tt FA\_USE\_PREDICATE\_ABSTRACTION} to value $1$.
+The abstraction is choiced by setting value of macro
+{\tt FA\_USE\_PREDICATE\_ABSTRACTION} to~$1$.
 When the predicate abstraction is chosen the method \emph{predicateAbstraction}
 is called on {\tt FA\_ABS} instruction execution.
 
@@ -2479,17 +2484,17 @@ intersection in top-down way which is less suitable for our purposes since
 it generates more product states that are not further needed.
 
 The first run of predicate abstraction should be done
-with empty set of predicates what could lead to very
+with an empty set of predicates what can lead to very
 strong abstraction where the most states would be merge.
 The result of this would be a lot of spurious counterexamples found
-in the first run.
+in the first run of the analysis.
 Therefore we use height abstraction with height $1$ (what is
 also the original configuration of abstraction used in Forester)
 for the first run of symbolic execution.
 When a spurious error is detected in this run then the new
-predicates are created and the next runs of symbolic execution uses predicate abstraction.
-Moreover, this approach keeps the original Forester behaviors
-because the first run of the analysis remain same.
+predicates are created and the next runs of symbolic execution use the predicate abstraction.
+Moreover, this approach keeps the original Forester behavior
+because the first run of the analysis remains the same.
 Only the behavior after the detection of a spurious error is changed.
 
 
