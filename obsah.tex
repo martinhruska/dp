@@ -2702,57 +2702,53 @@ the deeper investigation of the causes of the slowdown.
 	\label{tab:bwres}
 \end{table}
 
-Backward run implementation was evaluated on SV-COMP benchmark
+The implementation of backward run was evaluated on SV-COMP benchmark
 and also on the test suite distributed with Forester.
 The evaluation was done by analysing the programs that was correct
-but Forester found an (spurious) error in them.
-We also checked whether backward run correctly
-reports that the real errors are really real
-because Forester cannot verify
-that a found error is real before backward run implementation.
+but Forester found a (spurious) error in them.
+We also checked whether the backward run correctly
+confirms the real errors are real.
 Therefore it cannot report them correctly in SV-COMP'15 competition
 evaluation.
 
 Note there is a difference in reporting error between
 Forester test suite and SV-COMP benchmark.
-All found errors, including a memory garbage detection, are reported
-and the analysis is stopped after the detection in Forester test suite.
-On the other side, only the errors breaking a given specification
-causes the stopping the analysis in the SV-COMP benchmark.
-Particularly, the~garbage on the heap in the test cases from SV-COMP should not
-stop the analysis but it continues to
-detect other errors like an invalid pointer dereference.
+All found errors in the Forester test suite, including a memory garbage
+detection, are reported and the analysis is stopped after the detection.
+In the SV-COMP benchmark, only the errors breaking a given specification
+cause to stop of the analysis.
+For instance, the analysis should not stop when
+a~garbage on the heap is detected but the absence of the other errors such
+as an invalid pointer dereference is verified.
 We respect the specific rules for the both test sets in our evaluation.
-It is possible to configure whether
-Forester will stop after a garbage detection by
-macro {\tt FA\_CONTINUE\_WITH\_GARBAGE} in file \emph{config.h}.
+It is possible to configure
+Forester to stop after a garbage detection by
+the macro {\tt FA\_CONTINUE\_WITH\_GARBAGE} in file \emph{config.h}.
 
 The implementation of backward run confirmed $6$ real errors in the programs
 in the memory safety category of SV-COMP benchmark and
-the $8$ real errors in the heap manipulation category.
+$8$ real errors in the heap manipulation category.
 Moreover, the~$3$ spurious counterexamples were detected in the heap manipulation category.
 The~results are summarized in Table \ref{tab:bwres}.
-The analyzed programs in SV-COMP benchmark includes 
+The analyzed programs in SV-COMP benchmark include
 e.g., programs from LDV (Linux Drivers Verification) project
 containing implementation of alternating singly-linked list
 or manipulation with mutex locks, or the programs
 implementing bubble sort over a list implementation from the Linux kernel.
 Note that Forester does not successfully process all the programs in the test set
-because it does not currently support all the C language constructions.
-It causes that the number of the found errors, spurious or real, is not as high as it would be when
-Forester could analyze all the programs in the benchmark.
+because it does not currently support all C language constructions.
+It causes that the number of the found errors, spurious or real, is not as high as it would be
+if Forester could analyze all the programs in the benchmark.
 
-The results of evaluation at the Forester test set are following.
+The results of evaluation at the Forester test set are the following.
 There are $8$ cases where the spuriousness of the found error was proved.
 A~confirmation of the real errors does not make sense because
-the test set contains only the cases with the known results.
-Therefore a detection of the real errors was
-matched with the expected result also
-before backward run implementation.
+these errors were supposed to be found by Forester also before
+the backward run implementation as a part of its testing.
 
-The important contribution of backward run is a guarantee of correctness when
-an error in a program is reported to the user.
-Unfortunately, we have to restrict the correctness of the backward run
+The important contribution of backward run is a guarantee
+of correctness of answer when an error in a program is reported to the user.
+Unfortunately, so far we can apply the backward run
 only to the programs that use the supported C language constructions.
 %E.g., Consider that a spurious error is detected because Forester lacks a support for
 %evaluation of the arithmetic expressions or does not fully support
@@ -2766,9 +2762,11 @@ only to the programs that use the supported C language constructions.
 \begin{table}[bt]
 	\vskip6pt
 	\caption{Evaluation of predicate abstraction
-	in the SV-COMP benchmark and the Forester test suite after.
-	Table shows the number of the newly proved programs and the new found
-	errors.}
+	in the SV-COMP benchmark and the~Forester test suite.
+	Table shows the number of the programs which correctness Forester verfied 
+	for the first time and the number of the newly found errors
+	that Forester was not able to detect or confirm before.
+	}
 	\centering
 	\begin{tabular}{| l | c | c |}
 		\hline
@@ -2788,14 +2786,14 @@ only to the programs that use the supported C language constructions.
 This section provides an evaluation of the Forester with predicate abstraction.
 The predicate abstraction is used in the way described in Section \ref{sec:impl}.
 The first run is performed using height abstraction with height $1$ and when a spurious
-counterexample is found, the analysis creates the predicates and follows with
+counterexample is found, the analysis creates the~predicates and continues with
 the predicate abstraction.
 This method ensures that Forester successfully passes all the cases that it passed
 before because the first run remains the same.
 First, the number of the~new cases that Forester can analyse due to
 the predicate abstraction is evaluated.
-Then the newly analysed cases are studied more deeply and
-the Forester performance is compared to the Predator tool, the winner of HeapManipulation category,
+Then the newly analysed cases are studied in a more depth and
+the performance of Forester is compared to the Predator tool, the winner of HeapManipulation category
 and the best sound tool in MemorySafety category of SV-COMP'15.
 
 The results summarizing the evaluation of the predicate abstraction on SV-COMP'15
