@@ -2935,42 +2935,39 @@ in the competition SV-COMP 2015 \cite{www:svcomp} and a~paper introducing
 Forester was published in proceedings of the conference TACAS 2015 \cite{svcomp15}.
 
 The backward run over symbolic states was designed for forest automata based shape analysis
-and the design was implemented in the Forester tool.
-Non-hierarchical forest automata intersection was implemented for
-the purposes of backward run.
-The intersection of forest automata is not only necessary part of backward run
-but it is a nice theoretical contribution of this work since it has not
-been yet proposed.
-Predicate abstraction over forest automata was also designed employing the predicates
-created by the backward run.
-Predicate abstraction uses bottom up tree automata intersection in the VATA
+and implemented in the Forester tool.
+The intersection of non-hierarchical forest automata was implemented for
+the purposes of the backward run.
+The intersection of forest automata is not only a necessary part of backward run
+but it is a nice theoretical contribution of this work too.
+Predicate abstraction over forest automata was also designed including learning
+the new predicates by the backward run.
+Predicate abstraction uses bottom-up tree automata intersection in VATA
 which was also implemented (but not designed) as the part of this work.
 
 Backward run and predicate abstraction were evaluated on SV-COMP benchmark and
 Forester test suite.
-These new techniques makes possible to process some programs that the earlier version
-of Forester was not able to analyze.
-Moreover, Forester is to our best knowledge the only one sound tool
-able to verify the red black lists (and similar data structures)
-fully automatically after the extension with predicate abstraction and backward run.
+These new techniques make it possible to successfully analyze
+some programs on which the earlier version of Forester fails.
+Moreover, the extension of Forester with predicate abstraction and backward run
+is to our best knowledge the only one sound tool
+able to verify the red-black lists (and similar data structures)
+fully automatically.
 
 This work participated in the student conference \emph{Excel@FIT 2015} \cite{www:excel}.
 A~paper about this work was accepted to a local proceedings of the conference
 and the work was awarded with the second prize in the category "Scientific contribution".
 
-There is still a lot of possibilities for the future work.
-Forester is not able to analyse a lot of cases
-because the tool does not support used C language constructions
-or an analysis of a program lead to an internal error of Forester.
-Resolving this is one of the possible goals.
-Predicate abstraction is not also yet fine tuned.
-It needs further improvements for better performance.
-A~modification of Forester that makes it able to continue also
-when a garbage is created and e.g., the absence of invalid
-dereferences is verified, is needed.
-Then there are also the~conceptual extensions of the theory.
-The backward run, including FA intersection, and predicate analysis should be generalized
+There is still many possibilities for the future work.
+Forester is not able to analyse many programs
+because it does not support used C language constructions
+or the analysis of a program ends in an internal error.
+Resolving these issues is one of the future goals.
+Predicate abstraction is not also yet fine tuned and
+the further improvements would bring the better performance.
+There is also needed a~modification that would allow Forester to continue also
+when a garbage is created but a different property is verfied.
+The other future directions involve also conceptual and
+theoretical extensions of backward run, including intersection of
+FA intersection, and predicate analysis such as a generalization
 to the hierarchical forest automata.
-Improving the predicate abstraction to make Forester able to verify
-the data structures like singly-link lists of even length is
-another challenge.
