@@ -2,7 +2,7 @@
 
 The growing number of applications of computer programs in the past few decades brings
 the~need for their greater safety and security.
-But it is not an easy task to guarantee that a software has the specified properties.
+But it is not an easy task to guarantee that software has the specified properties.
 The~programs often go through many states during the computations
 and it could be very time and space consuming or even impossible to check whether no undesirable behavior
 may appear in any of the program runs.
@@ -18,13 +18,14 @@ Formal verification aims at using rigorous mathematical methods to check whether
 There are three main branches of formal verification.
 The~first one is \emph{model checking} which systematically explores the state space of a~system (e.g., a program) or its model to
 prove that it satisfies the verified property.
-The second one is \emph{static analysis} which is performed over a source code (or some modification of it) of a~system
-without a need of its explicit execution and it rather explores a syntactic structure of~the analysed program.
+The second one is \emph{static analysis} which is performed over a source code (or some modification of it) of a~system.
+It is done without a need of its explicit execution and it rather explores a syntactic structure of~the analysed program.
 One of the important and very widely used approaches in static analysis is called \emph{abstract interpretation} where the analysis is performed by
-applying abstract transformers corresponding to the original program semantics over an abstract domain.
-Model checking and static analysis are overlapping in present.
-Abstract interpretation is an example of technique that belongs to static analysis
-but it also has some attributes of the model checking techniques.
+applying abstract transformers corresponding to the original program semantics in an abstract domain.
+Abstract interpretation evolved from static analysis
+but since it deals with semantics of programs,
+and since later approaches to model checking use abstraction,
+boundaries of the two are rather unclear.
 The last approach is \emph{theorem proving}.
 It proves the program safety in the standard mathematical way\,---\,starting
 from axioms and using inference rules to verify properties of the given system.
@@ -32,9 +33,9 @@ Theorem proving can be partially automated.
 
 This work deals with a specific branch of static analysis called \emph{shape analysis} which focuses on verification of programs manipulating
 complex dynamic data structures (such as different kinds of lists and trees), typically allocated on the heap.
-Checked properties are for example absence of invalid pointer dereference,
-whether no invalid pointer is freed (no invalid free) or
-whether all allocated memory is freed during the program execution (no memory leaks).
+The checked properties are for example absence of invalid pointer dereference,
+that no invalid pointer is freed (no invalid free) or
+that all allocated memory is freed during the program execution (no memory leaks).
 There are different approaches to shape analysis with different advantages.
 The approaches based on \emph{separation logic} \cite{seplog,seplog07} provide great scalability.
 On the~other hand, automata based approaches, particularly \emph{abstract regular tree model checking} (ARTMC) \cite{artmc}, are
