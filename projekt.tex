@@ -94,13 +94,13 @@
   abstract.cs={
 	  V této práci je rozvíjena existující metoda pro shape analýzu programů založená na lesních automatech.
 	  Dále je také vylepšována implementace této metody, nástroj Forester.
-	  Lesní automaty jsou založeny na stromových automatech a Forester obsahuje jejich jednoduchou implementaci.
+	  Lesní automaty jsou založeny na stromových automatech, jejichž jednoduchou implementaci Forester obsahuje.
 	  Prvním přínosem této práce je nahrazení této implementace knihovnou VATA, která obsahuje efektivní algoritmy
 	  pro reprezentaci a manipulaci stromových automatů.
 	  Verze nástroje Forester používající knihovnu VATA se zúčastnila mezinárodní soutěže SV-COMP 2015.
 	  Dále je verifikace založená na lesních automatech v této práci rozšířena o predikátovou abstrakci a
 	  analýzu nalezených protipříkladů.
-	  Výsledek této analýzy je možné výužít následujícími způsoby.
+	  Výsledek této analýzy je možné využít následujícími způsoby.
 	  Prvním je určení toho, zda je nalezené chyba reálná nebo naopak nepravá.
 	  Druhým je pak zjemnění predikátové abstrakce pomocí predikátů odvozených při zpětném běhu.
 	  Obě techniky byly také implementovány v nástroji Forester.
@@ -108,17 +108,17 @@
   }, % abstrakt v ceskem jazyce
   abstract.en={
 	  In this work, we focus on improving the forest automata based shape analysis implemented in the Forester tool.
-	  This approach represents the shapes of heap using forest automata what are tuples of tree automata.
-	  Forester currently has a simple implementation of tree automata.
-	  Our first contribution is replacing this implementation by a general purpose tree automata library VATA,
-	  which contains the highly optimized implementations of the automata operations.
+	  This approach represents shapes of the heap using forest automata.
+	  Forest automata are based on tree automata and Forester currently has a simple implementation of tree automata.
+	  Our first contribution is replacing this implementation by the general purpose tree automata library VATA,
+	  which contains the highly optimized implementations of automata operations.
       The version of Forester using the VATA library participated in the competition SV-COMP 2015.
       We further extended the forest automata based verification method with two new techniques\,---\,a counterexample analysis
 	  and predicate abstraction.
 	  The first one allows us to determine whether a found error is a real of spurious one.
-	  The results of counterexample analysis is also used for creating the new predicates
+	  The results of the counterexample analysis is also used for creating new predicates
 	  which are used for the refinement of predicate abstraction.
-	  We show that both of these techniques contribute to the better results in comparison with the early approach.
+	  We show that both of these techniques contribute to an improvement over the early approach.
   }, % abstrakt v anglickem jazyce
   %Prohlaseni
   declaration={Prohlašuji, že jsem tuto diplomovou práci vypracoval samostatně pod vedením\\ pana Mgr. Lukáše Holíka, Ph.D.},
