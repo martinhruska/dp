@@ -1823,7 +1823,7 @@ Section \ref{sec:impl} covers the implementation.
 	\caption{
 		Figure is taken from \cite{artmc}.
 		Figures illustrates principle of forward and backward run and
-		a detection of an spurious counterexample.}
+		a detection of a spurious counterexample.}
 	\label{fig:bwrun}
 \end{figure}
 
@@ -1989,21 +1989,21 @@ There are several cases of how the product state is managed by.
 	\item Both $r$ and $s$ are referencing states.
 		The function $\mathit{intersect}$ is called recursively on the~referenced
 		  root states and creates a new TA with the index $cp$.
-		  Finally a transition with the product state $(r,s)$ at the left-handed side
-		  that is labeled by the root reference to a TA with index $cp$ is added
+		  Finally a transition with~the product state $(r,s)$ at the left-handed side,
+		  that is labeled by the root reference to a TA with index $cp$, is added
 		  to the transition set of the new TA.
 		  This is on lines $11$-$13$.
 	  \item The one of states $r$ or $s$ is a referencing state and the other one is normal.
 			The function $\mathit{intersect}$ is called with the referenced root state as one parameter
 			and the second parameter is the normal state.
     		The result of this function call is the position $cp$
-			of a~new TA at the resulting FA created by this call.
+			of a~new TA at the~resulting FA created by this call.
     		Then a transition with the product state $(r,s)$ at the left-handed side
 			that is labeled by the root reference to a component at the position $cp$
 			is added to the new TA.
     		These cases in the algorithm correspond to lines $14$-$16$ and $17$-$19$.
 	  \item The both $r$ and $s$ are not root references
-			but normal states.
+			but the normal states.
 			Then it is iterated over all $a \in \Sigma$ with $\#(a) = n$
 			and a new transition $t$ is added to the transition relation~$\Delta$,
 			where $t = (r,s) \xrightarrow{a} ((r_1,s_1) \cdots (r_n, s_n))$ such that
@@ -2020,22 +2020,22 @@ to the resulting FA and returns the index of this TA in the resulting FA, which 
 Algorithm \ref{alg:isect} returns the FA $\F_{\CC}$ overapproximating
 the intersection $\lang(\F_{\A}) \cap \lang(\F_{\B})$.
 The overapproximates comes from non-determinism causing that a referencing state $r_\A$ from $\A$
-may form more then one product state with the different referencing states $r_\B$ from $\B$.
+may form more then one product state with the different states $r_\B$ from $\B$.
 %FA $\F_{\CC}$ defines by its product states the several~bijections between
 %the referencing states of the input FA.
 %The bijections are defined such that
 %$r_\A$ from $\F_{\A}$ is in a bijection with $r_\B$ from $\F_{\B}$ iff
 %they form a product state in $\F_{\CC}$.
-This ambiguity in mapping among the referencing states
+This ambiguity in mapping among the states
 can led to a generation of a graph where one cut-point appears more then once
 what is not possible.
 It can be resolved by splitting FA $F_{\CC}$ to several FA.
 For each possible bijection between the referencing states of $\F_\A$ and the states of $\F_\B$
-it is created a particular FA by splitting $F_{\CC}$.
-Each of FA corresponds to a one maximum bijection between cut-points.
+it is created a particular FA.
+Each of FA corresponds to one maximum bijection states.
 The product states that contract the chosen bijection are
 removed from FA.
-The useless states are then removed from FA.
+The useless states are then removed from each FA.
 We continue for each FA separately.
 
 It is also necessary to care about the case when a referencing state $r$ of one FA
@@ -2051,7 +2051,7 @@ there is created FA $F=(T_1 \cdots T_n, \port)$
 such that $(r,s)$ is not in any other TA $T_{j}$, where $i \neq j$,
 and $(r,s)$ is not in any run of $T_i$ more then once.
 We remove useless states in every FA $F$ and throw away FA with the empty language.
-We get as a result of the intersection of FA the set of FA representing
+We get as a result of the intersection of FA the~set of FA representing
 the resulting language.
 
 \section{Designing Backward Run over Symbolic States}
@@ -2064,8 +2064,6 @@ It was mentioned that abstract
 transformers in Forester implements the instructions of its microcode in an abstract domain.
 The input C program is translated to
 microcode instructions $T=\isfwdp{1}, \isfwdp{2},\ldots, \isfwdp{n+1}$.
-An instruction has a symbolic state as its input and
-returns a~new symbolic state.
 
 The \emph{forward run} is done by going through $T$ in the forward order
 and executing the abstract transformers implementing the instructions in $T$
@@ -2078,13 +2076,13 @@ Assume that an error is detected in the symbolic state $\sfwdp{n}$.
 Then the backward run starts from this symbolic state
 and it is done by going through $T$ in the reverse order
 executing the reverse transformers $\rabstr^{i}$
-over the intersection $\sbwdp{i}$ and $\sfwdp{i}$ obtaining $\sbwdp{i-1}$ where $0 < j \leq n$.
+over the intersection $\sbwdp{i}$ and $\sfwdp{i}$ obtaining $\sbwdp{i-1}$ where $0 < i \leq n$.
 The intersection of $\sbwdp{i}$ and $\sfwdp{i}$ is a symbolic state that is identical
 to $\sbwdp{i}$ but has an FA representing a language
 that is an intersection of languages of FA of both states.
-The backward run generates the \emph{backward trace} $\btrace=\btraceseq{i}$.
+The backward run generates the \emph{backward trace} $\btrace=\btraceseq{n}$.
 Each $\rabstr^{i}$ implements \emph{reverse instruction} $\isbwdp{j}$
-and is reversion to $\abstr^{i}$ which implements the instruction $\isfwdp{j}$.
+and it is reversion of $\abstr^{i}$ which implements the instruction $\isfwdp{j}$.
 
 It is not necessary to compute FA with the language
 $L(\mathcal{F}_i^F) \cap L(\mathcal{F}_i^B)$ to get the next
@@ -2104,7 +2102,6 @@ The~function $\grev$ should have the reverse semantics
 to the forward function $f$ from Section \ref{subsec:microinstr}.
 The function models behavior of the reverse transformer
 implementing a reverse instruction with a given symbolic state as an input.
-The reverse transformers are an implementation of the reverse instruction 
 We further use $\ipred$ to denote an instruction $I_{i-1}$
 that precedes the instruction $I_{i}$.
 The symbolic states, their registers and instructions have the
@@ -2134,6 +2131,10 @@ added to the backward trace $\btrace$.
 \end{comment}
 
 \subsubsection{The Instructions With Special Reverse Semantics}
+
+This section provides a description of instructions such that
+the (forward) abstract transformers implementing them manipulates forest automata or do an operation that
+is not similar to any other instruction.
 
 \begin{itemize}
 	\item {\tt FI\_node\_create($r_s$, $r_d$)}
@@ -2416,7 +2417,7 @@ If this macro is set to value $1$, then the backward run is executed
 by class \emph{SymExec} on an error detection.
 
 The main method of backward run is called \emph{isSpuriousCE}.
-It checks whether a given error is an spurious or not.
+It checks whether a given error is a spurious or not.
 This method is implemented in class \emph{BackwardRun}\,---\,the wrapper
 class of backward run.
 
