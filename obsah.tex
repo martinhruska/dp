@@ -8,7 +8,7 @@ and it could be very time and space consuming or even impossible to check whethe
 may appear in any of the program runs.
 One of the approaches to ensure the software quality is \emph{testing} (and dynamic analysis) which is based
 on running the program in different contexts with different inputs
-and matching a program behavior and the outputs with the expected ones.
+and matching a~program behavior and the outputs with the expected ones.
 This method can satisfy the most of the software quality requirements and often covers the most of the program behavior.
 On the~other side, it is only possible to find the~errors using testing, not to prove their absence~\cite{dijkstra}.
 Finding some of the errors during testing also does not imply the~elimination of all of them.
@@ -37,8 +37,8 @@ The checked properties are for example absence of invalid pointer dereference,
 that no invalid pointer is freed (no invalid free) or
 that all allocated memory is freed during the program execution (no memory leaks).
 There are different approaches to shape analysis with different advantages.
-The approaches based on \emph{separation logic} \cite{seplog,seplog07} provide great scalability.
-On the~other hand, automata based approaches, particularly \emph{abstract regular tree model checking} (ARTMC) \cite{artmc}, are
+The~approaches based on \emph{separation logic} \cite{seplog,seplog07} provide great scalability.
+On the~other hand, automata based approaches, particularly \emph{abstract regular tree model checking} (ARTMC)~\cite{artmc}, are
 superior in their flexibility and generality (with the exception of
 the most recent separation logic based methods \cite{biabduction}).
 This work focuses on a verification procedure based on the concept of forest automata (FA) which
@@ -65,10 +65,10 @@ The VATA library implements very efficiently the most of state-of-the-art algori
 It is better to implement the algorithms efficiently with implementation optimizations
 only at one place (in VATA) than putting the effort to optimizing the implementation
 of the same algorithms in Forester again.
-This also improves the \emph{maintainability} of Forester.
+The library replacement so improves the \emph{maintainability} of Forester.
 Having the special encapsulated module for tree automata with a clear interface
 brings more modularity by decreasing dependencies to the internals of
-the tree automata module.
+the module.
 %The code with implementation optimization is also not easy maintainable in long term.
 %So it is again better to put this effort only once in the VATA library.
 Creating an interface between Forester and VATA will require refactoring of Forester.
@@ -2923,7 +2923,7 @@ The main goals of this thesis were (a) to implement version of Forester tool
 that uses the VATA library for tree automata representation and manipulation
 and (b) to extend the verification procedure based on forest automata with
 backward run for detection of the spurious errors found in the~analysed program.
-The theory of forest automata and the related theory of tree automata has been studied
+The theory of forest automata and the related theory of tree automata have been studied
 and described in the beginning of the thesis.
 The verification procedure based on forest automata
 has been also explored to fulfill the thesis goals.
@@ -2947,7 +2947,7 @@ the new predicates by the backward run.
 Predicate abstraction uses bottom-up tree automata intersection in VATA
 which was also implemented (but not designed) as the part of this work.
 
-Backward run and predicate abstraction were evaluated on SV-COMP benchmark and
+The backward run and predicate abstraction were evaluated on SV-COMP benchmark and
 Forester test suite.
 These new techniques make it possible to successfully analyze
 some programs on which the earlier version of Forester fails.
@@ -2971,5 +2971,5 @@ There is also needed a~modification that would allow Forester to continue also
 when a garbage is created but a different property is verified.
 The other future directions involve also conceptual and
 theoretical extensions of backward run, including intersection of
-FA intersection, and predicate analysis such as a generalization
+forest automata, and predicate analysis such as a generalization
 to the hierarchical forest automata.
