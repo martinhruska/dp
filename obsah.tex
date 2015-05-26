@@ -52,7 +52,7 @@ Forester verifies programs written in C and it can detect safety violations such
 memory leaks, and also reachability of an error line.
 It is capable of verifying non-trivial data structures such as skip-lists of the~second and the~third level.
 However, the current implementation is far from perfect.
-For instance, Forester currently does not fully support the~complete syntax of C and %TODO
+For instance, Forester currently does not fully support the~complete syntax of C and
 it also does not check whether a found error is real or spurious.
 A~general goal of this work is to improve Forester in the areas described further.
 
@@ -552,8 +552,6 @@ proved in \cite{forester:techrep}.
 However, the testing language inclusion with the same algorithm used for the non-hierarchical FA
 is sound but incomplete because the structured labels are compared as uninterpreted symbols and their semantics
 is not considered.
-
-%TODO sets of FA. are they really needed anywhere?
 
 \chapter{Forest Automata based Verification}
 \label{ch:fav}
@@ -1113,7 +1111,7 @@ The core of the forest automata module is class {\tt FA}.
 The implementation corresponds with the definitions given in Chapter \ref{ch:prel}.
 Class FA has a data member representing a vector of tree automata $(t_1 \cdots t_n)$.
 It also has a data member keeping a reference to an automaton representing the global variables
-and a reference to the automata representing the local variables of the actually executed function. %TODO define \abp
+and a reference to the automata representing the local variables of the actually executed function.
 The basic operations over an FA (like adding or removing a TA from an FA) are encapsulated in class FA.
 The other class providing operations over FA is class {\tt FAE} (Forest Automata Extension). 
 
@@ -2043,11 +2041,11 @@ is paired with a normal state $s$ of the second FA and the product state $(r,s)$
 more then once in a run of TA or in more then one TA.
 This would mean that the product state, which is the root,
 is referenced more then once what cannot happen since $s$ is a normal state.
-To guarantee that this will not happen we create the new FA $F=(T_1 \cdots T_n, \port)$
+To guarantee that this will not happen we create the new FA $F=(T_1 \cdots T_n, \iport)$
 in the following way.
 For each $1 \leq i \leq n: T_i$
 and for each $(r,s)$ in $T_i$
-there is created FA $F=(T_1 \cdots T_n, \port)$
+there is created FA $F=(T_1 \cdots T_n, \iport)$
 such that $(r,s)$ is not in any other TA $T_{j}$, where $i \neq j$,
 and $(r,s)$ is not in any run of $T_i$ more then once.
 We remove useless states in every FA $F$ and throw away FA with the empty language.

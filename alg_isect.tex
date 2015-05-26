@@ -1,8 +1,8 @@
 \begin{algorithm}[ht]
   \caption{Intersection for non-hierarchical forest automata}
 \label{alg:isect}
-  \KwIn{ $\F_{\A} = (\A_1, \dots, \A_n, \portseq{k}{\A})$, $\F_{\B} = (\B_1, \dots, \B_m, \portseq{k}{\B})$}
-  \KwOut{$\F_{\CC} = (\CC_1, \dots, \CC_p, R_{\CC})$ such that $\lang(\F_{\A}) \cap \lang(\F_{\B}) \subseteq \lang(\F_{\CC})$}
+  \KwIn{ $\F_{\A} = (\A_1 \cdots \A_n, \iportseq{k}{\A})$, $\F_{\B} = (\B_1 \cdots \B_m, \iportseq{k}{\B})$}
+  \KwOut{$\F_{\CC} = (\CC_1 \cdots \CC_p, \iport^c)$ such that $\lang(\F_{\A}) \cap \lang(\F_{\B}) \subseteq \lang(\F_{\CC})$}
 
   $\mathit{processed} := \emptyset$\;
   $\mathit{cnt} := 0$\;
@@ -10,11 +10,11 @@
   
   \For{$i := 1$ \KwTo $k$}
   {
-	\ForAll{$\emph{root states } r \emph{ of } \A_{\portof{i}{\A}}$}
+	\ForAll{$\emph{root states } r \emph{ of } \A_{\iportof{i}{\A}}$}
 	{
-		\ForAll{$\emph{root states } s \emph{ of } \B_{\portof{i}{\B}}$}
+		\ForAll{$\emph{root states } s \emph{ of } \B_{\iportof{i}{\B}}$}
 		{
-			$\mathit{intersect}((r,A_{\portof{i}{\A}}),(s,B_{\portof{i}{\B}}))$\;
+			$\mathit{intersect}((r,A_{\iportof{i}{\A}}),(s,B_{\iportof{i}{\B}}))$\;
 		}
 	}
   }
