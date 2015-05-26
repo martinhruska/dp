@@ -14,7 +14,7 @@
 	{
 		\ForAll{$\emph{root states } s \emph{ of } \B_{\portof{i}{\B}}$}
 		{
-			$\mathit{intersect}((r,\portof{i}{\A}),(s,\portof{i}{\B}))$\;
+			$\mathit{intersect}((r,A_{\portof{i}{\A}}),(s,B_{\portof{i}{\B}}))$\;
 		}
 	}
   }
@@ -28,7 +28,7 @@
   \caption{intersect(lhs, rhs)}
   \KwIn{$\mathit{lhs} = (\mathit{lhs.aut}, \mathit{lhs.state})$ and $\mathit{rhs} = (\mathit{rhs.aut}, \mathit{rhs.state})$ are pairs of an automaton and a state from the automaton}
   \SetKwInput{KwData}{Globals}
-  \KwData{$\mathit{F}$: a tuple of tree automata; $\mathit{processed}$: set of processed root points; $\mathit{cnt}$: counter of components of $\mathit{F}$}
+  \KwData{$\mathit{F}$: an FA; $\mathit{processed}$: set of processed root points; $\mathit{cnt}$: counter of components of $\mathit{F}$}
   \KwOut{Index of the resulting component in $\mathit{F}$}
 
   \If{$(lhs, rhs) \in \mathit{processed}$}

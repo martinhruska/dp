@@ -1819,7 +1819,7 @@ Section \ref{sec:impl} covers the implementation.
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[scale=0.35]{fig/artmc.png}
+	\includegraphics[scale=0.33]{fig/artmc.png}
 	\caption{
 		Figure is taken from \cite{artmc}.
 		Figures illustrates principle of forward and backward run and
@@ -1950,11 +1950,13 @@ data structures $\mathit{processed}$ (where the processed roots of the resulting
 $\mathit{cnt}$ (what is counter of TA of the resulting FA)
 and the data structure for the resulting automaton $F$ on lines $1$-$3$.
 Then it iterates over all port indices of the input FA
-and it calls the function $\mathit{intersect}$ over the TA at the position in
-the~input FA given by the port index.
+and over all roots of TA at the positions in
+the~input FA given by the port indices
+and it calls the function $\mathit{intersect}$ over the root states
+(one from each TA) and their TA.
 
 The function $\mathit{intersect}$ takes as the input parameter these two TA
-and one state from each TA.
+and one state from each of TA.
 We use $\mathit{lhs}$ to denote one of the inputs,
 $\mathit{lhs.aut}$ to denote the TA itself, and $\lstate$ to denote its state.
 The~same notation is used for the second input parameter $\mathit{rhs}$ of the function.
