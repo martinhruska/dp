@@ -2481,9 +2481,8 @@ The predicate abstraction is implemented by a method \emph{predicateAbstraction}
 a member of class \emph{Abstraction}.
 This method takes a set of tree automata representing the set of predicates
 as its parameter.
-The abstraction is performed over a forest automaton which is a member of
+The abstraction is performed over a forest automaton which is a data member of
 class~\emph{Abstraction}.
-
 The abstraction is chosen by setting value of macro
 {\tt FA\_USE\_PREDICATE\_ABSTRACTION} to~$1$.
 When the predicate abstraction is chosen, the method \emph{predicateAbstraction}
@@ -2963,7 +2962,7 @@ and the work was awarded with the second prize in the category "Scientific contr
 
 There is still many possibilities for the future work.
 Forester is not able to analyse many programs
-because it does not support used C language constructions
+because it does not support all C language constructions
 or the analysis of a program ends in an internal error.
 Resolving these issues is one of the future goals.
 Predicate abstraction is not also yet fine tuned and
