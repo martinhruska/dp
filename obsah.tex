@@ -1807,7 +1807,7 @@ We restrict ourselves only to basic forest automata, not the hierarchical ones
 to keep this work within the bounds of master thesis.
 
 The structure of this chapter is the following.
-The first Section \ref{sec:br} describes the backward run and the predicate abstraction in general.
+The first Section \ref{sec:br} describes the backward run and predicate abstraction in general.
 Section \ref{sec:isect} describes the algorithm for the intersection of non-hierarchical forest automata
 which is important part of the backward run.
 Section \ref{sec:brdesign} contains the design of backward run
@@ -2485,7 +2485,7 @@ The abstraction is performed over a forest automaton which is a data member of
 class~\emph{Abstraction}.
 The abstraction is chosen by setting value of macro
 {\tt FA\_USE\_PREDICATE\_ABSTRACTION} to~$1$.
-When the predicate abstraction is chosen, the method \emph{predicateAbstraction}
+When predicate abstraction is chosen, the method \emph{predicateAbstraction}
 is called on {\tt FA\_ABS} instruction execution.
 
 The new predicates used by predicate abstraction are created during
@@ -2508,7 +2508,7 @@ Therefore we use height abstraction with height $1$ (what is
 also the original configuration of abstraction used in Forester)
 for the first run of symbolic execution.
 When a spurious error is detected in this run then the~new
-predicates are created and the next runs of symbolic execution use the predicate abstraction.
+predicates are created and the next runs of symbolic execution use predicate abstraction.
 Moreover, the behavior of the new implementation is different only
 after the detection of a spurious error.
 
@@ -2523,7 +2523,7 @@ and finally the version of Forester using predicate abstraction is compared to t
 original one with height abstraction.
 We also discuss the programs that were newly verified by Forester
 because it was not possible to analyze them without the backward run and
-the predicate abstraction.
+predicate abstraction.
 
 All of the experiments have been evaluated on the computer with CPU Intel Core $2$ Duo ($2.13$ GHz)
 and $4$ GiB memory, using Debian Linux, testing version.
@@ -2788,17 +2788,17 @@ This section provides an evaluation of the Forester with predicate abstraction.
 The predicate abstraction is used in the way described in Section \ref{sec:impl}.
 The first run is performed using height abstraction with height $1$ and when a spurious
 counterexample is found, the analysis creates the~predicates and continues with
-the predicate abstraction.
+predicate abstraction.
 This method ensures that Forester successfully passes all the cases that it passed
 before because the first run remains the same.
 First, the number of the~new cases that Forester can analyse due to
-the predicate abstraction is evaluated.
+predicate abstraction is evaluated.
 Then the newly~analysed cases are studied in a more depth and
 the performance of Forester is compared to the~Predator tool, the winner of HeapManipulation category
 and the best sound tool in MemorySafety category of SV-COMP'15.
 
 Table \ref{tab:pares} summarizes the results of the evaluation
-of the predicate abstraction on SV-COMP'15 benchmark and Forester test suite.
+of predicate abstraction on SV-COMP'15 benchmark and Forester test suite.
 We distinguish between the programs with a new detected error
 that Forester was not able to find before and the programs proved to be correct.
 The most of the new errors are detected in the heap manipulation category of SV-COMP'15
