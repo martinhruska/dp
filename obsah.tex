@@ -39,8 +39,8 @@ that all allocated memory is freed during the program execution (no memory leaks
 There are different approaches to shape analysis with different advantages.
 The approaches based on \emph{separation logic} \cite{seplog,seplog07} provide great scalability.
 On the~other hand, automata based approaches, particularly \emph{abstract regular tree model checking} (ARTMC) \cite{artmc}, are
-superior in their flexibility and generality (but some state-of-the-art separation logic methods
-have comparable generality \cite{biabduction}).
+superior in their flexibility and generality (with the exception of
+the most recent separation logic based methods \cite{biabduction}).
 This work focuses on a verification procedure based on the concept of forest automata (FA) which
 combines the benefits of the both mentioned approaches \cite{forester11}.
 
@@ -57,51 +57,50 @@ it also does not check whether a found error is real or spurious.
 A~general goal of this work is to improve Forester in the areas described further.
 
 One of the problems of Forester is low modularity and maintainability of the code.
-The first goal of this thesis is to improve it by changing the~underlying implementation
-of finite tree automata in Forester to \vata\,---\,a library for manipulation with TA \cite{libvata}.
+The first goal of this thesis is to improve it by replacing the~underlying implementation
+of finite tree automata in Forester by \vata\,---\,a library for manipulation with TA \cite{libvata}.
 %This should bring better maintainability and modularity than having
 %a special TA library implementation within Forester as it is now.
 The VATA library implements very efficiently the most of state-of-the-art algorithms for TA.
 It is better to implement the algorithms efficiently with implementation optimizations
-only at the one place (in VATA) than putting effort to optimizing the implementation
+only at one place (in VATA) than putting the effort to optimizing the implementation
 of the same algorithms in Forester again.
-This improves the \emph{maintainability} of Forester.
+This also improves the \emph{maintainability} of Forester.
 Having the special encapsulated module for tree automata with a clear interface
-brings also the \emph{modularity} by decreasing the dependencies on the internals of
+brings more modularity by decreasing dependencies to the internals of
 the tree automata module.
 %The code with implementation optimization is also not easy maintainable in long term.
 %So it is again better to put this effort only once in the VATA library.
-But it is needed to refactor some parts of Forester code before the changes.
-Then it would be possible to create an interface between Forester and VATA.
+Creating an interface between Forester and VATA will require refactoring of Forester.
 
-Another weakness of Forester is lack of the analysis of detected errors.
+Another weakness of Forester is the missing of the analysis of detected errors.
 Since Forester uses abstraction to deal with unboudness of dynamic data structures
-a found error can be spurious what is caused by overapproximating
+a found error can be spurious which is caused by overapproximating
 the set of reachable heap configurations by abstraction.
-When this happens then the analysis of the detected error can determine
+When this happens, the analysis of the detected error could determine
 whether the error is a real or not.
-The results of the counterexample analysis can be also used for refinement of abstraction
-when the counterexample is spurious.
-Then the analysis can be restarted with the refined abstraction
+The results of the counterexample analysis could be also used for refinement of the abstraction
+in the case the counterexample is spurious.
+After the refinement, the analysis could be restarted with the refined abstraction
 to avoid the same run leading to the spurious counterexample.
-This gradual refinement of abstraction is based on \emph{counterexample-guided abstraction refinement} (CEGAR) \cite{cegar}.
+This gradual refinement of abstraction is called \emph{counterexample-guided abstraction refinement} (CEGAR) \cite{cegar}.
 %The verification procedure cannot verify correct programs with detected spurious error without this refinement.
 %It can also detect a spurious error instead of the real one because the verification procedure ends after the
 %first error detection without the analysis of the found error.
 The second goal of this thesis is to design and implement the analysis of the counterexamples
-and a refinement of abstraction (when a spurious error is found) for forest automata based verification.
+and a refinement of the abstraction (when a spurious error is found) for forest automata based verification.
 The method for analysing counterexamples is in this case \emph{backward run}
 and its results will be further used for refinement of \emph{predicate abstraction}.
-Forester does not currently use the mentioned predicate abstraction but \emph{height abstraction}
-because predicate abstraction needs backward run for creating the new predicates for refinement.
+Forester does not currently use predicate abstraction but \emph{height abstraction}
+because predicate abstraction needs backward run for creating the~new predicates for refinement.
 Height abstraction is less precise and less flexible compared to predicate abstraction.
-Predicate abstraction enables the analysis of even more complex data structures like red-black trees.
+Using predicate abstraction would allow to analyse even more complex data structures such as red-black lists.
 
-The outline of this master thesis is as follows.
+The outline of this master thesis is following.
 In Chapter \ref{ch:prel}, the preliminaries are given.
 The verification procedure based on FA is covered in Chapter \ref{ch:fav}.
 Chapter \ref{ch:tools} provides description of \vata\ and Forester
-and Chapter \ref{ch:fova} describes an implementation of the version of Forester tool using \vata.
+and Chapter \ref{ch:fova} describes the implementation of the version of Forester tool using \vata.
 The design and the implementation of backward run and predicate abstraction
 is described in Chapter \ref{ch:backward}.
 Finally, Chapter \ref{ch:eval} contains an overview of experimental evaluation and 
