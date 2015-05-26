@@ -2348,7 +2348,7 @@ forest automaton in the current symbolic state separately.
 Formally, let $\fpabs: \fclass \rightarrow \fclass$ be an abstract function where
 $\fclass$ is a domain of forest automata and $\predset = \{\pred_1, \ldots, \pred_n\}$ is a set of predicates.
 The function $\pabs$ is defined as follows.
-Let $F_1=(A_1 \cdots A_n, \pi_A)$ and $F_2=(B_1 \cdots B_n, \pi_B)$ be two forest automata
+Let $F_1=(A_1 \cdots A_n, \portoff{A})$ and $F_2=(B_1 \cdots B_n, \portoff{B})$ be two forest automata
 and let $\pabs$ be an abstraction function merging states of a tree automaton according
 to the equivalence relation $\peqrel$ defined in Section \ref{sec:br}.
 Then $\fpabs(F_1) = F_2 \defarrow \forall i \in \{1,\ldots,n\}: B_i = \pabs(A_i)$.
@@ -2357,7 +2357,7 @@ The states are merged only in one tree automaton and not across the different
 tree automata of forest automata using the proposed method.
 However, merging the states of different tree automata can be more efficient (since
 a forest automaton with smaller number of states is created).
-This work purposes the first version of predicate abstraction and 
+This work porposes the first version of predicate abstraction and 
 an optimization of the new method could be done as the future work.
 
 The predicates from $\predset$ are languages represented by tree automata.
@@ -2373,9 +2373,9 @@ We create the product automata $A \times \predauti{1}, \ldots, A~\times \predaut
 in the bottom-up way manner \cite{tata2007}.
 
 Each of product automata $A \times \predauti{i}$, where $1 \leq i \leq n$, has the state set
-containing the product states of the form $(p,q) \in Q_A \times Q_{\predauti{i}}$.
+consisting of the product states of the form $(p,q) \in Q_A \times Q_{\predauti{i}}$.
 To easier the construction of $\peqrel$, we introduce the auxiliary function $m$ that labels
-each state of $A$ by the states of predicate tree automata.
+each state of $A$ by the states of the predicate tree automata.
 Formally, the function $m: Q_A \rightarrow 2^{Q_{\predauti{1}} \cup \ldots
 \cup Q_{\predauti{m}}}$ is defined as follows: $m(p) = \{q \in Q_{\predauti{1}} \cup \ldots \cup Q_{\predauti{m}}\,|\,
 \exists A~\times \predauti{i}: (p,q) \in Q_{A} \times Q_{\predauti{i}}\}$.
@@ -2391,10 +2391,10 @@ Consider a point of an analysed program where the spurious error
 is detected at the $(i-1)$-th step of the backward run
 because $\lang(F^F_{i-1}) \cap \lang(F^B_{i-1}) = \emptyset$ where FA $F^F_{i-1}$ is from the forward run
 and FA $F^B_{i-1}$ is from the backward run.
-We create a normalized FA $F_{i}^{\mathit{FN}} = (A_1 \cdots A_n, \pi_A)$ and a normalized $F_{i}^{\mathit{BN}} = (B_1 \cdots B_m, \pi_B)$
+We create a normalized FA~$F_{i}^{\mathit{FN}} = (A_1 \cdots A_n, \portoff{A})$ and a normalized $F_{i}^{\mathit{BN}} = (B_1 \cdots B_m, \portoff{B})$
 by normalization of $F^{\mathit{F}}_{i}$ and $F^\mathit{B}_{i}$ from the $i$-th step.
 It can be supposed that $n = m$ because normalization transforms
-the both FA in an uniform form.
+the both FA to an uniform form.
 Then the set of the new predicates $\predset_{new} = \{B_i \in F^N_B \,|\, \lang(A_i) \cap \lang(B_i) =
 \emptyset\}$ is obtained.
 The symbolic execution is then restarted again with the $\predset = \predset \cup \predset_{new}$.
@@ -2417,14 +2417,14 @@ If this macro is set to value $1$, then the backward run is executed
 by class \emph{SymExec} on an error detection.
 
 The main method of backward run is called \emph{isSpuriousCE}.
-It checks whether a given error is a spurious or not.
+It checks whether a given error is a~spurious or not.
 This method is implemented in class \emph{BackwardRun}\,---\,the wrapper
 class of backward run.
 
 As it was described in Section \ref{sec:brdesign},
 the backward run is performed by going through the given
-forward trace in the backward order and executing the reverse
-instructions.
+forward trace in the backward order and executing reverse abstract transformers implementing
+the reverse instructions.
 The method \emph{reverseAndIsect} has been added to class \emph{AbstractInstruction}
 for modelling a reversion of instruction.
 The class \emph{AbstractInstruction} is the parent class of the inheritance hierarchy of
@@ -2457,7 +2457,8 @@ instructions {\tt FI\_abs, FI\_fix} which both compute the fixpoint.
 The intersection of forest automata is implemented by class \emph{SymState}
 representing a symbolic state.
 Moreover, it contains information about the variables in the current
-symbolic states, which is needed by the algorithm for forest automata intersection.
+symbolic states, which is needed by the implementation of the algorithm
+for forest automata intersection.
 
 The main method for symbolic state intersection is called \emph{Intersect}.
 It computes the intersection between the symbolic states.
@@ -2476,8 +2477,8 @@ The method is again member of class \emph{SymState}.
 \subsection{Predicate Abstraction}
 \label{subsec:paimpl}
 
-The predicate abstraction is implemented by a method \emph{predicateAbstraction}
-a data member of class \emph{Abstraction}.
+The predicate abstraction is implemented by a method \emph{predicateAbstraction},
+a member of class \emph{Abstraction}.
 This method takes a set of tree automata representing the set of predicates
 as its parameter.
 The abstraction is performed over a forest automaton which is a member of
@@ -2507,7 +2508,7 @@ in the first run of the analysis.
 Therefore we use height abstraction with height $1$ (what is
 also the original configuration of abstraction used in Forester)
 for the first run of symbolic execution.
-When a spurious error is detected in this run then~the new
+When a spurious error is detected in this run then the~new
 predicates are created and the next runs of symbolic execution use the predicate abstraction.
 Moreover, the behavior of the new implementation is different only
 after the detection of a spurious error.
@@ -2527,7 +2528,7 @@ the predicate abstraction.
 
 All of the experiments have been evaluated on the computer with CPU Intel Core $2$ Duo ($2.13$ GHz)
 and $4$ GiB memory, using Debian Linux, testing version.
-We used g++, version, 4.9 for compiling Forester and gcc, version 4.8,
+We used g++, version 4.9, for compiling Forester and gcc, version 4.8,
 for compiling the analysed programs.
 The measured time is the CPU~time.
 The presented times are the averages of the five measurings.
@@ -2565,7 +2566,7 @@ work started.
 \end{table}
 
 The first performance tests were performed over the regression test suite of Forester.
-The results of these tests are summarized in Table \ref{tab:vataregre}.
+The~results of these tests are summarized in Table \ref{tab:vataregre}.
 There are two cases that were measured.
 The first one is the case when Forester is compiled with the third level of optimization of the compiler.
 The~original implementation outperformed us by the factor of two.
@@ -2591,7 +2592,7 @@ Forester using its own tree automata module.
 \begin{table}[bt]
 	\vskip6pt
 	\caption{Comparison of Forester with and without VATA on the hard cases.
-		Compiled with g++ default optimization.
+		Compiled with g++ default optimizations.
 	}
 	\centering
 	\begin{tabular}{|l | r | r |}
@@ -2614,14 +2615,14 @@ Forester using its own tree automata module.
 \end{table}
 
 We decided to further explore this problem by comparing
-the programs on which the analysis done by Forester is time demanding.
+the particular programs.
 These programs contain manipulation of singly-linked lists of
 circular singly-linked lists, doubly-linked lists of
 circular doubly-linked lists, the skip-lists of the 2nd and
 the 3rd level and also a snippet from the Linux drivers.
 Not all of these programs are included in the Forester regression test set.
 
-The results comparing Forester with and without VATA library compiled
+The results comparing Forester with and without the VATA library compiled
 without the compiler optimization are in Table \ref{tab:vatadef}.
 The version of Forester with VATA is faster in this case.
 The only exception is a verification of the skip-list of the~third
@@ -2635,7 +2636,7 @@ is the probably the most difficult case from the whole Forester testing benchmar
 
 The comparison of the two versions of Forester compiled with the compiler optimization
 on the same programs are in Table \ref{tab:vataopt}.
-Here, the original implementation of Forester is again faster.
+Here, the original implementation of Forester is faster.
 The~biggest difference is in the time needed for the verification of the skip-list of the third level.
 It has probably the same cause as in the version without optimization.
 Putting the results together, we assume that the main performance
@@ -2706,20 +2707,18 @@ the deeper investigation of the causes of the slowdown.
 \end{table}
 
 The implementation of backward run was evaluated on SV-COMP benchmark
-and also on the test suite distributed with Forester.
+and also on the~test suite distributed with Forester.
 The evaluation was done by analysing the programs that was correct
 but Forester found a (spurious) error in them.
 We also checked whether the backward run correctly
 confirms the real errors are real.
-Therefore it cannot report them correctly in SV-COMP'15 competition
-evaluation.
 
 Note there is a difference in reporting error between
 Forester test suite and SV-COMP benchmark.
 All found errors in the Forester test suite, including a memory garbage
 detection, are reported and the analysis is stopped after the detection.
 In the SV-COMP benchmark, only the errors breaking a given specification
-cause to stop of the analysis.
+cause stop of the analysis.
 For instance, the analysis should not stop when
 a~garbage on the heap is detected but the absence of the other errors such
 as an invalid pointer dereference is verified.
@@ -2738,7 +2737,7 @@ e.g., programs from LDV (Linux Drivers Verification) project
 containing implementation of alternating singly-linked list
 or manipulation with mutex locks, or the programs
 implementing bubble sort over a list implementation from the Linux kernel.
-Note that Forester does not successfully process all the programs in the test set
+Forester does not successfully process all the programs in the test set
 because it does not currently support all C language constructions.
 It causes that the number of the found errors, spurious or real, is not as high as it would be
 if Forester could analyze all the programs in the benchmark.
@@ -2750,7 +2749,7 @@ these errors were supposed to be found by Forester also before
 the backward run implementation as a part of its testing.
 
 The important contribution of backward run is a guarantee
-of correctness of answer when an error in a program is reported to the user.
+of correctness of answer when an~error in a program is reported to the user.
 Unfortunately, so far we can apply the backward run
 only to the programs that use the supported C language constructions.
 %E.g., Consider that a spurious error is detected because Forester lacks a support for
@@ -2766,8 +2765,8 @@ only to the programs that use the supported C language constructions.
 	\vskip6pt
 	\caption{Evaluation of predicate abstraction
 	in the SV-COMP benchmark and the~Forester test suite.
-	Table shows the number of the programs which correctness Forester was not
-	verified before and the number of the newly found errors
+	Table shows the number of the verified programs which correctness Forester was not
+	verified before this work and the number of the newly found errors
 	that Forester was not able to detect or confirm before.
 	}
 	\centering
@@ -2795,20 +2794,21 @@ This method ensures that Forester successfully passes all the cases that it pass
 before because the first run remains the same.
 First, the number of the~new cases that Forester can analyse due to
 the predicate abstraction is evaluated.
-Then the newly analysed cases are studied in a more depth and
-the performance of Forester is compared to the Predator tool, the winner of HeapManipulation category
+Then the newly~analysed cases are studied in a more depth and
+the performance of Forester is compared to the~Predator tool, the winner of HeapManipulation category
 and the best sound tool in MemorySafety category of SV-COMP'15.
 
 Table \ref{tab:pares} summarizes the results of the evaluation
 of the predicate abstraction on SV-COMP'15 benchmark and Forester test suite.
 We distinguish between the programs with a new detected error
 that Forester was not able to find before and the programs proved to be correct.
-The most of the new errors are detected in the HeapManipulation category of SV-COMP'15
-benchmark, where $9$ new errors have been detected.
+The most of the new errors are detected in the heap manipulation category of SV-COMP'15
+benchmark, where $9$~errors have been detected that Forester
+has not been able to detect before.
 We also proved $2$ programs from the LDV project to be correct.
-In the MemorySafety category, there is less found errors and verified programs
+In the memory safety category, there is less found errors and verified programs
 but it is partially caused by the fact that this category contains less test cases
-then the HeapMnipulation category.
+then the heap manipulation category.
 Finally, we prove correctness of $4$ programs from Forester test set
 which could not be proved without the use of predicate abstraction.
 These programs manipulate the data structures like doubly-linked list
@@ -2817,7 +2817,7 @@ They do not need creating boxes during the verification procedure although
 some other use of these data structures can lead to an application of boxes.
 
 The main issue complicating the successful analysis of
-more programs is the immaturity of the Forester tool.
+more programs is the immaturity of Forester.
 It does not support all C language constructions
 and it fails due to an internal error because some unexpected
 state occurs during the analysis.
@@ -2855,7 +2855,7 @@ that each left successor node have allocated it
 right successor node.
 Forester is able to verify the correctness of such a structure
 but it is the most time demanding task of this set.
-Finally, the last tested program is the one traversing
+Finally, the~last tested program is the one traversing
 a singly-linked list of even length and then
 freeing the list by two nodes at time (which is safe because
 the number of nodes is even).
@@ -2878,7 +2878,7 @@ is not fully complete in Forester.
 It needs to be implemented more efficiently to get the better
 performance on the hard cases.
 The new predicates are not also created in the most
-precise way so some state may not be abstracted
+precise way so some states may not be abstracted
 although it would be theoretically possible.
 Predicate abstraction also often causes an internal
 Forester error when a garbage is created but the
