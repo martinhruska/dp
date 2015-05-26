@@ -109,13 +109,13 @@
   abstract.en={
 	  In this work, we focus on improving the forest automata based shape analysis implemented in the Forester tool.
 	  This approach represents shapes of the heap using forest automata.
-	  Forest automata are based on tree automata and Forester currently has a simple implementation of tree automata.
+	  Forest automata are based on tree automata and Forester currently has only a simple implementation of tree automata.
 	  Our first contribution is replacing this implementation by the general purpose tree automata library VATA,
 	  which contains the highly optimized implementations of automata operations.
       The version of Forester using the VATA library participated in the competition SV-COMP 2015.
       We further extended the forest automata based verification method with two new techniques\,---\,a counterexample analysis
 	  and predicate abstraction.
-	  The first one allows us to determine whether a found error is a real of spurious one.
+	  The first one allows us to determine whether a found error is a real or spurious one.
 	  The results of the counterexample analysis is also used for creating new predicates
 	  which are used for the refinement of predicate abstraction.
 	  We show that both of these techniques contribute to an improvement over the early approach.
