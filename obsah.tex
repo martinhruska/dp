@@ -462,7 +462,6 @@ We use $SE(g)$ to denote all sub-edges of the graph $g$.
 A~node $v$ of a graph is \emph{isolated} if it is not part of any sub-edge.
 Formally, a node $v$ is isolated
 iff $\nexists\, e\langle i\rangle = v~\mapsto (a_i,v_k \cdots v_l) \wedge \nexists\, e\langle i\rangle = v' \mapsto (a_i,v_k \cdots v_l): v~\in \{v_k,\ldots, v_l\}$.
-%If you read this really carefully, you got a beer on me. % EGG
 A~graph $g$ is \emph{unambiguously determined} by $SE(g)$ if $g$ has no isolated nodes.
 
 \subsection{Tree Automata over Structured Labels}
@@ -1464,7 +1463,6 @@ that do not change forest automata.
 		The size $S$ is determined by an integer value in the source register $r_s$.
 		The created instance will be further used for creation of a new TA
 		and it is yet stored to the destination register.
-		%The second present for the attentive reader. % EGG
 		
 		$f(\stdsym) = \symstate{F}{
 		\regssub{
@@ -1765,7 +1763,6 @@ in the original TA library).
 \emph{VATAAdapter} also sometimes performs mentioned conversion of the data types.
 There are also the methods implemented by adapter not presented
 in VATA, like the method \emph{unfoldAtRoot}, performing unfolding.
-%(I~bet you will not read an implementation part, so here is one mug if you do.) % EGG
 These methods are very Forester specific
 and so it is not sensible to add them to a general purpose library such as VATA
 and it is better to implement them in an interface like class \emph{VATAAdapter}.
@@ -2104,7 +2101,6 @@ We further use $\ipred$ to denote an instruction $I_{i-1}$
 that precedes the instruction $I_{i}$.
 The symbolic states, their registers and instructions have the
 same role as they have in Section \ref{subsec:microinstr}.
-%Another drink on me for reading this (but only when you read carefully). % EGG
 
 \begin{comment}
 This section provides a description of the reverse operations for
@@ -2693,7 +2689,7 @@ the deeper investigation of the causes of the slowdown.
 		Category & Real & Spurious \\
 		\hline
 		\hline
-		HeapMnipulation & $8$ & $3$ \\
+		HeapManipulation & $8$ & $3$ \\
 		\hline
 		MemorySafety & $6$ & $0$ \\
 		\hline
@@ -2772,7 +2768,7 @@ only to the programs that use the supported C language constructions.
 		Category & New errors found & Newly proved programs  \\
 		\hline
 		\hline
-		HeapMnipulation & $9$ & $2$ \\
+		HeapManipulation & $9$ & $2$ \\
 		\hline
 		MemorySafety & $2$ & $1$ \\
 		\hline
